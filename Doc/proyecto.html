@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Arquitectura: Proyecto Semáforos en Moodle</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --bg-main: #f3f4f6;
+            --bg-card: #ffffff;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --danger: #dc2626;
+            --border: #e5e7eb;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .summary {
+            background: var(--bg-card);
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-left: 5px solid var(--primary);
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        .tab-btn {
+            padding: 12px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+        .tab-btn:hover {
+            background: var(--primary-light);
+            color: var(--primary);
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .tab-content {
+            display: none;
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .card {
+            background: var(--bg-main);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        h2, h3 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+        h3 {
+            border-bottom: 2px solid var(--primary-light);
+            padding-bottom: 8px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        .b-tech { background: var(--primary); }
+        .b-time { background: var(--warning); }
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin: 20px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px 10px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+        th {
+            background: var(--primary-light);
+            font-weight: 700;
+        }
+        .pro-con-list { list-style-type: none; padding-left: 0; }
+        .pro-con-list li { margin-bottom: 8px; }
+        .pro-con-list li::before { margin-right: 8px; }
+        .pro { color: var(--success); }
+        .pro::before { content: "✅"; }
+        .con { color: var(--danger); }
+        .con::before { content: "⚠️"; }
+
+        .sem-verde {
+            background-color: #dcfce7;
+            color: #166534;
+            font-weight: 600;
+            text-align: center;
+            border-radius: 6px;
+        }
+
+        .sem-amarillo {
+            background-color: #fef9c3;
+            color: #854d0e;
+            font-weight: 600;
+            text-align: center;
+            border-radius: 6px;
+        }
+
+        .sem-rojo {
+            background-color: #fee2e2;
+            color: #991b1b;
+            font-weight: 600;
+            text-align: center;
+            border-radius: 6px;
+        }
+
+        .sem-verde::before { content: "🟢 "; }
+        .sem-amarillo::before { content: "🟡 "; }
+        .sem-rojo::before { content: "🔴 "; }
+    </style>
+
+    <!-- Incluir Mermaid.js para diagramas -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: false });
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🚦 Diseño de Arquitectura: Semáforos en Moodle</h1>
+        <p>Reporte de evaluación técnica para Aula Puente. Escala: 100-500 alumnos.</p>
+    </header>
+
+    <div class="summary">
+        <strong>Parámetros Base del Proyecto:</strong>
+        <ul>
+            <li><strong>Cálculo:</strong> Notas + Asistencia + Actividades (Ciclo actual, sin historial).</li>
+            <li><strong>Roles:</strong> Administrador (gestiona parámetros, aprueba avisos), Profesores (reciben alertas y contactan alumnos), Alumnos (ven su estado propio).</li>
+            <li><strong>Notificaciones:</strong> Generadas con Claude API, flujo semi-automático, entregadas vía Moodle Internal Messages.</li>
+            <li><strong>Equipo:</strong> Mixto (técnicos y no técnicos).</li>
+        </ul>
+    </div>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab('op1')">Opción 1: Google Stack</button>
+        <button class="tab-btn" onclick="openTab('op2')">Opción 2: Supabase + Next.js</button>
+        <button class="tab-btn" onclick="openTab('op3')">Opción 3: n8n + Airtable</button>
+        <button class="tab-btn" onclick="openTab('op4')">Comparativa Final</button>
+    </div>
+
+    <!-- OPCIÓN 1 -->
+    <div id="op1" class="tab-content active">
+        <h2>Opción 1: Google Sheets + Looker Studio + GitHub Pages</h2>
+        <p>La alternativa de menor barrera de entrada técnica. Utiliza el ecosistema gratuito de Google para la persistencia y visualización, integrando la API de Claude mediante una interfaz web estática.</p>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>Capas de Procesamiento</h3>
+                <ul>
+                    <li><strong>Ingesta (Capa de Datos):</strong> Google Forms (2° año) y subida manual de CSV a Google Sheets (1° año).</li>
+                    <li><strong>Lógica y Cálculo:</strong> Fórmulas dentro de Google Sheets combinando notas, asistencia y entregas.</li>
+                    <li><strong>Presentación (Moodle iFrames):</strong> Looker Studio para el Dashboard de Admin. GitHub Pages (HTML/JS) para el perfil del alumno y la interfaz de aprobación de notificaciones.</li>
+                    <li><strong>Notificaciones:</strong> Interfaz en GitHub Pages llama a la API de Claude para redactar, el Admin aprueba, y mediante JavaScript se hace un POST a la API REST de Moodle (función <code>core_message_send_instant_messages</code>).</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Recursos y Tiempos</h3>
+                <span class="badge b-time">Tiempo estimado: 2 a 3 semanas</span>
+                <p><strong>Equipo necesario:</strong> Perfil semi-técnico (manejo avanzado de Excel/Sheets, JS básico, conocimiento de Moodle API).</p>
+                <p><strong>Tecnologías:</strong></p>
+                <span class="badge b-tech">Google Sheets</span>
+                <span class="badge b-tech">Looker Studio</span>
+                <span class="badge b-tech">Google Forms</span>
+                <span class="badge b-tech">GitHub Pages (HTML/JS)</span>
+                <span class="badge b-tech">Claude API</span>
+            </div>
+        </div>
+
+        <div class="mermaid">
+graph TD
+    A[CSV Profesores] -->|Importación| C[(Google Sheets)]
+    B[Formularios Moodle/Google] -->|Respuestas| C
+    C -->|Fórmulas Internas| C1(Cálculo Semáforo)
+    C1 --> D[Looker Studio Dashboard]
+    D -->|iFrame| E((Moodle: Vista Admin))
+    C1 -->|Fetch API| F[GitHub Pages Web App]
+    F -->|iFrame parámetro ?id=| G((Moodle: Vista Alumno))
+    F -->|Detecta Críticos| H[Admin Revisa en Web App]
+    H -->|Aprobación| I{Claude API}
+    I -->|Mensaje Generado| J[Moodle Web Services API]
+    J -->|Notificación Interna| K((Profesores / Alumnos))
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>Ventajas</h3>
+                <ul class="pro-con-list">
+                    <li class="pro">Infraestructura 100% gratuita y sin mantenimiento de servidores.</li>
+                    <li class="pro">Looker Studio permite crear dashboards muy visuales sin programar.</li>
+                    <li class="pro">Ideal para el volumen de 500 alumnos (Sheets lo maneja perfecto).</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Desventajas</h3>
+                <ul class="pro-con-list">
+                    <li class="con">La lógica en hojas de cálculo puede volverse frágil si se modifican columnas accidentalmente.</li>
+                    <li class="con">La seguridad se basa en ocultar URLs (seguridad por oscuridad en GitHub Pages si no se hace un backend).</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- OPCIÓN 2 -->
+    <div id="op2" class="tab-content">
+        <h2>Opción 2: Supabase + Next.js (Vercel) + Claude API</h2>
+        <p>La opción de grado profesional. Crea una aplicación web completa que actúa como "cerebro" detrás de Moodle, con base de datos real y alta escalabilidad.</p>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>Capas de Procesamiento</h3>
+                <ul>
+                    <li><strong>Ingesta (Capa de Datos):</strong> Interfaz Next.js para carga de CSV. Formularios generados en Next.js embebidos en Moodle. Base de datos PostgreSQL (Supabase).</li>
+                    <li><strong>Lógica y Cálculo:</strong> Funciones del lado del servidor en Next.js (Node.js) procesan los pesos de notas, asistencia y entregas.</li>
+                    <li><strong>Presentación (Moodle iFrames):</strong> Rutas de Next.js protegidas. <code>/admin/dashboard</code> embebido para administradores; <code>/alumno/[id]</code> embebido para estudiantes con validación JWT o Moodle Token.</li>
+                    <li><strong>Notificaciones:</strong> Panel de control en la App donde el admin ve alumnos críticos, hace un clic, el backend llama a Claude, muestra el borrador, el admin lo edita/aprueba y el backend lo envía por Moodle API.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Recursos y Tiempos</h3>
+                <span class="badge b-time">Tiempo estimado: 4 a 6 semanas</span>
+                <p><strong>Equipo necesario:</strong> Desarrollador Web Full Stack (React/Next.js, Node, SQL básico).</p>
+                <p><strong>Tecnologías:</strong></p>
+                <span class="badge b-tech">Next.js (React)</span>
+                <span class="badge b-tech">Supabase (PostgreSQL)</span>
+                <span class="badge b-tech">Vercel (Hosting)</span>
+                <span class="badge b-tech">Claude API</span>
+                <span class="badge b-tech">TailwindCSS</span>
+            </div>
+        </div>
+
+        <div class="mermaid">
+graph TD
+    A[CSV o Formularios Next.js] -->|API Route| B[(Supabase DB)]
+    B -->|Query| C[Next.js Backend Engine]
+    C -->|Cálculo Algorítmico| D{Estado Alumno}
+    D -->|Verde/Amarillo| E[React Dashboard]
+    D -->|Rojo/Crítico| F[Bandeja de Aprobación Admin]
+    E -->|iFrame Admin/Alumno| G((Moodle UI))
+    F -->|Admin hace clic en Generar Aviso| H{Claude API}
+    H -->|Texto Propuesto| F
+    F -->|Admin Aprueba| I[Moodle Web Services API]
+    I -->|Mensaje Directo| J((Profesores / Alumnos))
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>Ventajas</h3>
+                <ul class="pro-con-list">
+                    <li class="pro">Robusto, seguro y libre de errores accidentales (como borrar una celda de Excel).</li>
+                    <li class="pro">Interfaz de usuario unificada y diseñada a medida.</li>
+                    <li class="pro">Los parámetros del semáforo se cambian desde un panel UI muy intuitivo.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Desventajas</h3>
+                <ul class="pro-con-list">
+                    <li class="con">Requiere conocimientos de programación avanzados para el equipo técnico.</li>
+                    <li class="con">Mayor tiempo de desarrollo inicial.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- OPCIÓN 3 -->
+    <div id="op3" class="tab-content">
+        <h2>Opción 3: n8n + Airtable + Streamlit</h2>
+        <p>El punto dulce para equipos mixtos. Usa automatización visual (n8n) y bases de datos amigables (Airtable) para gestionar la lógica, delegando el dashboard a Python puro (Streamlit).</p>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>Capas de Procesamiento</h3>
+                <ul>
+                    <li><strong>Ingesta (Capa de Datos):</strong> Admin sube CSV a Airtable o n8n captura webhooks de encuestas de Moodle y los inserta en Airtable.</li>
+                    <li><strong>Lógica y Cálculo:</strong> Fórmulas nativas de Airtable (muy parecidas a Excel pero relacionales) calculan el estado (Verde/Amarillo/Rojo).</li>
+                    <li><strong>Presentación (Moodle iFrames):</strong> Vistas de Airtable embebidas para edición rápida de parámetros. Streamlit Cloud embebido para el Dashboard analítico general.</li>
+                    <li><strong>Notificaciones:</strong> Una vista en Airtable filtra "Alumnos Críticos". El admin cambia una celda a "Aprobar Aviso". n8n detecta el cambio, llama a Claude API, y luego n8n usa el nodo HTTP para pegarle a la API de Moodle y enviar el mensaje.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Recursos y Tiempos</h3>
+                <span class="badge b-time">Tiempo estimado: 3 a 4 semanas</span>
+                <p><strong>Equipo necesario:</strong> Perfil técnico en Python (para Streamlit) y alguien con pensamiento lógico para armar los flujos visuales en n8n.</p>
+                <p><strong>Tecnologías:</strong></p>
+                <span class="badge b-tech">Airtable</span>
+                <span class="badge b-tech">n8n (Workflows)</span>
+                <span class="badge b-tech">Streamlit (Python)</span>
+                <span class="badge b-tech">Claude API</span>
+            </div>
+        </div>
+
+        <div class="mermaid">
+graph TD
+    A[CSV/Moodle Encuestas] -->|n8n Webhook / Upload| B[(Airtable DB)]
+    B -->|Fórmulas de Umbral| C{Estado Semáforo}
+    C -->|Lee Datos| D[Streamlit Dashboard Python]
+    D -->|iFrame| E((Moodle: Vista Admin))
+    C -->|Vista: Alumnos en Riesgo| F[Admin revisa Airtable]
+    F -->|Cambia celda a Notificar| G[n8n Workflow Automático]
+    G -->|Solicita Redacción| H{Claude API}
+    H -->|Devuelve Mensaje| G
+    G -->|HTTP Request| I[Moodle Web Services API]
+    I -->|Mensaje Interno| J((Profesores / Alumnos))
+        </div>
+
+        <div class="grid-2">
+            <div class="card">
+                <h3>Ventajas</h3>
+                <ul class="pro-con-list">
+                    <li class="pro">Airtable es excelente para equipos no técnicos; pueden ajustar los parámetros visualmente.</li>
+                    <li class="pro">El flujo semi-automático se resuelve brillante y visualmente con n8n.</li>
+                    <li class="pro">Streamlit permite dashboards analíticos potentes con muy pocas líneas de Python.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Desventajas</h3>
+                <ul class="pro-con-list">
+                    <li class="con">Airtable tiene un límite de 1000 registros en la capa gratuita (Para 500 alumnos y 1 solo ciclo actual está perfecto, pero no sobra mucho margen).</li>
+                    <li class="con">n8n Cloud tiene límite de ejecuciones gratuitas (se recomienda hostear n8n localmente o en un VPS barato).</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- OPCIÓN 4: COMPARATIVA FINAL -->
+    <div id="op4" class="tab-content">
+        <h2>📊 Comparativa final</h2>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Criterio</th>
+                    <th>Opción 1 Google</th>
+                    <th>Opción 2 Supabase</th>
+                    <th>Opción 3 n8n</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Dificultad técnica</td>
+                    <td class="sem-verde">Baja</td>
+                    <td class="sem-amarillo">Media</td>
+                    <td class="sem-amarillo">Media</td>
+                </tr>
+                <tr>
+                    <td>Escalabilidad</td>
+                    <td class="sem-amarillo">Media</td>
+                    <td class="sem-verde">Alta</td>
+                    <td class="sem-amarillo">Media</td>
+                </tr>
+                <tr>
+                    <td>Gratuito real</td>
+                    <td class="sem-verde">Sí</td>
+                    <td class="sem-verde">Sí</td>
+                    <td class="sem-amarillo">Con límites</td>
+                </tr>
+                <tr>
+                    <td>Embebible en Moodle</td>
+                    <td class="sem-verde">Fácil</td>
+                    <td class="sem-verde">Fácil</td>
+                    <td class="sem-verde">Fácil</td>
+                </tr>
+                <tr>
+                    <td>Parámetros editables</td>
+                    <td class="sem-amarillo">Indirecto</td>
+                    <td class="sem-verde">Directo</td>
+                    <td class="sem-verde">Directo</td>
+                </tr>
+                <tr>
+                    <td>Automatización avisos</td>
+                    <td class="sem-amarillo">Manual</td>
+                    <td class="sem-amarillo">Semi</td>
+                    <td class="sem-verde">Automático</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<script>
+    function renderMermaid(tabId) {
+        mermaid.run({ querySelector: `#${tabId} .mermaid` });
+    }
+
+    function openTab(tabId) {
+        document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        event.currentTarget.classList.add('active');
+        renderMermaid(tabId);
+    }
+
+    window.addEventListener('load', () => {
+        renderMermaid('op1');
+    });
+</script>
+
+</body>
+</html>
