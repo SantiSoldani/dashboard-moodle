@@ -34,3 +34,4 @@ Este repositorio contiene el backend (API) del Proyecto Travesía, desarrollado 
 2.  **Transformación:** El backend cruza todas estas fuentes de datos fragmentadas para armar el perfil de riesgo actualizado de cada estudiante .
 3.  **Salida (Output):** Mediante librerías de visualización, el sistema exporta los tableros de control y semáforos en formato HTML .
 4.  **Integración final:** Estos reportes gráficos se inyectan como *Iframes* dentro del Campus Virtual, permitiendo embeber contenidos personalizados según el rol del usuario (Dashboard Estudiante o Dashboard Docente) .
+
