@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reporte de Arquitectura: Proyecto Travesía - Semáforos en Moodle</title>
+    <title>Reporte de Arquitectura: Proyecto Travesía</title>
     <style>
         :root {
             --primary: #2563eb;
@@ -26,88 +26,110 @@
             line-height: 1.6;
         }
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
         }
         header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 30px;
         }
-        h1 {
-            color: var(--primary);
-            margin-bottom: 10px;
-        }
+        h1 { color: var(--primary); margin-bottom: 5px; }
+        
+        /* Introducción */
         .intro-box {
-            background: var(--primary-light);
+            background: var(--bg-card);
             padding: 25px;
             border-radius: 8px;
             border-left: 5px solid var(--primary);
-            margin-bottom: 30px;
-            font-size: 1.1em;
+            margin-bottom: 25px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
-        .card {
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        .tab-btn {
+            padding: 12px 24px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            color: var(--text-muted);
+            transition: all 0.2s;
+        }
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+        .tab-content {
+            display: none;
             background: var(--bg-card);
             padding: 30px;
             border-radius: 8px;
             box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
         }
+        .tab-content.active { display: block; }
+
+        /* Tarjetas y Grillas */
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
+            margin-bottom: 20px;
         }
-        .sub-card {
+        .card {
             background: var(--bg-main);
             padding: 20px;
             border-radius: 8px;
             border: 1px solid var(--border);
         }
-        h2, h3 {
-            color: var(--primary);
-            margin-top: 0;
-        }
-        .badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-            color: white;
-            margin-right: 5px;
-            margin-bottom: 10px;
-        }
-        .b-tech { background: var(--primary); }
+        h2, h3 { color: var(--primary); margin-top: 0; }
+        
         .mermaid {
             background: white;
             padding: 20px;
             border-radius: 8px;
             border: 1px solid var(--border);
-            margin: 20px 0;
-            text-align: center;
-            overflow-x: auto;
+            margin-top: 15px;
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
         }
-        ul { padding-left: 20px; }
-        li { margin-bottom: 10px; }
+        .endpoint {
+            font-family: monospace;
+            background: #e5e7eb;
+            padding: 2px 4px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
     </style>
 
     <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
-        mermaid.initialize({ startOnLoad: true });
+        mermaid.initialize({ 
+            startOnLoad: false, 
+            theme: 'default',
+            securityLevel: 'loose' 
+        });
     </script>
 </head>
 <body>
 
 <div class="container">
     <header>
-        <h1>🚦 Diseño de Arquitectura: Semáforos en Moodle</h1>
-        <p>Sistema de Monitoreo de Alumnos - Proyecto Travesía</p>
+        <h1>🚦 Diseño de Arquitectura: Proyecto Travesía</h1>
+        <p>Documentación Técnica y Lógica de Negocio</p>
     </header>
 
     <div class="intro-box">
         <strong>Introducción del Diseño:</strong><br>
         Toda la implementación de los módulos va a estar implementada por la <strong>Página de Travesía</strong>. 
-        Los embebidos en Moodle van a estar diseñados a partir de iframes específicos generados por nuestra página que van a estar divididos de la siguiente manera: 
+        Los embebidos en moodle van a estar diseñados a partir de iframes específicos generados por nuestra página que van a estar divididos de la siguiente manera: 
         <ul>
             <li>Iframe Dashboard Dinámico</li>
             <li>Iframe Formulario</li>
@@ -117,36 +139,23 @@
         </ul>
     </div>
 
-    <div class="card">
-        <h2>Estructura del Sistema: Página Paralela Proyecto Travesía</h2>
-        <p>El núcleo del sistema reside en un servidor propio con una base de datos personal, eliminando dependencias externas de terceros y centralizando la lógica en la plataforma Travesía.</p>
+    <div class="tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'tab1')">Arquitectura General</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab2')">Lógica de Negocio</button>
+    </div>
 
-        <div class="grid-2">
-            <div class="sub-card">
-                <h3>Capas de Procesamiento</h3>
-                <ul>
-                    <li><strong>Almacenamiento:</strong> Base de Datos Personal (Local) para persistencia de notas, asistencia y parámetros.</li>
-                    <li><strong>Lógica de Control:</strong> Módulo de modificación centralizado para ajustar umbrales de alerta y estados del semáforo.</li>
-                    <li><strong>Visualización:</strong> Generación dinámica de vistas optimizadas para ser servidas como <em>iframe embebido en Moodle</em>.</li>
-                    <li><strong>Mensajería:</strong> Módulo de notificación que conecta la base de datos con la API de mensajería interna de Moodle.</li>
-                </ul>
-            </div>
-            <div class="sub-card">
-                <h3>Tecnologías Core</h3>
-                <span class="badge b-tech">Base de Datos Personal</span>
-                <span class="badge b-tech">Página Proyecto Travesía</span>
-                <span class="badge b-tech">Moodle Web Services</span>
-                <span class="badge b-tech">HTML5 / iFrames</span>
-                <p><strong>Seguridad:</strong> Validación de tokens entre Moodle y Travesía para asegurar que cada alumno/profesor solo acceda a su información correspondiente.</p>
-            </div>
-        </div>
-
-        <div class="mermaid">
+    <div id="tab1" class="tab-content active">
+        <h2>Implementación de Módulos</h2>
+        <p>El sistema opera de forma paralela a Moodle, centralizando la lógica en el servidor de Travesía.</p>
+        
+        <div class="card">
+            <h3>Flujo de Integración Moodle</h3>
+            <div class="mermaid" id="graph1">
 graph TD
-    subgraph Servidor Travesia [Página Paralela Proyecto Travesía]
+    subgraph ServidorTravesia [Servidor Proyecto Travesía]
         DB[(Base de Datos Personal)]
         MOD[Módulo de Modificación]
-        GEN[Generador de Vistas / Iframes]
+        GEN[Generador de Vistas]
         DB <--> MOD
         MOD --> GEN
     end
@@ -155,36 +164,126 @@ graph TD
         direction TB
         IF1[Iframe Dashboard Dinámico]
         IF2[Iframe Formulario]
-        IF3[Iframe Configuración Formulario]
+        IF3[Iframe Configuración]
         IF4[Iframe Ingesta de Datos]
         IF5[Iframe Semáforo]
     end
 
-    GEN -->|Embebido vía iFrame| IF1
-    GEN -->|Embebido vía iFrame| IF2
-    GEN -->|Embebido vía iFrame| IF3
-    GEN -->|Embebido vía iFrame| IF4
-    GEN -->|Embebido vía iFrame| IF5
-
-    MOD -->|Acción: Notificar| API[Moodle Web Services API]
-    API -->|Mensaje Interno| USER((Alumno / Profesor))
-
-    style Servidor Travesia fill:#eff6ff,stroke:#2563eb,stroke-width:2px
-    style MoodleUI fill:#f3f4f6,stroke:#4b5563,stroke-dasharray: 5 5
+    GEN -->|Servir Embebido| IF1
+    GEN -->|Servir Embebido| IF2
+    GEN -->|Servir Embebido| IF3
+    GEN -->|Servir Embebido| IF4
+    GEN -->|Servir Embebido| IF5
+    
+    MOD -->|Web Services| API[API Moodle]
+            </div>
         </div>
     </div>
 
-    <div class="card">
-        <h3>Detalle de Módulos Embebidos</h3>
-        <ul>
-            <li><strong>Iframe Dashboard Dinámico:</strong> Panel visual de control para el administrador con métricas en tiempo real.</li>
-            <li><strong>Iframe Formulario:</strong> Interfaz para la carga de datos específicos por parte de docentes o alumnos.</li>
-            <li><strong>Iframe Configuración Formulario:</strong> Herramienta para que el Admin modifique los campos y lógica de los formularios.</li>
-            <li><strong>Iframe Ingesta de Datos:</strong> Módulo para la carga masiva de archivos o sincronización con la base de datos personal.</li>
-            <li><strong>Iframe Semáforo:</strong> Visualización del estado individual del alumno (Verde/Amarillo/Rojo) basado en los cálculos de Travesía.</li>
-        </ul>
+    <div id="tab2" class="tab-content">
+        <h2>Arquitectura de la Lógica de Negocio</h2>
+        
+        <div class="grid-2">
+            <div class="card">
+                <h3>1. Base de Datos y Controladores</h3>
+                <p><strong>Base de Datos:</strong> Almacenamiento local para entidades y registros históricos.</p>
+                <p><strong>Endpoints (Controladores):</strong></p>
+                <ul>
+                    <li><span class="endpoint">GET</span>: Recuperación de estados de semáforos y perfiles.</li>
+                    <li><span class="endpoint">POST</span>: Carga masiva de CSVs y respuestas de formularios.</li>
+                    <li><span class="endpoint">PUT/PATCH</span>: Modificación de parámetros de configuración.</li>
+                </ul>
+                <p><strong>Entidades:</strong> Profesor, Alumno Inicial, Alumno Avanzado.</p>
+            </div>
+
+            <div class="card">
+                <h3>2. Modelos de Procesamiento</h3>
+                <ul>
+                    <li><strong>Cálculo de Semáforos:</strong> Motor de reglas para procesar riesgos.</li>
+                    <li><strong>Dashboard Dinámico:</strong> Agregación de datos (compatible con exteriorización a Looker).</li>
+                    <li><strong>Modelo de Formulario:</strong> Lógica de generación dinámica y validación de completación.</li>
+                    <li><strong>Limpieza de Datos:</strong> Módulo de saneamiento para inputs de CSV y formularios.</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Arquitectura del Back-End</h3>
+            <div class="mermaid" id="graph2">
+graph TD
+    subgraph Clientes [Capa de Presentación]
+        IF[Iframes en Moodle]
+        TRAV[Frontend Travesía]
+    end
+
+    subgraph BackEnd [Core de Aplicación]
+        direction TB
+        subgraph Controladores [Controladores / API REST]
+            API[Manejo de Solicitudes GET/POST/PUT]
+        end
+
+        subgraph Modelos [Modelos / Capa de Servicio]
+            LIMP[Limpieza de Datos: CSV/Form]
+            FORM[Gestión de Formularios]
+            CALC[Cálculo de Semáforos]
+            DASH[Dashboard Dinámico]
+        end
+    end
+
+    subgraph Persistencia [Capa de Datos]
+        DB[(Base de Datos Local)]
+        ENT[Entidades: Profesor / Alumno]
+    end
+
+    Clientes --> API
+    API --> LIMP
+    API --> FORM
+    API --> CALC
+    API --> DASH
+    
+    LIMP & FORM & CALC & DASH --> ENT
+    ENT --> DB
+    
+    DASH -.-> |Opcional| LOOK[Looker / Apps Externas]
+
+    style BackEnd fill:#eff6ff,stroke:#2563eb
+    style Persistencia fill:#f0fdf4,stroke:#16a34a
+            </div>
+        </div>
     </div>
 </div>
+
+<script>
+    function openTab(evt, tabName) {
+        // Ocultar todos los contenidos
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tab-content");
+        for (i = 0; i < tabcontent.length; i++) {
+            tabcontent[i].style.display = "none";
+            tabcontent[i].classList.remove("active");
+        }
+
+        // Desactivar todos los botones
+        tablinks = document.getElementsByClassName("tab-btn");
+        for (i = 0; i < tablinks.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        // Mostrar pestaña actual
+        var currentTab = document.getElementById(tabName);
+        currentTab.style.display = "block";
+        currentTab.classList.add("active");
+        evt.currentTarget.className += " active";
+
+        // Forzar renderizado de Mermaid al mostrar la pestaña
+        mermaid.init(undefined, currentTab.querySelectorAll(".mermaid"));
+    }
+
+    // Renderizado inicial al cargar la página
+    window.addEventListener('load', () => {
+        mermaid.init(undefined, document.querySelectorAll("#tab1 .mermaid"));
+    });
+</script>
 
 </body>
 </html>
