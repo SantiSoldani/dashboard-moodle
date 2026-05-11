@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es-AR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte de Arquitectura: Proyecto Travesía - Semáforos en Moodle</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-light: #eff6ff;
+            --text-main: #1f2937;
+            --text-muted: #4b5563;
+            --bg-main: #f3f4f6;
+            --bg-card: #ffffff;
+            --success: #16a34a;
+            --warning: #ca8a04;
+            --danger: #dc2626;
+            --border: #e5e7eb;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        h1 {
+            color: var(--primary);
+            margin-bottom: 10px;
+        }
+        .intro-box {
+            background: var(--primary-light);
+            padding: 25px;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary);
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+        .card {
+            background: var(--bg-card);
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .sub-card {
+            background: var(--bg-main);
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        h2, h3 {
+            color: var(--primary);
+            margin-top: 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            margin-right: 5px;
+            margin-bottom: 10px;
+        }
+        .b-tech { background: var(--primary); }
+        .mermaid {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin: 20px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 10px; }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        mermaid.initialize({ startOnLoad: true });
+    </script>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>🚦 Diseño de Arquitectura: Semáforos en Moodle</h1>
+        <p>Sistema de Monitoreo de Alumnos - Proyecto Travesía</p>
+    </header>
+
+    <div class="intro-box">
+        <strong>Introducción del Diseño:</strong><br>
+        Toda la implementación de los módulos va a estar implementada por la <strong>Página de Travesía</strong>. 
+        Los embebidos en Moodle van a estar diseñados a partir de iframes específicos generados por nuestra página que van a estar divididos de la siguiente manera: 
+        <ul>
+            <li>Iframe Dashboard Dinámico</li>
+            <li>Iframe Formulario</li>
+            <li>Iframe Configuración Formulario</li>
+            <li>Iframe Ingesta de Datos</li>
+            <li>Iframe Semáforo</li>
+        </ul>
+    </div>
+
+    <div class="card">
+        <h2>Estructura del Sistema: Página Paralela Proyecto Travesía</h2>
+        <p>El núcleo del sistema reside en un servidor propio con una base de datos personal, eliminando dependencias externas de terceros y centralizando la lógica en la plataforma Travesía.</p>
+
+        <div class="grid-2">
+            <div class="sub-card">
+                <h3>Capas de Procesamiento</h3>
+                <ul>
+                    <li><strong>Almacenamiento:</strong> Base de Datos Personal (Local) para persistencia de notas, asistencia y parámetros.</li>
+                    <li><strong>Lógica de Control:</strong> Módulo de modificación centralizado para ajustar umbrales de alerta y estados del semáforo.</li>
+                    <li><strong>Visualización:</strong> Generación dinámica de vistas optimizadas para ser servidas como <em>iframe embebido en Moodle</em>.</li>
+                    <li><strong>Mensajería:</strong> Módulo de notificación que conecta la base de datos con la API de mensajería interna de Moodle.</li>
+                </ul>
+            </div>
+            <div class="sub-card">
+                <h3>Tecnologías Core</h3>
+                <span class="badge b-tech">Base de Datos Personal</span>
+                <span class="badge b-tech">Página Proyecto Travesía</span>
+                <span class="badge b-tech">Moodle Web Services</span>
+                <span class="badge b-tech">HTML5 / iFrames</span>
+                <p><strong>Seguridad:</strong> Validación de tokens entre Moodle y Travesía para asegurar que cada alumno/profesor solo acceda a su información correspondiente.</p>
+            </div>
+        </div>
+
+        <div class="mermaid">
+graph TD
+    subgraph Servidor Travesia [Página Paralela Proyecto Travesía]
+        DB[(Base de Datos Personal)]
+        MOD[Módulo de Modificación]
+        GEN[Generador de Vistas / Iframes]
+        DB <--> MOD
+        MOD --> GEN
+    end
+
+    subgraph MoodleUI [Moodle: Interfaz de Usuario]
+        direction TB
+        IF1[Iframe Dashboard Dinámico]
+        IF2[Iframe Formulario]
+        IF3[Iframe Configuración Formulario]
+        IF4[Iframe Ingesta de Datos]
+        IF5[Iframe Semáforo]
+    end
+
+    GEN -->|Embebido vía iFrame| IF1
+    GEN -->|Embebido vía iFrame| IF2
+    GEN -->|Embebido vía iFrame| IF3
+    GEN -->|Embebido vía iFrame| IF4
+    GEN -->|Embebido vía iFrame| IF5
+
+    MOD -->|Acción: Notificar| API[Moodle Web Services API]
+    API -->|Mensaje Interno| USER((Alumno / Profesor))
+
+    style Servidor Travesia fill:#eff6ff,stroke:#2563eb,stroke-width:2px
+    style MoodleUI fill:#f3f4f6,stroke:#4b5563,stroke-dasharray: 5 5
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Detalle de Módulos Embebidos</h3>
+        <ul>
+            <li><strong>Iframe Dashboard Dinámico:</strong> Panel visual de control para el administrador con métricas en tiempo real.</li>
+            <li><strong>Iframe Formulario:</strong> Interfaz para la carga de datos específicos por parte de docentes o alumnos.</li>
+            <li><strong>Iframe Configuración Formulario:</strong> Herramienta para que el Admin modifique los campos y lógica de los formularios.</li>
+            <li><strong>Iframe Ingesta de Datos:</strong> Módulo para la carga masiva de archivos o sincronización con la base de datos personal.</li>
+            <li><strong>Iframe Semáforo:</strong> Visualización del estado individual del alumno (Verde/Amarillo/Rojo) basado en los cálculos de Travesía.</li>
+        </ul>
+    </div>
+</div>
+
+</body>
+</html>
