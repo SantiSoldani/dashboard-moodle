@@ -2,6 +2,13 @@
 
 ## 🚀 Guía de Inicio Rápido para el Equipo
 
+TO-DO: 
+- Diseñar los cuestionarios (definir preguntas, escalas).
+- Crear db, diseñar tablas etc.
+- <iframe>PARA Ingesta de datos
+- Looker Studio
+
+
 ### 🔗 Seguir estos pasos en terminal (la de vscode por ejemplo) para levantar el backend y el servidor.
 1. git clone <URL_DEL_REPOSITORIO> 
 2. python -m venv venv // Les debe aparecer en la terminal la palabra (venv) en verde, significa activo.
