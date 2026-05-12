@@ -5,7 +5,6 @@
 TO-DO: 
 - Diseñar los cuestionarios (definir preguntas, escalas).
 - Crear db, diseñar tablas etc.
-- <iframe>PARA Ingesta de datos
 - Looker Studio
 
 
