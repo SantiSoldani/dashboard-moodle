@@ -1,0 +1,1681 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proyecto Travesía — Documentación Técnica</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d0f14;
+    --surface: #141720;
+    --surface2: #1c2030;
+    --border: #252c40;
+    --accent: #4f7fff;
+    --accent2: #7c5cfc;
+    --green: #22c97a;
+    --yellow: #f5c842;
+    --red: #f05454;
+    --text: #e2e8f8;
+    --muted: #7b879f;
+    --font-display: 'Syne', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+
+  /* ─── HEADER ─── */
+  header {
+    background: linear-gradient(135deg, #0d0f14 0%, #141c35 60%, #0e1929 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 60px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(79,127,255,.15) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: 200px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(124,92,252,.1) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .badge {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    background: rgba(79,127,255,.12);
+    border: 1px solid rgba(79,127,255,.3);
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(2rem, 5vw, 3.8rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -.02em;
+    margin-bottom: 16px;
+  }
+  h1 span { color: var(--accent); }
+  .subtitle {
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 600px;
+    font-weight: 300;
+  }
+  .header-meta {
+    margin-top: 30px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+  }
+  .meta-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+  .meta-chip .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+  }
+  .dot-green { background: var(--green); box-shadow: 0 0 6px var(--green); }
+  .dot-blue  { background: var(--accent); }
+  .dot-purple{ background: var(--accent2); }
+
+  /* ─── NAV TABS ─── */
+  nav {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 60px;
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .tab-btn {
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: .04em;
+    padding: 18px 22px;
+    border: none;
+    background: none;
+    color: var(--muted);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all .2s;
+    white-space: nowrap;
+  }
+  .tab-btn:hover { color: var(--text); }
+  .tab-btn.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  /* ─── MAIN CONTENT ─── */
+  main { padding: 50px 60px; max-width: 1200px; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  h2 {
+    font-family: var(--font-display);
+    font-size: 1.9rem;
+    font-weight: 800;
+    letter-spacing: -.02em;
+    margin-bottom: 8px;
+  }
+  h3 {
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    font-weight: 700;
+    margin-bottom: 12px;
+    color: var(--text);
+  }
+  .section-lead {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 40px;
+    max-width: 700px;
+  }
+
+  /* ─── CARDS ─── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 28px;
+    margin-bottom: 20px;
+    transition: border-color .2s, transform .2s;
+  }
+  .card:hover { border-color: rgba(79,127,255,.4); transform: translateY(-1px); }
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 14px;
+  }
+  .card-icon {
+    width: 42px; height: 42px;
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+  .icon-blue   { background: rgba(79,127,255,.15); }
+  .icon-green  { background: rgba(34,201,122,.15); }
+  .icon-purple { background: rgba(124,92,252,.15); }
+  .icon-yellow { background: rgba(245,200,66,.15); }
+  .icon-red    { background: rgba(240,84,84,.15); }
+  .card p { color: var(--muted); font-size: 14px; line-height: 1.7; }
+
+  /* ─── GRID ─── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 20px; }
+  @media(max-width:900px) {
+    .grid-2, .grid-3 { grid-template-columns: 1fr; }
+    header, nav, main { padding-left: 24px; padding-right: 24px; }
+    nav { padding: 0 24px; }
+  }
+
+  /* ─── ARCH DIAGRAM ─── */
+  .arch-diagram {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 40px;
+    margin-bottom: 30px;
+    overflow-x: auto;
+  }
+  .arch-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .arch-box {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px 18px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    text-align: center;
+    min-width: 140px;
+    justify-content: center;
+  }
+  .arch-box.highlight-blue   { border-color: var(--accent); color: var(--accent); }
+  .arch-box.highlight-green  { border-color: var(--green); color: var(--green); }
+  .arch-box.highlight-purple { border-color: var(--accent2); color: var(--accent2); }
+  .arch-box.highlight-yellow { border-color: var(--yellow); color: var(--yellow); }
+  .arch-arrow {
+    color: var(--muted);
+    font-size: 20px;
+    display: flex; align-items: center;
+  }
+  .arch-label {
+    text-align: center;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--muted);
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .arch-layer {
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    padding: 16px 20px;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  /* ─── CODE SNIPPET ─── */
+  .code-block {
+    background: #0a0c10;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px 24px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.8;
+    overflow-x: auto;
+    margin: 16px 0;
+    color: #a8b8d8;
+  }
+  .code-block .kw  { color: var(--accent2); }
+  .code-block .str { color: var(--green); }
+  .code-block .cmt { color: #4a5568; font-style: italic; }
+  .code-block .fn  { color: var(--accent); }
+  .code-block .num { color: var(--yellow); }
+
+  /* ─── TAGS ─── */
+  .tag {
+    display: inline-block;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 2px 10px;
+    border-radius: 20px;
+    margin: 2px;
+    border: 1px solid;
+  }
+  .tag-blue   { color: var(--accent); border-color: rgba(79,127,255,.3); background: rgba(79,127,255,.08); }
+  .tag-green  { color: var(--green); border-color: rgba(34,201,122,.3); background: rgba(34,201,122,.08); }
+  .tag-purple { color: var(--accent2); border-color: rgba(124,92,252,.3); background: rgba(124,92,252,.08); }
+  .tag-yellow { color: var(--yellow); border-color: rgba(245,200,66,.3); background: rgba(245,200,66,.08); }
+  .tag-red    { color: var(--red); border-color: rgba(240,84,84,.3); background: rgba(240,84,84,.08); }
+
+  /* ─── SEMAFORO ─── */
+  .semaforo {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    flex-wrap: wrap;
+    margin: 20px 0;
+  }
+  .sem-card {
+    flex: 1;
+    min-width: 160px;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .sem-card h4 {
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+  }
+  .sem-card p { font-size: 13px; opacity: .8; }
+  .sem-green  { background: rgba(34,201,122,.12); border: 2px solid var(--green); }
+  .sem-green h4 { color: var(--green); }
+  .sem-yellow { background: rgba(245,200,66,.12); border: 2px solid var(--yellow); }
+  .sem-yellow h4 { color: var(--yellow); }
+  .sem-red    { background: rgba(240,84,84,.12); border: 2px solid var(--red); }
+  .sem-red h4 { color: var(--red); }
+
+  /* ─── FORM ─── */
+  .form-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .form-header {
+    background: linear-gradient(135deg, #141c35, #1c243a);
+    padding: 30px 36px;
+    border-bottom: 1px solid var(--border);
+  }
+  .form-header h3 {
+    font-family: var(--font-display);
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+  }
+  .form-header p { color: var(--muted); font-size: 14px; }
+  .form-body { padding: 36px; }
+  .form-section {
+    margin-bottom: 36px;
+  }
+  .form-section-title {
+    font-family: var(--font-display);
+    font-size: .85rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 18px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .form-row.full { grid-template-columns: 1fr; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  label {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  input[type="text"], input[type="number"], input[type="email"],
+  select, textarea {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    transition: border-color .2s;
+    outline: none;
+  }
+  input:focus, select:focus, textarea:focus {
+    border-color: var(--accent);
+  }
+  select option { background: var(--surface2); }
+  textarea { resize: vertical; min-height: 80px; }
+
+  .likert-group { display: flex; flex-direction: column; gap: 10px; }
+  .likert-item { display: flex; flex-direction: column; gap: 6px; }
+  .likert-item label { font-size: 13px; text-transform: none; color: var(--text); font-weight: 400; letter-spacing: 0; }
+  .likert-scale {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .likert-scale input[type="range"] {
+    flex: 1;
+    accent-color: var(--accent);
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .likert-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+    margin-top: 2px;
+  }
+  .checkbox-group { display: flex; flex-wrap: wrap; gap: 10px; }
+  .checkbox-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    cursor: pointer;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 14px;
+    transition: all .2s;
+  }
+  .checkbox-item:hover { border-color: var(--accent); }
+  .checkbox-item input { accent-color: var(--accent); }
+
+  .risk-preview {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    margin-top: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .risk-indicator {
+    width: 60px; height: 60px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    font-weight: 800;
+    flex-shrink: 0;
+    transition: all .4s;
+  }
+  .risk-verde   { background: rgba(34,201,122,.2); color: var(--green); border: 2px solid var(--green); }
+  .risk-amarillo{ background: rgba(245,200,66,.2); color: var(--yellow); border: 2px solid var(--yellow); }
+  .risk-rojo    { background: rgba(240,84,84,.2); color: var(--red); border: 2px solid var(--red); }
+
+  .form-submit-btn {
+    width: 100%;
+    padding: 14px;
+    background: var(--accent);
+    border: none;
+    border-radius: 10px;
+    color: white;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .04em;
+    margin-top: 10px;
+  }
+  .form-submit-btn:hover { background: #6a92ff; transform: translateY(-1px); }
+
+  /* ─── ER DIAGRAM ─── */
+  .er-wrapper {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+    overflow-x: auto;
+    margin-bottom: 30px;
+  }
+  svg.er-svg { width: 100%; max-width: 1000px; display: block; margin: auto; }
+  .er-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .er-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--font-mono);
+  }
+  .er-legend-rect {
+    width: 16px; height: 16px;
+    border-radius: 3px;
+    border: 1px solid;
+  }
+
+  /* ─── MISC ─── */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 36px 0;
+  }
+  .pill-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+  .info-row {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .info-row:last-child { border-bottom: none; }
+  .info-icon { font-size: 18px; flex-shrink: 0; }
+  .info-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; font-family: var(--font-mono); }
+  .info-value { font-size: 14px; color: var(--text); }
+
+  .flow-step {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+    padding: 18px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .flow-step:last-child { border-bottom: none; }
+  .step-num {
+    width: 32px; height: 32px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
+    display: flex; align-items: center; justify-content: center;
+    font-family: var(--font-display);
+    font-weight: 800;
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .step-content h4 { font-family: var(--font-display); font-size: 1rem; font-weight: 700; margin-bottom: 4px; }
+  .step-content p { font-size: 13px; color: var(--muted); }
+
+  .stack-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+  .stack-icon { font-size: 22px; }
+  .stack-name { font-family: var(--font-display); font-weight: 700; font-size: .95rem; }
+  .stack-desc { font-size: 12px; color: var(--muted); }
+
+  /* TOOLTIP */
+  [data-tooltip] { position: relative; cursor: help; }
+  [data-tooltip]:hover::after {
+    content: attr(data-tooltip);
+    position: absolute;
+    bottom: 110%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1c2030;
+    border: 1px solid var(--border);
+    color: var(--text);
+    font-size: 12px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    white-space: nowrap;
+    z-index: 999;
+  }
+
+  /* Collapsible */
+  .collapse-btn {
+    width: 100%;
+    text-align: left;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: .9rem;
+    font-weight: 700;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px;
+    transition: background .2s;
+  }
+  .collapse-btn:hover { background: #222840; }
+  .collapse-content {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 18px;
+    margin-bottom: 10px;
+    display: none;
+  }
+  .collapse-content.open { display: block; }
+  .chevron { transition: transform .2s; display: inline-block; }
+  .chevron.open { transform: rotate(180deg); }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header>
+  <div class="badge">FI-UNMdP · Ingeniería Industrial</div>
+  <h1>Proyecto <span>Travesía</span></h1>
+  <p class="subtitle">Sistema de BI para la Retención de Estudiantes (SBIRE) — Documentación técnica del backend, formularios de riesgo y modelo de base de datos.</p>
+  <div class="header-meta">
+    <div class="meta-chip"><span class="dot dot-green"></span>Estado: En desarrollo activo</div>
+    <div class="meta-chip"><span class="dot dot-blue"></span>Python · FastAPI · PostgreSQL</div>
+    <div class="meta-chip"><span class="dot dot-purple"></span>Integración Moodle vía iFrame</div>
+  </div>
+</header>
+
+<!-- ═══════════════════ NAV ═══════════════════ -->
+<nav>
+  <button class="tab-btn active" onclick="switchTab('arquitectura', this)">🏗 Arquitectura</button>
+  <button class="tab-btn" onclick="switchTab('modulos', this)">🧩 Módulos</button>
+  <button class="tab-btn" onclick="switchTab('flujo', this)">🔄 Flujo de Datos</button>
+  <button class="tab-btn" onclick="switchTab('formulario', this)">📋 Formulario de Riesgo</button>
+  <button class="tab-btn" onclick="switchTab('er', this)">🗄 Modelo ER</button>
+  <button class="tab-btn" onclick="switchTab('setup', this)">⚡ Setup</button>
+</nav>
+
+<!-- ═══════════════════ MAIN ═══════════════════ -->
+<main>
+
+<!-- ══════ TAB: ARQUITECTURA ══════ -->
+<div id="arquitectura" class="tab-panel active">
+  <h2>Arquitectura del Sistema</h2>
+  <p class="section-lead">El sistema sigue una arquitectura en capas claramente separadas, desacoplando ingesta, procesamiento, persistencia y visualización. La integración con Moodle ocurre en la capa de presentación mediante iframes.</p>
+
+  <div class="arch-diagram">
+    <div class="arch-label">Capa de Presentación</div>
+    <div class="arch-layer">
+      <div class="arch-row">
+        <div class="arch-box highlight-purple">🎓 Campus Virtual<br><small>Moodle (LMS)</small></div>
+        <div class="arch-arrow">↔</div>
+        <div class="arch-box highlight-blue">🖥 index.html<br><small>iframe_handler.js</small></div>
+        <div class="arch-arrow">↔</div>
+        <div class="arch-box highlight-purple">📊 Dashboard Docente</div>
+        <div class="arch-box highlight-blue">📈 Dashboard Alumno</div>
+      </div>
+    </div>
+
+    <div style="text-align:center;color:var(--muted);font-size:20px;margin:6px 0">↕ HTTP/REST</div>
+
+    <div class="arch-label">Capa de API (Backend)</div>
+    <div class="arch-layer">
+      <div class="arch-row">
+        <div class="arch-box highlight-blue">⚙ FastAPI<br><small>Routers / Endpoints</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box highlight-green">🧮 Processor<br><small>Pandas · Reglas</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box highlight-yellow">🚦 Semáforo Engine<br><small>Motor de Criticidad</small></div>
+        <div class="arch-arrow">→</div>
+        <div class="arch-box">📊 Plotly<br><small>HTML Export</small></div>
+      </div>
+    </div>
+
+    <div style="text-align:center;color:var(--muted);font-size:20px;margin:6px 0">↕ SQLModel ORM</div>
+
+    <div class="arch-label">Capa de Datos</div>
+    <div class="arch-layer">
+      <div class="arch-row">
+        <div class="arch-box highlight-green">🐘 PostgreSQL<br><small>Base de datos principal</small></div>
+        <div class="arch-arrow">←</div>
+        <div class="arch-box">📄 Archivos XLS<br><small>Docentes (notas/ausentes)</small></div>
+        <div class="arch-arrow">←</div>
+        <div class="arch-box highlight-purple">📝 Encuestas Moodle<br><small>Respuestas cualitativas</small></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-blue">🔑</div>
+        <h3>Principio de Diseño Central</h3>
+      </div>
+      <p>El sistema usa el <strong style="color:var(--accent)">DNI o Legajo</strong> como identificador universal para cruzar todas las fuentes de datos: notas de parciales cargadas por docentes vía XLS, encuestas completadas en el campus, e información de inscripción académica.</p>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-purple">🎯</div>
+        <h3>Separación de Perfiles</h3>
+      </div>
+      <p>El sistema distingue entre <strong style="color:var(--accent2)">alumnos ingresantes</strong> (primer año, riesgo de abandono temprano) y <strong style="color:var(--accent2)">alumnos avanzados</strong> (años superiores, riesgo de atraso o abandono tardío), aplicando lógicas de procesamiento diferenciadas para cada perfil.</p>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <h3>Stack Tecnológico</h3>
+  <div class="grid-2">
+    <div>
+      <div class="stack-item"><span class="stack-icon">🐍</span><div><div class="stack-name">Python</div><div class="stack-desc">Lenguaje principal — elegido por su ecosistema de datos</div></div></div>
+      <div class="stack-item"><span class="stack-icon">⚡</span><div><div class="stack-name">FastAPI</div><div class="stack-desc">Framework API — docs interactivas automáticas vía Swagger</div></div></div>
+      <div class="stack-item"><span class="stack-icon">🐘</span><div><div class="stack-name">PostgreSQL</div><div class="stack-desc">Base de datos relacional — persistencia principal del sistema</div></div></div>
+    </div>
+    <div>
+      <div class="stack-item"><span class="stack-icon">🔗</span><div><div class="stack-name">SQLModel</div><div class="stack-desc">ORM — interacción con DB vía Python puro, sin SQL directo</div></div></div>
+      <div class="stack-item"><span class="stack-icon">🐼</span><div><div class="stack-name">Pandas + OpenPyXL</div><div class="stack-desc">Procesamiento de datos — lectura de XLS y cálculo de métricas</div></div></div>
+      <div class="stack-item"><span class="stack-icon">📊</span><div><div class="stack-name">Plotly</div><div class="stack-desc">Visualizaciones — exporta dashboards interactivos en HTML</div></div></div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <h3>Sistema de Semáforos</h3>
+  <p style="color:var(--muted);margin-bottom:16px;font-size:14px">Motor de reglas central que clasifica el nivel de criticidad de cada estudiante basándose en porcentajes de aprobación y completitud de encuestas.</p>
+  <div class="semaforo">
+    <div class="sem-card sem-green">
+      <div style="font-size:2rem;margin-bottom:8px">🟢</div>
+      <h4>Verde</h4>
+      <p>Trayectoria regular. Sin alertas activas. Aprobación dentro de parámetros esperados.</p>
+    </div>
+    <div class="sem-card sem-yellow">
+      <div style="font-size:2rem;margin-bottom:8px">🟡</div>
+      <h4>Amarillo</h4>
+      <p>Riesgo moderado. Indicadores por debajo del umbral o encuesta omitida.</p>
+    </div>
+    <div class="sem-card sem-red">
+      <div style="font-size:2rem;margin-bottom:8px">🔴</div>
+      <h4>Rojo</h4>
+      <p>Riesgo crítico. Requiere intervención proactiva del sistema de tutoría.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════ TAB: MÓDULOS ══════ -->
+<div id="modulos" class="tab-panel">
+  <h2>Módulos y Componentes</h2>
+  <p class="section-lead">El repositorio está organizado en capas bien definidas. Cada módulo tiene una responsabilidad única y se comunica con los demás a través de interfaces explícitas.</p>
+
+  <button class="collapse-btn" onclick="toggleCollapse(this)">
+    📁 Estructura del Repositorio <span class="chevron">▾</span>
+  </button>
+  <div class="collapse-content open">
+    <div class="code-block">
+<span class="cmt"># dashboard-moodle/</span>
+├── <span class="kw">src/</span>
+│   ├── <span class="fn">main.py</span>              <span class="cmt"># Entry point FastAPI — app + routers</span>
+│   ├── <span class="kw">models/</span>
+│   │   └── <span class="fn">models.py</span>        <span class="cmt"># SQLModel: Estudiante, Nota, Encuesta, Perfil...</span>
+│   ├── <span class="kw">routers/</span>
+│   │   ├── <span class="fn">ingesta.py</span>       <span class="cmt"># Endpoints de carga de datos (XLS, encuestas)</span>
+│   │   ├── <span class="fn">alumnos.py</span>       <span class="cmt"># CRUD y consultas de estudiantes</span>
+│   │   └── <span class="fn">dashboard.py</span>     <span class="cmt"># Endpoints de visualización (Plotly HTML)</span>
+│   ├── <span class="kw">services/</span>
+│   │   ├── <span class="fn">procesador.py</span>    <span class="cmt"># Pandas — cálculo de métricas y KPIs</span>
+│   │   ├── <span class="fn">semaforo.py</span>      <span class="cmt"># Motor de reglas — clasificación de riesgo</span>
+│   │   └── <span class="fn">alertas.py</span>       <span class="cmt"># Gestión de alertas (encuestas omitidas, etc.)</span>
+│   └── <span class="kw">front-end/</span>
+│       └── <span class="kw">controllers/</span>
+│           └── <span class="fn">iframe_handler.js</span>  <span class="cmt"># Inyección de dashboards como iframes</span>
+├── <span class="kw">Doc/</span>                     <span class="cmt"># Documentación técnica previa</span>
+├── <span class="fn">index.html</span>               <span class="cmt"># Contenedor principal del iframe</span>
+└── <span class="fn">requirements.txt</span>         <span class="cmt"># Dependencias Python</span>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <h3 style="margin-bottom:20px">Backend — Módulos Python</h3>
+  <div class="grid-2">
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-blue">🚀</div>
+        <h3>main.py</h3>
+      </div>
+      <p>Punto de entrada de la aplicación FastAPI. Instancia la app, registra todos los routers (ingesta, alumnos, dashboard) y configura el ciclo de vida de la conexión a PostgreSQL a través del ORM SQLModel.</p>
+      <div class="pill-row">
+        <span class="tag tag-blue">FastAPI</span>
+        <span class="tag tag-blue">Entry Point</span>
+        <span class="tag tag-blue">Router Register</span>
+        <span class="tag tag-blue">Lifespan</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-green">🗃</div>
+        <h3>models/models.py</h3>
+      </div>
+      <p>Define todas las entidades del sistema usando <strong style="color:var(--green)">SQLModel</strong>: Estudiante, Materia, Inscripcion, NotaParcial, Encuesta, PerfilRiesgo, Tutor. Cada clase actúa simultáneamente como tabla SQL y schema Pydantic.</p>
+      <div class="pill-row">
+        <span class="tag tag-green">SQLModel</span>
+        <span class="tag tag-green">Pydantic</span>
+        <span class="tag tag-green">ORM</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-purple">📥</div>
+        <h3>routers/ingesta.py</h3>
+      </div>
+      <p>Centraliza los endpoints de carga de información académica. Permite subir <strong style="color:var(--accent2)">archivos XLS</strong> con notas de parciales y ausentes (procesados con Pandas/OpenPyXL), e importar respuestas de encuestas provenientes de Moodle.</p>
+      <div class="pill-row">
+        <span class="tag tag-purple">POST /upload-xls</span>
+        <span class="tag tag-purple">POST /encuesta</span>
+        <span class="tag tag-purple">OpenPyXL</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-yellow">👤</div>
+        <h3>routers/alumnos.py</h3>
+      </div>
+      <p>Endpoints de consulta y gestión de estudiantes. Permite obtener el perfil completo de un alumno (datos personales, historial de notas, estado del semáforo) y listar todos los estudiantes con filtros por carrera, año y nivel de riesgo.</p>
+      <div class="pill-row">
+        <span class="tag tag-yellow">GET /alumnos</span>
+        <span class="tag tag-yellow">GET /alumno/{id}</span>
+        <span class="tag tag-yellow">CRUD</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-blue">📊</div>
+        <h3>routers/dashboard.py</h3>
+      </div>
+      <p>Genera y sirve los dashboards interactivos mediante <strong style="color:var(--accent)">Plotly</strong>. Exporta HTML auto-contenido con gráficos del semáforo, distribución de riesgo y evolución académica. Distingue entre <em>vista docente</em> (agregados) y <em>vista alumno</em> (individual).</p>
+      <div class="pill-row">
+        <span class="tag tag-blue">GET /dashboard/docente</span>
+        <span class="tag tag-blue">GET /dashboard/alumno/{id}</span>
+        <span class="tag tag-blue">Plotly HTML</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-green">🧮</div>
+        <h3>services/procesador.py</h3>
+      </div>
+      <p>Núcleo analítico del sistema. Usa <strong style="color:var(--green)">Pandas</strong> para calcular el porcentaje de aprobación de cada alumno, cruzar datos cuantitativos (notas) con cualitativos (encuestas), y generar los insumos para el motor de reglas. Aplica lógicas diferenciadas por año de cursada.</p>
+      <div class="pill-row">
+        <span class="tag tag-green">Pandas</span>
+        <span class="tag tag-green">Métricas</span>
+        <span class="tag tag-green">KPIs</span>
+        <span class="tag tag-green">Cross-data</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-yellow">🚦</div>
+        <h3>services/semaforo.py</h3>
+      </div>
+      <p>Motor de reglas que clasifica a cada estudiante en Verde / Amarillo / Rojo basándose en el porcentaje de aprobación calculado por el procesador y el estado de completitud de encuestas obligatorias. Es el componente central para la toma de decisiones de tutoría.</p>
+      <div class="pill-row">
+        <span class="tag tag-yellow">Rule Engine</span>
+        <span class="tag tag-yellow">Clasificación</span>
+        <span class="tag tag-yellow">Umbrales</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-header">
+        <div class="card-icon icon-red">🔔</div>
+        <h3>services/alertas.py</h3>
+      </div>
+      <p>Gestiona el disparo de alertas cuando se detectan situaciones críticas: encuestas obligatorias no completadas, ausencias repetidas, o cambio de semáforo a Rojo. Genera las notificaciones que el sistema de tutoría debe atender con prioridad.</p>
+      <div class="pill-row">
+        <span class="tag tag-red">Alertas</span>
+        <span class="tag tag-red">Triggers</span>
+        <span class="tag tag-red">Notificaciones</span>
+      </div>
+    </div>
+
+  </div>
+
+  <hr class="divider">
+  <h3 style="margin-bottom:20px">Frontend — Componentes JavaScript</h3>
+  <div class="card">
+    <div class="card-header">
+      <div class="card-icon icon-purple">🖥</div>
+      <h3>src/front-end/controllers/iframe_handler.js</h3>
+    </div>
+    <p>Controlador JavaScript que gestiona la inyección dinámica de los dashboards HTML generados por Plotly dentro de los iframes del campus Moodle. Detecta el rol del usuario (docente/alumno) y carga el dashboard correspondiente desde los endpoints de la API. Permite embeber contenido personalizado sin modificar el código base de Moodle.</p>
+    <div class="pill-row">
+      <span class="tag tag-purple">ES Module</span>
+      <span class="tag tag-purple">iFrame Injection</span>
+      <span class="tag tag-purple">Role Detection</span>
+      <span class="tag tag-purple">Dynamic Load</span>
+    </div>
+    <div class="code-block" style="margin-top:16px">
+<span class="cmt">// Lógica conceptual del módulo</span>
+<span class="kw">const</span> container = document.<span class="fn">getElementById</span>(<span class="str">'iframe_container'</span>);
+<span class="kw">const</span> userRole = <span class="fn">getMoodleUserRole</span>(); <span class="cmt">// 'docente' | 'alumno'</span>
+<span class="kw">const</span> endpoint = userRole === <span class="str">'docente'</span>
+  ? <span class="str">'/api/dashboard/docente'</span>
+  : <span class="str">`/api/dashboard/alumno/${userId}`</span>;
+
+<span class="kw">const</span> iframe = document.<span class="fn">createElement</span>(<span class="str">'iframe'</span>);
+iframe.src = endpoint;
+container.<span class="fn">appendChild</span>(iframe);
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════ TAB: FLUJO ══════ -->
+<div id="flujo" class="tab-panel">
+  <h2>Flujo de Datos</h2>
+  <p class="section-lead">El sistema orquesta tres fuentes de datos distintas y las transforma en dashboards accionables embebidos en el campus virtual.</p>
+
+  <h3 style="margin-bottom:16px">Pipeline Completo</h3>
+  <div class="card" style="padding:30px 36px">
+    <div class="flow-step">
+      <div class="step-num">1</div>
+      <div class="step-content">
+        <h4>Ingesta de Datos Cuantitativos (XLS)</h4>
+        <p>Los docentes exportan el listado de notas de parciales y ausentes desde sus sistemas y cargan el archivo XLS a la API mediante el endpoint <code style="color:var(--accent)">/upload-xls</code>. El módulo <strong>procesador.py</strong> con OpenPyXL lee las columnas y normaliza los datos usando el DNI/Legajo como clave de cruce.</p>
+        <div class="pill-row"><span class="tag tag-blue">Notas parciales</span><span class="tag tag-blue">Ausencias</span><span class="tag tag-blue">Inscriptos</span></div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">2</div>
+      <div class="step-content">
+        <h4>Ingesta de Datos Cualitativos (Encuestas Moodle)</h4>
+        <p>Las encuestas diseñadas en Moodle (cuestionarios nativos) son respondidas por los alumnos en el campus. Las respuestas son importadas a la API por el endpoint <code style="color:var(--accent2)">/encuesta</code>, vinculando cada respuesta con el perfil del estudiante vía DNI/Legajo.</p>
+        <div class="pill-row"><span class="tag tag-purple">Autopercepción</span><span class="tag tag-purple">Factores socioeconómicos</span><span class="tag tag-purple">Motivación</span></div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">3</div>
+      <div class="step-content">
+        <h4>Procesamiento y Cruce de Fuentes</h4>
+        <p>El módulo <strong>procesador.py</strong> cruza ambas fuentes de datos usando Pandas para construir el perfil de riesgo actualizado de cada estudiante. Aplica lógica diferenciada según el año de cursada: métricas de ingresantes vs. métricas de alumnos avanzados.</p>
+        <div class="pill-row"><span class="tag tag-green">% Aprobación</span><span class="tag tag-green">Encuesta completada</span><span class="tag tag-green">Tendencia</span></div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">4</div>
+      <div class="step-content">
+        <h4>Motor de Semáforos y Alertas</h4>
+        <p><strong>semaforo.py</strong> recibe el perfil procesado y aplica el conjunto de reglas para clasificar al estudiante en Verde, Amarillo o Rojo. <strong>alertas.py</strong> dispara notificaciones cuando se detectan condiciones críticas (ej. encuesta no completada).</p>
+        <div class="pill-row"><span class="tag tag-yellow">Rule Engine</span><span class="tag tag-red">Alertas</span><span class="tag tag-yellow">Semáforo</span></div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">5</div>
+      <div class="step-content">
+        <h4>Generación de Dashboards HTML (Plotly)</h4>
+        <p>El router <strong>dashboard.py</strong> usa Plotly para generar visualizaciones interactivas del estado del semáforo, distribución de riesgo por cohorte, y evolución académica individual. El output es un archivo HTML auto-contenido.</p>
+        <div class="pill-row"><span class="tag tag-blue">Plotly</span><span class="tag tag-blue">HTML Export</span><span class="tag tag-blue">Charts</span></div>
+      </div>
+    </div>
+    <div class="flow-step">
+      <div class="step-num">6</div>
+      <div class="step-content">
+        <h4>Integración en Moodle vía iFrame</h4>
+        <p><strong>iframe_handler.js</strong> detecta el rol del usuario en Moodle e inyecta el dashboard correspondiente como iframe en el campus virtual. El docente ve el dashboard agregado de toda la cohorte; el alumno ve únicamente su propio semáforo y estado académico.</p>
+        <div class="pill-row"><span class="tag tag-purple">iFrame</span><span class="tag tag-purple">Moodle</span><span class="tag tag-purple">Dashboard Docente</span><span class="tag tag-purple">Dashboard Alumno</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════ TAB: FORMULARIO ══════ -->
+<div id="formulario" class="tab-panel">
+  <h2>Formulario de Riesgo — Alumnos Avanzados</h2>
+  <p class="section-lead">Diseñado para alumnos de 3.º año en adelante. Captura factores académicos, socioeconómicos y motivacionales para alimentar el motor de semáforos con datos cualitativos de mayor profundidad.</p>
+
+  <div class="form-wrapper">
+    <div class="form-header">
+      <h3>🎓 Encuesta de Seguimiento de Trayectoria — SBIRE</h3>
+      <p>Tus respuestas son confidenciales y se utilizarán únicamente para ofrecerte apoyo personalizado. No afectan tu situación académica formal.</p>
+    </div>
+    <div class="form-body">
+
+      <!-- SECCIÓN 1: DATOS IDENTIFICATORIOS -->
+      <div class="form-section">
+        <div class="form-section-title">🪪 01 — Datos identificatorios</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Legajo o DNI *</label>
+            <input type="text" placeholder="Ej: 12345 / 35678901" id="f_legajo" oninput="calcRisk()">
+          </div>
+          <div class="form-group">
+            <label>Nombre completo</label>
+            <input type="text" placeholder="Apellido, Nombre">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Correo electrónico</label>
+            <input type="email" placeholder="alumno@fi.mdp.edu.ar">
+          </div>
+          <div class="form-group">
+            <label>Año de ingreso a la carrera *</label>
+            <select id="f_ingreso" onchange="calcRisk()">
+              <option value="">— Seleccioná —</option>
+              <option>2018</option><option>2019</option><option>2020</option>
+              <option>2021</option><option>2022</option><option>2023</option><option>2024</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 2: TRAYECTORIA ACADÉMICA -->
+      <div class="form-section">
+        <div class="form-section-title">📚 02 — Trayectoria académica</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Materias aprobadas (regularizadas + finales) *</label>
+            <input type="number" placeholder="Ej: 18" min="0" max="60" id="f_aprobadas" oninput="calcRisk()">
+          </div>
+          <div class="form-group">
+            <label>Materias que deberías tener aprobadas según el plan *</label>
+            <input type="number" placeholder="Ej: 24" min="0" max="60" id="f_esperadas" oninput="calcRisk()">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Materias en las que estás inscripto/cursando actualmente</label>
+            <input type="number" placeholder="Ej: 3" min="0" max="10">
+          </div>
+          <div class="form-group">
+            <label>¿Hace cuántos meses fue tu última instancia de evaluación (parcial/final)?</label>
+            <select id="f_ultima_eval" onchange="calcRisk()">
+              <option value="">— Seleccioná —</option>
+              <option value="1">Menos de 1 mes</option>
+              <option value="2">1–3 meses</option>
+              <option value="4">3–6 meses</option>
+              <option value="8">6–12 meses</option>
+              <option value="15">Más de 12 meses</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label>¿Cuáles son las principales dificultades académicas que encontrás?</label>
+            <div class="checkbox-group" id="f_dificultades">
+              <label class="checkbox-item"><input type="checkbox" value="tiempo"> Falta de tiempo</label>
+              <label class="checkbox-item"><input type="checkbox" value="base"> Dificultades conceptuales/base</label>
+              <label class="checkbox-item"><input type="checkbox" value="metodologia"> Metodología de estudio</label>
+              <label class="checkbox-item"><input type="checkbox" value="catedra"> Problemas con la cátedra</label>
+              <label class="checkbox-item"><input type="checkbox" value="correlatividades"> Trabas por correlatividades</label>
+              <label class="checkbox-item"><input type="checkbox" value="ninguna"> Ninguna en particular</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 3: SITUACIÓN LABORAL Y SOCIOECONÓMICA -->
+      <div class="form-section">
+        <div class="form-section-title">💼 03 — Situación laboral y socioeconómica</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>¿Trabajás actualmente? *</label>
+            <select id="f_trabaja" onchange="calcRisk()">
+              <option value="">— Seleccioná —</option>
+              <option value="0">No</option>
+              <option value="1">Sí, menos de 20 hs/semana</option>
+              <option value="2">Sí, entre 20 y 35 hs/semana</option>
+              <option value="3">Sí, más de 35 hs/semana (full-time)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>¿Tu trabajo está relacionado con la carrera?</label>
+            <select>
+              <option value="">— Seleccioná —</option>
+              <option>Sí, directamente</option>
+              <option>Parcialmente</option>
+              <option>No</option>
+              <option>No trabajo</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>¿Tenés personas a cargo (hijos, familiar dependiente)?</label>
+            <select id="f_dependientes" onchange="calcRisk()">
+              <option value="">— Seleccioná —</option>
+              <option value="0">No</option>
+              <option value="1">Sí, con apoyo familiar/red de contención</option>
+              <option value="2">Sí, sin apoyo adicional</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>¿Financiás tus estudios principalmente con…?</label>
+            <select>
+              <option value="">— Seleccioná —</option>
+              <option>Ayuda familiar</option>
+              <option>Trabajo propio</option>
+              <option>Beca (CONICET, Progresar, etc.)</option>
+              <option>Combinación de fuentes</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 4: MOTIVACIÓN Y BIENESTAR -->
+      <div class="form-section">
+        <div class="form-section-title">🧠 04 — Motivación y bienestar subjetivo</div>
+        <p style="color:var(--muted);font-size:13px;margin-bottom:20px">Indicá tu nivel de acuerdo con cada afirmación. (1 = Muy en desacuerdo · 5 = Muy de acuerdo)</p>
+        <div class="likert-group">
+
+          <div class="likert-item">
+            <label id="lbl_motivacion">Mi motivación para terminar la carrera sigue siendo alta. <strong id="val_motivacion" style="color:var(--accent)">[3]</strong></label>
+            <div class="likert-scale">
+              <span style="font-size:12px;color:var(--muted)">1</span>
+              <input type="range" min="1" max="5" value="3" id="f_motivacion" oninput="document.getElementById('val_motivacion').textContent='['+this.value+']';calcRisk()">
+              <span style="font-size:12px;color:var(--muted)">5</span>
+            </div>
+            <div class="likert-labels"><span>Muy en desacuerdo</span><span>Muy de acuerdo</span></div>
+          </div>
+
+          <div class="likert-item">
+            <label>Me siento capaz de terminar la carrera. <strong id="val_autoeficacia" style="color:var(--accent)">[3]</strong></label>
+            <div class="likert-scale">
+              <span style="font-size:12px;color:var(--muted)">1</span>
+              <input type="range" min="1" max="5" value="3" id="f_autoeficacia" oninput="document.getElementById('val_autoeficacia').textContent='['+this.value+']';calcRisk()">
+              <span style="font-size:12px;color:var(--muted)">5</span>
+            </div>
+            <div class="likert-labels"><span>Muy en desacuerdo</span><span>Muy de acuerdo</span></div>
+          </div>
+
+          <div class="likert-item">
+            <label>Cuento con apoyo de mi entorno familiar/social para continuar estudiando. <strong id="val_apoyo" style="color:var(--accent)">[3]</strong></label>
+            <div class="likert-scale">
+              <span style="font-size:12px;color:var(--muted)">1</span>
+              <input type="range" min="1" max="5" value="3" id="f_apoyo" oninput="document.getElementById('val_apoyo').textContent='['+this.value+']';calcRisk()">
+              <span style="font-size:12px;color:var(--muted)">5</span>
+            </div>
+            <div class="likert-labels"><span>Muy en desacuerdo</span><span>Muy de acuerdo</span></div>
+          </div>
+
+          <div class="likert-item">
+            <label>Me siento satisfecho/a con mi avance en la carrera. <strong id="val_satisfaccion" style="color:var(--accent)">[3]</strong></label>
+            <div class="likert-scale">
+              <span style="font-size:12px;color:var(--muted)">1</span>
+              <input type="range" min="1" max="5" value="3" id="f_satisfaccion" oninput="document.getElementById('val_satisfaccion').textContent='['+this.value+']';calcRisk()">
+              <span style="font-size:12px;color:var(--muted)">5</span>
+            </div>
+            <div class="likert-labels"><span>Muy en desacuerdo</span><span>Muy de acuerdo</span></div>
+          </div>
+
+          <div class="likert-item">
+            <label>He pensado en dejar la carrera en el último año. <strong id="val_abandono" style="color:var(--red)">[2]</strong></label>
+            <div class="likert-scale">
+              <span style="font-size:12px;color:var(--muted)">1</span>
+              <input type="range" min="1" max="5" value="2" id="f_abandono" oninput="document.getElementById('val_abandono').textContent='['+this.value+']';calcRisk()">
+              <span style="font-size:12px;color:var(--muted)">5</span>
+            </div>
+            <div class="likert-labels"><span>Nunca</span><span>Con frecuencia</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECCIÓN 5: CAMPUS Y TUTORÍAS -->
+      <div class="form-section">
+        <div class="form-section-title">💻 05 — Uso del campus y tutorías</div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>¿Con qué frecuencia accedés al campus virtual?</label>
+            <select id="f_campus" onchange="calcRisk()">
+              <option value="">— Seleccioná —</option>
+              <option value="3">Todos los días</option>
+              <option value="2">Varias veces por semana</option>
+              <option value="1">Una vez por semana</option>
+              <option value="0">Menos de una vez por semana</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>¿Has recurrido alguna vez al sistema de tutorías de la facultad?</label>
+            <select id="f_tutorias" onchange="calcRisk()">
+              <option value="">— Seleccioná —</option>
+              <option value="2">Sí, y me fue útil</option>
+              <option value="1">Sí, pero no me resultó útil</option>
+              <option value="0">No, no lo conocía</option>
+              <option value="0">No, pero sé que existe</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label>¿Cuál es tu expectativa de graduación?</label>
+            <select id="f_expectativa" onchange="calcRisk()">
+              <option value="">— Seleccioná —</option>
+              <option value="3">En menos de 1 año</option>
+              <option value="2">Entre 1 y 2 años</option>
+              <option value="1">Entre 2 y 3 años</option>
+              <option value="0">Más de 3 años / No lo sé</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row full">
+          <div class="form-group">
+            <label>¿Hay algo más que quieras contarnos sobre tu situación o que creas que debería saber el equipo de tutorías?</label>
+            <textarea placeholder="Comentarios adicionales (opcional)..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- PREVIEW DE RIESGO EN TIEMPO REAL -->
+      <div class="risk-preview" id="riskPreview">
+        <div class="risk-indicator risk-verde" id="riskIndicator">?</div>
+        <div>
+          <div style="font-family:var(--font-display);font-weight:700;font-size:1rem" id="riskLabel">Completá el formulario</div>
+          <div style="font-size:13px;color:var(--muted)" id="riskDesc">El nivel de riesgo estimado se actualizará automáticamente.</div>
+          <div style="margin-top:8px">
+            <div style="background:var(--border);border-radius:4px;height:6px;overflow:hidden">
+              <div id="riskBar" style="height:100%;width:0%;background:var(--accent);border-radius:4px;transition:width .4s,background .4s"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="form-submit-btn" onclick="submitForm()">Enviar respuestas al sistema SBIRE →</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-blue">🔢</div><h3>Variables capturadas y su peso en el semáforo</h3></div>
+    <div style="overflow-x:auto">
+      <table style="width:100%;border-collapse:collapse;font-size:13px">
+        <thead>
+          <tr style="border-bottom:1px solid var(--border)">
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:500">Variable</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:500">Tipo</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:500">Impacto en semáforo</th>
+            <th style="text-align:left;padding:8px 12px;color:var(--muted);font-weight:500">Fuente</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">% Aprobación (real vs. esperado)</td><td><span class="tag tag-blue">Cuantitativo</span></td><td><span class="tag tag-red">Alto</span></td><td>XLS Docente</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Meses sin evaluación</td><td><span class="tag tag-blue">Cuantitativo</span></td><td><span class="tag tag-red">Alto</span></td><td>XLS Docente</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Carga laboral (hs/semana)</td><td><span class="tag tag-green">Cualitativo</span></td><td><span class="tag tag-yellow">Medio</span></td><td>Encuesta</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Motivación para continuar</td><td><span class="tag tag-green">Cualitativo</span></td><td><span class="tag tag-red">Alto</span></td><td>Encuesta</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Pensamiento de abandono</td><td><span class="tag tag-green">Cualitativo</span></td><td><span class="tag tag-red">Alto</span></td><td>Encuesta</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Personas a cargo</td><td><span class="tag tag-green">Cualitativo</span></td><td><span class="tag tag-yellow">Medio</span></td><td>Encuesta</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Autoeficacia percibida</td><td><span class="tag tag-green">Cualitativo</span></td><td><span class="tag tag-yellow">Medio</span></td><td>Encuesta</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:10px 12px">Acceso al campus</td><td><span class="tag tag-green">Cualitativo</span></td><td><span class="tag tag-yellow">Bajo-Medio</span></td><td>Encuesta + Moodle</td></tr>
+          <tr><td style="padding:10px 12px">Expectativa de graduación</td><td><span class="tag tag-green">Cualitativo</span></td><td><span class="tag tag-yellow">Medio</span></td><td>Encuesta</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════ TAB: ER ══════ -->
+<div id="er" class="tab-panel">
+  <h2>Modelo Entidad-Relación</h2>
+  <p class="section-lead">Propuesta de estructura de base de datos para PostgreSQL, basada en las entidades del sistema, el flujo de datos y las variables del formulario de riesgo.</p>
+
+  <div class="er-wrapper">
+    <svg class="er-svg" viewBox="0 0 980 780" xmlns="http://www.w3.org/2000/svg" font-family="'DM Mono', monospace">
+      <defs>
+        <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#4a5568"/>
+        </marker>
+        <marker id="arrow-blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L8,3 z" fill="#4f7fff"/>
+        </marker>
+      </defs>
+
+      <!-- ESTUDIANTE (centro) -->
+      <rect x="360" y="300" width="210" height="190" rx="10" fill="#141720" stroke="#4f7fff" stroke-width="2"/>
+      <rect x="360" y="300" width="210" height="30" rx="10" fill="#1e2d55"/>
+      <rect x="360" y="318" width="210" height="12" rx="0" fill="#1e2d55"/>
+      <text x="465" y="320" fill="#4f7fff" font-size="12" font-weight="bold" text-anchor="middle">ESTUDIANTE</text>
+      <text x="372" y="347" fill="#7b879f" font-size="10">🔑 id (PK)</text>
+      <text x="372" y="362" fill="#e2e8f8" font-size="10">dni / legajo (UNIQUE)</text>
+      <text x="372" y="377" fill="#e2e8f8" font-size="10">nombre · apellido</text>
+      <text x="372" y="392" fill="#e2e8f8" font-size="10">email</text>
+      <text x="372" y="407" fill="#e2e8f8" font-size="10">anio_ingreso</text>
+      <text x="372" y="422" fill="#e2e8f8" font-size="10">carrera_id (FK)</text>
+      <text x="372" y="437" fill="#e2e8f8" font-size="10">activo</text>
+      <text x="372" y="452" fill="#7b879f" font-size="10">created_at · updated_at</text>
+
+      <!-- CARRERA -->
+      <rect x="30" y="300" width="180" height="130" rx="10" fill="#141720" stroke="#7c5cfc" stroke-width="1.5"/>
+      <rect x="30" y="300" width="180" height="28" rx="10" fill="#1e1435"/>
+      <rect x="30" y="316" width="180" height="12" rx="0" fill="#1e1435"/>
+      <text x="120" y="318" fill="#7c5cfc" font-size="12" font-weight="bold" text-anchor="middle">CARRERA</text>
+      <text x="42" y="345" fill="#7b879f" font-size="10">🔑 id (PK)</text>
+      <text x="42" y="360" fill="#e2e8f8" font-size="10">nombre</text>
+      <text x="42" y="375" fill="#e2e8f8" font-size="10">departamento</text>
+      <text x="42" y="390" fill="#e2e8f8" font-size="10">facultad</text>
+      <text x="42" y="405" fill="#7b879f" font-size="10">plan_de_estudios</text>
+      <text x="42" y="420" fill="#7b879f" font-size="10">materias_total</text>
+
+      <!-- MATERIA -->
+      <rect x="30" y="80" width="180" height="160" rx="10" fill="#141720" stroke="#7c5cfc" stroke-width="1.5"/>
+      <rect x="30" y="80" width="180" height="28" rx="10" fill="#1e1435"/>
+      <rect x="30" y="96" width="180" height="12" rx="0" fill="#1e1435"/>
+      <text x="120" y="98" fill="#7c5cfc" font-size="12" font-weight="bold" text-anchor="middle">MATERIA</text>
+      <text x="42" y="125" fill="#7b879f" font-size="10">🔑 id (PK)</text>
+      <text x="42" y="140" fill="#e2e8f8" font-size="10">codigo (UNIQUE)</text>
+      <text x="42" y="155" fill="#e2e8f8" font-size="10">nombre</text>
+      <text x="42" y="170" fill="#e2e8f8" font-size="10">anio_plan</text>
+      <text x="42" y="185" fill="#e2e8f8" font-size="10">creditos</text>
+      <text x="42" y="200" fill="#e2e8f8" font-size="10">carrera_id (FK)</text>
+      <text x="42" y="215" fill="#7b879f" font-size="10">tipo (obligatoria / elec.)</text>
+
+      <!-- INSCRIPCION -->
+      <rect x="280" y="80" width="190" height="160" rx="10" fill="#141720" stroke="#22c97a" stroke-width="1.5"/>
+      <rect x="280" y="80" width="190" height="28" rx="10" fill="#0e2018"/>
+      <rect x="280" y="96" width="190" height="12" rx="0" fill="#0e2018"/>
+      <text x="375" y="98" fill="#22c97a" font-size="12" font-weight="bold" text-anchor="middle">INSCRIPCION</text>
+      <text x="292" y="125" fill="#7b879f" font-size="10">🔑 id (PK)</text>
+      <text x="292" y="140" fill="#e2e8f8" font-size="10">estudiante_id (FK)</text>
+      <text x="292" y="155" fill="#e2e8f8" font-size="10">materia_id (FK)</text>
+      <text x="292" y="170" fill="#e2e8f8" font-size="10">ciclo_lectivo</text>
+      <text x="292" y="185" fill="#e2e8f8" font-size="10">estado</text>
+      <text x="292" y="200" fill="#7b879f" font-size="10">  (cursando/aprobada/libre)</text>
+      <text x="292" y="215" fill="#e2e8f8" font-size="10">fecha_inscripcion</text>
+
+      <!-- NOTA PARCIAL -->
+      <rect x="530" y="80" width="190" height="170" rx="10" fill="#141720" stroke="#22c97a" stroke-width="1.5"/>
+      <rect x="530" y="80" width="190" height="28" rx="10" fill="#0e2018"/>
+      <rect x="530" y="96" width="190" height="12" rx="0" fill="#0e2018"/>
+      <text x="625" y="98" fill="#22c97a" font-size="12" font-weight="bold" text-anchor="middle">NOTA_PARCIAL</text>
+      <text x="542" y="125" fill="#7b879f" font-size="10">🔑 id (PK)</text>
+      <text x="542" y="140" fill="#e2e8f8" font-size="10">inscripcion_id (FK)</text>
+      <text x="542" y="155" fill="#e2e8f8" font-size="10">nro_parcial</text>
+      <text x="542" y="170" fill="#e2e8f8" font-size="10">nota (Float)</text>
+      <text x="542" y="185" fill="#e2e8f8" font-size="10">ausente (Bool)</text>
+      <text x="542" y="200" fill="#e2e8f8" font-size="10">recuperatorio (Bool)</text>
+      <text x="542" y="215" fill="#7b879f" font-size="10">fecha</text>
+
+      <!-- PERFIL RIESGO -->
+      <rect x="570" y="300" width="210" height="190" rx="10" fill="#141720" stroke="#f5c842" stroke-width="2"/>
+      <rect x="570" y="300" width="210" height="28" rx="10" fill="#2a2000"/>
+      <rect x="570" y="316" width="210" height="12" rx="0" fill="#2a2000"/>
+      <text x="675" y="318" fill="#f5c842" font-size="12" font-weight="bold" text-anchor="middle">PERFIL_RIESGO</text>
+      <text x="582" y="345" fill="#7b879f" font-size="10">🔑 id (PK)</text>
+      <text x="582" y="360" fill="#e2e8f8" font-size="10">estudiante_id (FK)</text>
+      <text x="582" y="375" fill="#e2e8f8" font-size="10">semaforo (verde/am./rojo)</text>
+      <text x="582" y="390" fill="#e2e8f8" font-size="10">pct_aprobacion</text>
+      <text x="582" y="405" fill="#e2e8f8" font-size="10">alerta_encuesta (Bool)</text>
+      <text x="582" y="420" fill="#e2e8f8" font-size="10">puntaje_riesgo (Float)</text>
+      <text x="582" y="435" fill="#7b879f" font-size="10">encuesta_id (FK)</text>
+      <text x="582" y="450" fill="#7b879f" font-size="10">fecha_calculo</text>
+      <text x="582" y="465" fill="#7b879f" font-size="10">ciclo_lectivo</text>
+
+      <!-- ENCUESTA -->
+      <rect x="730" y="80" width="200" height="140" rx="10" fill="#141720" stroke="#f05454" stroke-width="1.5"/>
+      <rect x="730" y="80" width="200" height="28" rx="10" fill="#200e0e"/>
+      <rect x="730" y="96" width="200" height="12" rx="0" fill="#200e0e"/>
+      <text x="830" y="98" fill="#f05454" font-size="12" font-weight="bold" text-anchor="middle">ENCUESTA</text>
+      <text x="742" y="125" fill="#7b879f" font-size="10">🔑 id (PK)</text>
+      <text x="742" y="140" fill="#e2e8f8" font-size="10">nombre</text>
+      <text x="742" y="155" fill="#e2e8f8" font-size="10">tipo (ingresante/avanzado)</text>
+      <text x="742" y="170" fill="#e2e8f8" font-size="10">ciclo_lectivo</text>
+      <text x="742" y="185" fill="#7b879f" font-size="10">fecha_inicio · fecha_fin</text>
+
+      <!-- RESPUESTA_ENCUESTA -->
+      <rect x="730" y="280" width="210" height="150" rx="10" fill="#141720" stroke="#f05454" stroke-width="1.5"/>
+      <rect x="730" y="280" width="210" height="28" rx="10" fill="#200e0e"/>
+      <rect x="730" y="296" width="210" height="12" rx="0" fill="#200e0e"/>
+      <text x="835" y="298" fill="#f05454" font-size="12" font-weight="bold" text-anchor="middle">RESPUESTA_ENCUESTA</text>
+      <text x="742" y="325" fill="#7b879f" font-size="10">🔑 id (PK)</text>
+      <text x="742" y="340" fill="#e2e8f8" font-size="10">estudiante_id (FK)</text>
+      <text x="742" y="355" fill="#e2e8f8" font-size="10">encuesta_id (FK)</text>
+      <text x="742" y="370" fill="#e2e8f8" font-size="10">respuestas (JSONB)</text>
+      <text x="742" y="385" fill="#7b879f" font-size="10">puntaje_calculado</text>
+      <text x="742" y="400" fill="#7b879f" font-size="10">fecha_respuesta</text>
+
+      <!-- TUTOR -->
+      <rect x="360" y="580" width="190" height="150" rx="10" fill="#141720" stroke="#7c5cfc" stroke-width="1.5"/>
+      <rect x="360" y="580" width="190" height="28" rx="10" fill="#1e1435"/>
+      <rect x="360" y="596" width="190" height="12" rx="0" fill="#1e1435"/>
+      <text x="455" y="598" fill="#7c5cfc" font-size="12" font-weight="bold" text-anchor="middle">TUTOR</text>
+      <text x="372" y="625" fill="#7b879f" font-size="10">🔑 id (PK)</text>
+      <text x="372" y="640" fill="#e2e8f8" font-size="10">nombre · apellido</text>
+      <text x="372" y="655" fill="#e2e8f8" font-size="10">email</text>
+      <text x="372" y="670" fill="#e2e8f8" font-size="10">rol (tutor/coordinador)</text>
+      <text x="372" y="685" fill="#7b879f" font-size="10">activo</text>
+
+      <!-- INTERVENCION -->
+      <rect x="570" y="560" width="210" height="170" rx="10" fill="#141720" stroke="#7c5cfc" stroke-width="1.5"/>
+      <rect x="570" y="560" width="210" height="28" rx="10" fill="#1e1435"/>
+      <rect x="570" y="576" width="210" height="12" rx="0" fill="#1e1435"/>
+      <text x="675" y="578" fill="#7c5cfc" font-size="12" font-weight="bold" text-anchor="middle">INTERVENCION_TUTORIA</text>
+      <text x="582" y="605" fill="#7b879f" font-size="10">🔑 id (PK)</text>
+      <text x="582" y="620" fill="#e2e8f8" font-size="10">tutor_id (FK)</text>
+      <text x="582" y="635" fill="#e2e8f8" font-size="10">estudiante_id (FK)</text>
+      <text x="582" y="650" fill="#e2e8f8" font-size="10">tipo (llamado/reun/email)</text>
+      <text x="582" y="665" fill="#e2e8f8" font-size="10">descripcion</text>
+      <text x="582" y="680" fill="#e2e8f8" font-size="10">resultado</text>
+      <text x="582" y="695" fill="#7b879f" font-size="10">fecha</text>
+
+      <!-- ──── RELACIONES ──── -->
+      <!-- Carrera → Estudiante -->
+      <line x1="210" y1="365" x2="358" y2="395" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="265" y="372" fill="#4a5568" font-size="9">1</text>
+      <text x="340" y="390" fill="#4a5568" font-size="9">N</text>
+
+      <!-- Carrera → Materia -->
+      <line x1="165" y1="300" x2="155" y2="242" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="168" y="278" fill="#4a5568" font-size="9">1:N</text>
+
+      <!-- Materia → Inscripcion -->
+      <line x1="210" y1="160" x2="278" y2="160" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="230" y="155" fill="#4a5568" font-size="9">1:N</text>
+
+      <!-- Estudiante → Inscripcion -->
+      <line x1="420" y1="300" x2="390" y2="242" stroke="#4f7fff" stroke-width="1.5" marker-end="url(#arrow-blue)"/>
+      <text x="398" y="270" fill="#4f7fff" font-size="9">1:N</text>
+
+      <!-- Inscripcion → NotaParcial -->
+      <line x1="470" y1="160" x2="528" y2="160" stroke="#4a5568" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="488" y="155" fill="#4a5568" font-size="9">1:N</text>
+
+      <!-- Estudiante → PerfilRiesgo -->
+      <line x1="570" y1="395" x2="572" y2="395" stroke="#f5c842" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+      <!-- Estudiante → PerfilRiesgo (proper) -->
+      <line x1="570" y1="390" x2="570" y2="390" stroke="#f5c842" stroke-width="1"/>
+
+      <!-- Estudiante right → PerfilRiesgo left -->
+      <path d="M570 390 L570 390" stroke="#f5c842" stroke-width="1"/>
+      <line x1="571" y1="390" x2="569" y2="390" stroke="#f5c842" stroke-width="1.5"/>
+
+      <!-- Actually draw Student to PerfilRiesgo -->
+      <line x1="570" y1="393" x2="572" y2="393" stroke="#f5c842" stroke-width="2"/>
+
+      <!-- Student → PerfilRiesgo correct -->
+      <path d="M 570 393 L 571 393" stroke="none"/>
+      <!-- Arrow from Estudiante (right edge) to PerfilRiesgo (left edge) -->
+      <line x1="570" y1="393" x2="571" y2="393" stroke="none"/>
+      <line x1="569" y1="393" x2="572" y2="393" stroke="none"/>
+
+      <!-- Let me fix: Estudiante right=570, PerfilRiesgo left=570. They overlap. Let me check coordinates. -->
+      <!-- Estudiante: x=360, width=210, so right edge = 570 -->
+      <!-- PerfilRiesgo: x=570. So left edge = 570 exactly. They're adjacent. -->
+      <!-- Draw line from y center to y center -->
+      <line x1="570" y1="393" x2="570" y2="393" stroke="none"/>
+
+      <!-- Corrected: use midpoints -->
+      <!-- Estudiante center: x=465, y=395. PerfilRiesgo center: x=675, y=395 -->
+      <!-- Just connect right/left edges -->
+      <line x1="571" y1="393" x2="568" y2="393" stroke="none"/>
+
+      <!-- Draw: Estudiante right edge (570,393) to PerfilRiesgo left edge (570,393) - they touch -->
+      <!-- Use a curved path to show the relationship clearly -->
+      <path d="M 570 380 Q 580 365 570 355" stroke="#f5c842" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <text x="573" y="370" fill="#f5c842" font-size="9">1:N</text>
+
+      <!-- Encuesta → PerfilRiesgo -->
+      <line x1="780" y1="300" x2="782" y2="300" stroke="none"/>
+      <!-- Draw from Encuesta bottom to PerfilRiesgo via connection -->
+      <line x1="800" y1="222" x2="780" y2="300" stroke="#f05454" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="796" y="268" fill="#f05454" font-size="9">1:N</text>
+
+      <!-- RespuestaEncuesta → Encuesta -->
+      <line x1="835" y1="278" x2="835" y2="222" stroke="#f05454" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="840" y="256" fill="#f05454" font-size="9">N:1</text>
+
+      <!-- RespuestaEncuesta → Estudiante -->
+      <path d="M 730 355 Q 700 350 680 395 Q 650 430 570 430" stroke="#f05454" stroke-width="1.5" fill="none" marker-end="url(#arrow)"/>
+      <text x="668" y="436" fill="#f05454" font-size="9">N:1</text>
+
+      <!-- Estudiante → Tutor (intervencion) -->
+      <line x1="465" y1="490" x2="455" y2="578" stroke="#7c5cfc" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="437" y="535" fill="#7c5cfc" font-size="9">M:N via</text>
+      <text x="434" y="546" fill="#7c5cfc" font-size="9">intervención</text>
+
+      <!-- Tutor → Intervencion -->
+      <line x1="550" y1="650" x2="568" y2="645" stroke="#7c5cfc" stroke-width="1.5" marker-end="url(#arrow)"/>
+      <text x="546" y="638" fill="#7c5cfc" font-size="9">1:N</text>
+
+      <!-- Estudiante → Intervencion -->
+      <path d="M 570 490 Q 650 520 660 558" stroke="#4f7fff" stroke-width="1.5" fill="none" marker-end="url(#arrow-blue)"/>
+      <text x="644" y="524" fill="#4f7fff" font-size="9">1:N</text>
+    </svg>
+
+    <div class="er-legend">
+      <div class="er-legend-item"><div class="er-legend-rect" style="background:rgba(79,127,255,.15);border-color:#4f7fff"></div>Entidad principal (Estudiante)</div>
+      <div class="er-legend-item"><div class="er-legend-rect" style="background:rgba(124,92,252,.15);border-color:#7c5cfc"></div>Entidades maestras (Carrera, Tutor, Materia)</div>
+      <div class="er-legend-item"><div class="er-legend-rect" style="background:rgba(34,201,122,.15);border-color:#22c97a"></div>Datos académicos (Inscripcion, Nota)</div>
+      <div class="er-legend-item"><div class="er-legend-rect" style="background:rgba(245,200,66,.15);border-color:#f5c842"></div>Analítica de riesgo (PerfilRiesgo)</div>
+      <div class="er-legend-item"><div class="er-legend-rect" style="background:rgba(240,84,84,.15);border-color:#f05454"></div>Encuestas (Encuesta, RespuestaEncuesta)</div>
+    </div>
+  </div>
+
+  <hr class="divider">
+  <h3>Notas de Diseño</h3>
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-yellow">⚡</div><h3>PERFIL_RIESGO como snapshot</h3></div>
+      <p>La tabla PERFIL_RIESGO almacena un snapshot del semáforo en cada cálculo, no solo el estado actual. Esto permite auditoría histórica y análisis de evolución del riesgo a lo largo del tiempo.</p>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-red">🔗</div><h3>JSONB para respuestas de encuesta</h3></div>
+      <p>Las respuestas individuales de cada pregunta se almacenan como JSONB en PostgreSQL, lo que permite flexibilidad en el diseño de los cuestionarios sin requerir migraciones de esquema.</p>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-blue">🔑</div><h3>DNI/Legajo como clave natural</h3></div>
+      <p>El campo <code style="color:var(--accent)">dni/legajo</code> tiene restricción UNIQUE sobre la tabla ESTUDIANTE y actúa como clave de cruce entre las importaciones XLS y el perfil en la base de datos.</p>
+    </div>
+    <div class="card">
+      <div class="card-header"><div class="card-icon icon-purple">📋</div><h3>INTERVENCION_TUTORIA como log</h3></div>
+      <p>Cada acción de tutoría (llamado, reunión, email) se registra con resultado, creando un historial que permite evaluar la efectividad de las intervenciones sobre el semáforo del estudiante.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════ TAB: SETUP ══════ -->
+<div id="setup" class="tab-panel">
+  <h2>Guía de Setup</h2>
+  <p class="section-lead">Pasos para levantar el entorno de desarrollo local del backend de Proyecto Travesía.</p>
+
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-green">📦</div><h3>Requisitos previos</h3></div>
+    <div class="info-row"><span class="info-icon">🐍</span><div><div class="info-label">Python</div><div class="info-value">3.10 o superior</div></div></div>
+    <div class="info-row"><span class="info-icon">🐘</span><div><div class="info-label">PostgreSQL</div><div class="info-value">14 o superior, corriendo localmente</div></div></div>
+    <div class="info-row"><span class="info-icon">📝</span><div><div class="info-label">Editor recomendado</div><div class="info-value">VS Code con extensión Python</div></div></div>
+    <div class="info-row"><span class="info-icon">🔧</span><div><div class="info-label">Variables de entorno</div><div class="info-value">Archivo .env con DATABASE_URL (ver .env.example)</div></div></div>
+  </div>
+
+  <div class="code-block" style="margin-top:20px">
+<span class="cmt"># 1. Clonar el repositorio</span>
+git clone https://github.com/SantiSoldani/dashboard-moodle.git
+cd dashboard-moodle
+
+<span class="cmt"># 2. Crear y activar entorno virtual</span>
+python -m venv venv
+
+<span class="cmt"># Windows (PowerShell / VS Code Terminal)</span>
+.\venv\Scripts\activate
+
+<span class="cmt"># macOS / Linux</span>
+source venv/bin/activate
+
+<span class="cmt"># 3. Instalar dependencias</span>
+pip install -r requirements.txt
+
+<span class="cmt"># 4. Configurar variables de entorno</span>
+cp .env.example .env
+<span class="cmt"># Editá .env con tu DATABASE_URL de PostgreSQL</span>
+
+<span class="cmt"># 5. Levantar el servidor de desarrollo</span>
+uvicorn <span class="fn">main</span>:app --reload
+
+<span class="cmt"># La API queda disponible en: http://localhost:8000</span>
+<span class="cmt"># Documentación interactiva: http://localhost:8000/docs</span>
+  </div>
+
+  <hr class="divider">
+  <div class="card">
+    <div class="card-header"><div class="card-icon icon-purple">✅</div><h3>TO-DO pendiente (según README)</h3></div>
+    <div class="info-row"><span class="info-icon">📋</span><div><div class="info-label">Encuestas</div><div class="info-value">Diseñar preguntas definitivas y escala de puntajes — el formulario de esta documentación es una propuesta de base</div></div></div>
+    <div class="info-row"><span class="info-icon">🗄</span><div><div class="info-label">Base de Datos</div><div class="info-value">Crear la base en PostgreSQL, diseñar las tablas e implementar el modelo ER propuesto en esta doc</div></div></div>
+    <div class="info-row"><span class="info-icon">📊</span><div><div class="info-label">Looker Studio</div><div class="info-value">Integrar conexión a Looker Studio como alternativa o complemento a los dashboards Plotly</div></div></div>
+  </div>
+</div>
+
+</main>
+
+<script>
+function switchTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function toggleCollapse(btn) {
+  const content = btn.nextElementSibling;
+  const chevron = btn.querySelector('.chevron');
+  content.classList.toggle('open');
+  chevron.classList.toggle('open');
+}
+
+function calcRisk() {
+  let score = 0;
+  let factors = 0;
+
+  // Aprobación académica (peso alto)
+  const aprobadas = parseFloat(document.getElementById('f_aprobadas').value) || 0;
+  const esperadas = parseFloat(document.getElementById('f_esperadas').value) || 1;
+  if (esperadas > 0 && aprobadas > 0) {
+    const pct = aprobadas / esperadas;
+    if (pct < 0.6)       score += 3;
+    else if (pct < 0.8)  score += 1.5;
+    else                 score += 0;
+    factors++;
+  }
+
+  // Última evaluación
+  const ultimaEval = parseInt(document.getElementById('f_ultima_eval').value) || 0;
+  if (ultimaEval >= 8)       score += 3;
+  else if (ultimaEval >= 4)  score += 1.5;
+  factors++;
+
+  // Trabajo
+  const trabaja = parseInt(document.getElementById('f_trabaja').value) || 0;
+  score += trabaja;
+  factors++;
+
+  // Dependientes
+  const dep = parseInt(document.getElementById('f_dependientes').value) || 0;
+  score += dep;
+  factors++;
+
+  // Motivación (invertida)
+  const motivacion = parseInt(document.getElementById('f_motivacion').value) || 3;
+  score += (5 - motivacion) * 0.5;
+  factors++;
+
+  // Autoeficacia (invertida)
+  const autoef = parseInt(document.getElementById('f_autoeficacia').value) || 3;
+  score += (5 - autoef) * 0.4;
+  factors++;
+
+  // Pensamiento de abandono
+  const abandono = parseInt(document.getElementById('f_abandono').value) || 2;
+  score += (abandono - 1) * 0.8;
+  factors++;
+
+  // Campus
+  const campus = parseInt(document.getElementById('f_campus').value);
+  if (!isNaN(campus)) { score += (3 - campus) * 0.3; factors++; }
+
+  // Expectativa
+  const expectativa = parseInt(document.getElementById('f_expectativa').value);
+  if (!isNaN(expectativa)) { score += (3 - expectativa) * 0.4; factors++; }
+
+  if (factors < 3) return;
+
+  const maxScore = 14;
+  const pct = Math.min(score / maxScore, 1);
+  const bar = document.getElementById('riskBar');
+  const indicator = document.getElementById('riskIndicator');
+  const label = document.getElementById('riskLabel');
+  const desc = document.getElementById('riskDesc');
+
+  bar.style.width = (pct * 100) + '%';
+
+  if (pct < 0.35) {
+    indicator.className = 'risk-indicator risk-verde';
+    indicator.textContent = '🟢';
+    label.textContent = 'Riesgo VERDE — Trayectoria Regular';
+    desc.textContent = 'No se detectan factores de riesgo significativos. Seguimiento estándar.';
+    bar.style.background = 'var(--green)';
+  } else if (pct < 0.65) {
+    indicator.className = 'risk-indicator risk-amarillo';
+    indicator.textContent = '🟡';
+    label.textContent = 'Riesgo AMARILLO — Atención Moderada';
+    desc.textContent = 'Algunos indicadores de alerta. Se recomienda contacto preventivo desde tutoría.';
+    bar.style.background = 'var(--yellow)';
+  } else {
+    indicator.className = 'risk-indicator risk-rojo';
+    indicator.textContent = '🔴';
+    label.textContent = 'Riesgo ROJO — Intervención Prioritaria';
+    desc.textContent = 'Múltiples factores de riesgo detectados. El sistema generará una alerta de tutoría inmediata.';
+    bar.style.background = 'var(--red)';
+  }
+}
+
+function submitForm() {
+  const legajo = document.getElementById('f_legajo').value;
+  if (!legajo) { alert('Por favor completá el campo de Legajo o DNI antes de enviar.'); return; }
+  alert('✅ Formulario enviado correctamente.\n\nLos datos fueron recibidos por el sistema SBIRE y el perfil de riesgo fue actualizado.\n\nLegajo: ' + legajo);
+}
+</script>
+</body>
+</html>
