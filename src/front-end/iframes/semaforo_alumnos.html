@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../styles/all_students_style.css">
-    <script type="module" src="../controllers/semaforo_alumnos_controller.js"></script>
+    <script type="module" src="../controllers/semaforo_iframe_controller.js"></script>
     <title>Lista de Alumnos</title>
 </head>
 <body>
@@ -17,9 +17,9 @@
             <div class="page-actions">
                 <div class="search-group">
                     <label for="searchAlumno" class="sr-only">Buscar alumno</label>
-                    <input id="searchAlumno" type="search" placeholder="Buscar alumno..." disabled>
+                    <input id="searchAlumno" type="search" placeholder="Buscar alumno...">
                 </div>
-                <button id = "btnBuscar" class="btn-primary" disabled>Buscar</button>
+                <button id="btnBuscar" class="btn-primary" disabled>Buscar</button>
             </div>
         </header>
 
@@ -62,7 +62,7 @@
 
         <section class="table-card">
             <div class="table-meta">
-                <span class="meta-item">Total de alumnos: <strong>0</strong></span>
+                <span class="meta-item">Total de alumnos: <strong id="totalAlumnosCount">0</strong></span>
                 <span class="meta-item">Filtro activo: <strong>Todos</strong></span>
             </div>
 
@@ -88,5 +88,6 @@
             </div>
         </section>
     </div>
+    <script type = "module" src="../controllers/semaforo_iframe_controller.js"></script>
 </body>
 </html>
