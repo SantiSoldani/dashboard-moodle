@@ -12,6 +12,9 @@ const Iframe_tipes = {
     'semaforo_alumnos':{
         src: 'src/front-end/iframes/semaforo_alumnos.html'
     },
+    'all_students':{
+        src: 'src/front-end/iframes/all_students.html'
+    },
     //pendiente en agregar mas iframes en caso de necesitarlos
 }
 
@@ -33,6 +36,7 @@ function Handle_which_iframe(){
     iframe.style.width = '100%';
     iframe.style.height = '100%';
     iframe.style.border = 'none';
+    iframe.style.display = 'block';
 
     conteiner.appendChild(iframe);
 

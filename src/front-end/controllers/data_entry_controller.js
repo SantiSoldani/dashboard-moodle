@@ -6,7 +6,7 @@
  * -OTORGAR FLAGS DE QUE LOS DATOS FUERON CARGADOS EXITOSAMENTE
  */
 
-
+import { Post_csv } from '../models/files_model.js';
 
 //------------------------------------SECTOR DE FUNCIONES PRINCIPALES----------------------------------------------------
 async function procesarArchivos(){
@@ -24,30 +24,19 @@ async function procesarArchivos(){
         return;
     }
 
-    msj('procesado correctamente...', 'success', 3000, 'mensaje');
-    
-    /** trabajo del modelo cuando sea creado
- 
-    const formData = new FormData();
-    
-    if(alumnos_file.files[0]){ formData.append('alumnos', alumnos_file.files[0]);}
+    //msj('procesado correctamente...', 'success', 3000, 'mensaje');
 
-    if(notas_file.files[0]){ formData.append('notas', notas_file.files[0] );}
 
-    try{
-        fetch( //url de la api
-        {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => console.log(data))
-
+    if(alumnos_file.files[0]){
+         (Post_csv(alumnos_file.files[0], 'alumnos'))?
+             msj('Archivo de alumnos cargado correctamente', 'success', 3000, 'mensaje')
+            :msj('Error al cargar el archivo de alumnos', 'error', 3000, 'mensaje');
     }
-    catch(error){
-        console.error('Error al cargar los archivos:', error);
+    if(notas_file.files[0]){ 
+        (Post_csv(notas_file.files[0], 'notas'))? 
+            msj('Archivo de notas cargado correctamente', 'success', 3000, 'mensaje') 
+            :msj('Error al cargar el archivo de notas', 'error', 3000, 'mensaje');
     }
-*/
 }
 
 
@@ -74,25 +63,6 @@ async function procesarArchivos(){
             });
 }
 
-/*async function data_preview() {
-
-    try {
-        const tbody = document
-            .getElementById('tablaResultados')
-            .querySelector('tbody');
-        
-        // No limpiar automáticamente, solo mostrar según la vista activa
-        console.log('Previsualización disponible para actualizar');
-        
-    } catch(error) {
-
-        console.error(
-            'Error al mostrar la previsualización:',
-            error
-        );
-    }
-}
-*/
 async function mostrarAlumnos() {
     try {
         const tbody = document
@@ -129,7 +99,7 @@ async function mostrarAlumnos() {
             );
         }
         headerRow.innerHTML = '';
-        campos = alumnosCSV[0];
+        const campos = alumnosCSV[0];
         for(let i = 0; i < campos.length; i++) {
             campos[i] = campos[i].toLowerCase();
             headerRow.innerHTML += `<th>${campos[i]}</th>`;
@@ -190,7 +160,7 @@ async function mostrarNotas() {
             );
         }
         headerRow.innerHTML = '';
-        campos = notasCSV[0];
+        const campos = notasCSV[0];
         for(let i = 0; i < campos.length; i++) {
             campos[i] = campos[i].toLowerCase();
             headerRow.innerHTML += `<th>${campos[i]}</th>`;
@@ -269,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 //------------------------------SECTOR DE FUNCIONES UTILES----------------------------------------------------
-function msj( texto, tipo = 'info', duracion = 3000, which_container) {
+export function msj( texto, tipo = 'info', duracion = 3000, which_container) {
 
     const container = document.getElementById(which_container);
 
@@ -320,7 +290,7 @@ function msj( texto, tipo = 'info', duracion = 3000, which_container) {
 }
 
 
-//faltaria una funcion de handle_post_data que llame al modelo para que haga el fetch de los datos
+
 //revisar los datos que vamos a persistir y definir un formato claro de os csv para la carga y visualizacion de datos
 
 // Inicializar mostrando mensaje de vacío al cargar la página
