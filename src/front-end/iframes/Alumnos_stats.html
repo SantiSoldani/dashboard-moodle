@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alumnos Stats</title>
+    <script type = "module"src = "../controllers/Alumno_stats_controller.js" ></script>
+    <link rel="stylesheet" href="../styles/Alumno_stats_style.css">
+</head>
+<body>
+    <div class="stats-page">
+        <header id="header" class="stats-header">
+            <div>
+                <p class="eyebrow">Panel de seguimiento</p>
+                <h1>Estadísticas del alumno</h1>
+                <p class="subtitle">Aquí podrá ver el estado del semáforo, información personal y la encuesta respondida.</p>
+            </div>
+            <div class="status-badge estado-verde">
+                <span class="status-dot estado-verde"></span>
+                <strong>Estado: Verde</strong>
+            </div>
+        </header>
+
+        <section class="status-panel">
+            <div class="status-card estado-verde">
+                <div id = "status-section" class="status-card-content">
+                    <p class="status-card-label">Estado actual</p>
+                    <h1 class="student-name">Mateo González</h1>
+                    <p class="status-card-state">Verde</p>
+                    <p class="status-card-description">Alumno sin alertas críticas; desempeño estable y avance correcto en su curso.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="dashboard-panel">
+            <div class="panel-header">
+                <h2>Dashboard</h2>
+                <p>Resumen rápido del rendimiento y comportamiento.</p>
+            </div>
+            <div class="dashboard-grid">
+                <article class="dashboard-card">
+                    <span class="card-label">Promedio</span>
+                    <strong>8.9</strong>
+                </article>
+                <article class="dashboard-card">
+                    <span class="card-label">Asistencia</span>
+                    <strong>92%</strong>
+                </article>
+                <article class="dashboard-card">
+                    <span class="card-label">Tareas entregadas</span>
+                    <strong>17/18</strong>
+                </article>
+                <article class="dashboard-card">
+                    <span class="card-label">Última actualización</span>
+                    <strong>Hoy</strong>
+                </article>
+            </div>
+        </section>
+
+        <section class="info-panel">
+            <div class="section-header">
+                <h2>Información personal</h2>
+                <p>Datos básicos del alumno.</p>
+            </div>
+            <div id = "info-panel" class="info-grid">
+                <div class="info-item">
+                    <span>Nombre</span>
+                    <strong>Mateo González</strong>
+                </div>
+                <div class="info-item">
+                    <span>Documento</span>
+                    <strong>44322111</strong>
+                </div>
+                <div class="info-item">
+                    <span>Carrera</span>
+                    <strong>Ingeniería Civil</strong>
+                </div>
+                <div class="info-item">
+                    <span>Curso</span>
+                    <strong>1er año</strong>
+                </div>
+                <div class="info-item">
+                    <span>Email</span>
+                    <strong>mateo.gonzalez@example.com</strong>
+                </div>
+                <div class="info-item">
+                    <span>Teléfono</span>
+                    <strong>+54 11 5555 1234</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="survey-panel">
+            <div class="section-header">
+                <h2>Encuesta respondida</h2>
+                <p>Respuestas del alumno a la última encuesta disponible.</p>
+            </div>
+            <div class="survey-card">
+                <div class="survey-row">
+                    <span class="survey-question">1. ¿Cómo calificas tu nivel de motivación?</span>
+                    <strong>Alto</strong>
+                </div>
+                <div class="survey-row">
+                    <span class="survey-question">2. ¿Te sientes apoyado por tus docentes?</span>
+                    <strong>Sí</strong>
+                </div>
+                <div class="survey-row">
+                    <span class="survey-question">3. ¿Tienes dudas sobre el contenido del curso?</span>
+                    <strong>Leves</strong>
+                </div>
+                <div class="survey-row">
+                    <span class="survey-question">4. ¿Necesitas acompañamiento extra?</span>
+                    <strong>No</strong>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

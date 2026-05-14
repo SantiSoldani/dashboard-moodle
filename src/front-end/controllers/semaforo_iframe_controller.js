@@ -8,7 +8,7 @@
  * 
  */
 
-
+import { HandleGet_alumnos } from '../models/Alumno.js';
 
 
 
@@ -112,21 +112,59 @@ document.getElementById('btnBuscar').addEventListener('click', function(event){
 
 document.getElementById('filterValue').addEventListener('change', function(event){
     event.preventDefault();
+ 
     //todas las funciones relacionadas al valor que puede ser tomado como filtro para los alumnos por ejemplo estado_semaforo == rojo
 });
 
 filterField.addEventListener('click', function(event){
     event.preventDefault();
+    
+    filterField.disabled = false;
     //todas las funciones relacionadas al filtro de los alumnos, por ejemplo, mostrar solo los alumnos con semaforo rojo, o mostrar solo los alumnos con semaforo verde, etc
 });
 
 btnLimpiarFiltros.addEventListener('click', function(event){
     event.preventDefault();
+
+    alumnos_filtrados = alumnos; //restablece la lista de alumnos filtrados a la lista completa de alumnos
+    mostrar_alumnos(alumnos_filtrados);
+
+    //limpiar de la lista de filtrados 
+    const filtros = document.querySelectorAll('.filter-tag strong');
+    filtros.forEach(filtro => filtro.textContent = ''); //limpia el texto de cada filtro activo
     //todas las funciones relacionadas a limpiar los filtros, vacia la lista de filtros cuando se presiona el boton
 });
 
 document.getElementById('btnAgregarFiltro').addEventListener('click', function(event){
     event.preventDefault();
+    const campo = filterField.value;
+    const valor = filterValue.value;
+    console.log('Campo seleccionado:', campo);
+    console.log('Valor ingresado:', valor);
+    console.log('Alumnos antes de aplicar filtro:', alumnos_filtrados);
+    if(campo === '' || valor === ''){
+        //mostrar mensaje de error o algo asi, porque no se puede agregar un filtro sin campo o sin valor
+        return;
+    }
+    else{
+        alumnos_filtrados = alumnos_filtrados.filter(alumno => {
+            switch(campo){
+                case 'nombre':
+                    return alumno.nombre.toLowerCase() === valor.toLowerCase();
+                case 'apellido':
+                    return alumno.apellido.toLowerCase() === valor.toLowerCase();
+                case 'carrera':
+                    return alumno.carrera.toLowerCase() === valor.toLowerCase();
+                case 'estado':
+                    return alumno.estado.toLowerCase() === valor.toLowerCase();
+                default:
+                    return false; // Si el campo no coincide, no filtrar
+            }
+        });
+        document.getElementById(`filterTag${campo.charAt(0).toUpperCase() + campo.slice(1)}`).querySelector('strong').textContent = valor;
+        mostrar_alumnos(alumnos_filtrados);
+    } 
+
     //todas las funciones relacionadas a agregar un filtro, se habilita cuando haya al menos un campo seleccionado y cuando se presiona toma los valores del filtro y .los agrega a lista de filtros
 });
 
@@ -139,7 +177,8 @@ document.getElementById('studentsTable').querySelector('tbody').addEventListener
 
     const dni = fila.cells[3].textContent; // Suponiendo que el DNI está en la cuarta columna (índice 3)
     console.log('DNI del alumno seleccionado:', dni);
-    window.location.href = `Url del embebido de metricas personales del alumno`;
+    console.log(fila.cells[1].textContent)
+    window.location.href = `../iframes/Alumnos_stats.html?modo=x&alumno=${fila.cells[1].textContent}`; // Agregar en el controlador un url param para identificar el alumno del que debe cargar los datos
 
     //aqui tendria una especie de logica para abrir otra pagina que me muestre las metricas personales del alumno, con su rendimiento academico
 
@@ -151,7 +190,7 @@ document.getElementById('studentsTable').querySelector('tbody').addEventListener
 function cargar_alumnos(){
 
     //traer alumnos del modelo que devolveria un arreglo de alumnos 
-    
+    //alumnos = HandleGet_alumnos();
     //mostrarlos abajo
     mostrar_alumnos(alumnos);
 
@@ -178,17 +217,32 @@ function mostrar_alumnos(alumnos){
 
     alumnos.forEach(alumno =>{
         const fila = document.createElement('tr');
+        const claseEstado = obtenerClaseEstado(alumno.estado);
         fila.innerHTML += `<td>${alumno.id}</td>`;
         fila.innerHTML += `<td>${alumno.nombre}</td>`;
         fila.innerHTML += `<td>${alumno.apellido}</td>`;
         fila.innerHTML += `<td>${alumno.documento}</td>`;
         fila.innerHTML += `<td>${alumno.carrera}</td>`;
         fila.innerHTML += `<td>${alumno.curso}</td>`;
-        fila.innerHTML += `<td>${alumno.estado}</td>`;
+        fila.innerHTML += `<td class="estado-text ${claseEstado}">${alumno.estado}</td>`;
         Tbody.appendChild(fila);
     });
 
     actualizarTotalAlumnos(alumnos.length);
+}
+
+function obtenerClaseEstado(estado) {
+    const valor = String(estado).trim().toLowerCase();
+    switch (valor) {
+        case 'verde':
+            return 'estado-verde';
+        case 'amarillo':
+            return 'estado-amarillo';
+        case 'rojo':
+            return 'estado-rojo';
+        default:
+            return 'estado-desconocido';
+    }
 }
 
 function actualizarTotalAlumnos(cantidad) {

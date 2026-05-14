@@ -239,7 +239,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 //------------------------------SECTOR DE FUNCIONES UTILES----------------------------------------------------
-export function msj( texto, tipo = 'info', duracion = 3000, which_container) {
+function msj( texto, tipo = 'info', duracion = 3000, which_container) {
 
     const container = document.getElementById(which_container);
 

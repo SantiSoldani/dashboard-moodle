@@ -18,8 +18,11 @@ const Iframe_tipes = {
     //pendiente en agregar mas iframes en caso de necesitarlos
 }
 
+//(Iframe_tipes[tipo].src)? 
+window.location.href = Iframe_tipes[tipo].src 
+//: console.error('Tipo de iframe no reconocido:', tipo);
 
-function Handle_which_iframe(){
+/**function Handle_which_iframe(){
 
     const source = Iframe_tipes[tipo];
 
@@ -51,5 +54,5 @@ function Handle_which_iframe(){
 
 window.addEventListener('load',Handle_which_iframe);
 
-
+**/
 

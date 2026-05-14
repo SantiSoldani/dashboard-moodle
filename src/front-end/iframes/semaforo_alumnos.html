@@ -33,7 +33,7 @@
             <div class="filters-row">
                 <div class="filter-field">
                     <label for="filterField">Campo</label>
-                    <select id="filterField" disabled>
+                    <select id="filterField">
                         <option value="">Seleccionar campo</option>
                         <option value="nombre">Nombre</option>
                         <option value="apellido">Apellido</option>
@@ -44,18 +44,21 @@
                 </div>
                 <div class="filter-field">
                     <label for="filterValue">Valor</label>
-                    <input id="filterValue" type="text" placeholder="Escribir valor..." disabled>
+                    <input id="filterValue" type="text" placeholder="Escribir valor...">
                 </div>
                 <div class="filter-actions">
-                    <button id = "btnAgregarFiltro" class="btn-secondary" disabled>Agregar filtro</button>
-                    <button id = "btnLimpiarFiltros" class="btn-clear" disabled>Limpiar filtros</button>
+                    <button id = "btnAgregarFiltro" class="btn-secondary">Agregar filtro</button>
+                    <button id = "btnLimpiarFiltros" class="btn-clear">Limpiar filtros</button>
                 </div>
             </div>
             <div class="active-filters">
                 <span class="filters-label">Filtros activos:</span>
                 <div class="filter-tags">
-                    <span class="filter-tag">Nombre: <strong>Ejemplo</strong></span>
-                    <span class="filter-tag">Carrera: <strong>Todos</strong></span>
+                    <span id="filterTagNombre" class="filter-tag">Nombre: <strong></strong></span>
+                    <span id="filterTagApellido" class="filter-tag">Apellido: <strong></strong></span>
+                    <span id="filterTagCarrera" class="filter-tag">Carrera: <strong></strong></span>
+                    <span id="filterTagEstado" class="filter-tag">Estado: <strong></strong></span>
+                    <span id="filterTagCurso" class="filter-tag">Curso: <strong></strong></span>
                 </div>
             </div>
         </section>
