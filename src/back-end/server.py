@@ -8,10 +8,8 @@ load_dotenv() #carga variables de entorno
 
 # Construimos la URL de conexión de forma segura
 SQLALCHEMY_DATABASE_URL = f"{os.getenv("DATABASE_URL")}" #mantiene la url en variable de entorno. Los .env no se suben a github
-
 # Creamos el motor de base de datos
 engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
-
 # Creamos una clase para las sesiones
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
