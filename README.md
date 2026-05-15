@@ -41,3 +41,4 @@ Este repositorio contiene el backend (API) del Proyecto Travesía, desarrollado 
 3.  **Salida (Output):** Mediante librerías de visualización, el sistema exporta los tableros de control y semáforos en formato HTML .
 4.  **Integración final:** Estos reportes gráficos se inyectan como *Iframes* dentro del Campus Virtual, permitiendo embeber contenidos personalizados según el rol del usuario (Dashboard Estudiante o Dashboard Docente) .
 
+![**Diagrama modulos**] (/Doc/Diagrama_modulos.png)
