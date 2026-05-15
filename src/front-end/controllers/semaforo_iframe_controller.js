@@ -214,7 +214,7 @@ function mostrar_alumnos(alumnos){
         actualizarTotalAlumnos(0);
         return;
     }
-
+    console.log(alumnos);
     alumnos.forEach(alumno =>{
         const fila = document.createElement('tr');
         const claseEstado = obtenerClaseEstado(alumno.estado);
