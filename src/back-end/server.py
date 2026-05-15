@@ -1,17 +1,13 @@
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker, declarative_base
 from urllib.parse import quote_plus
+from dotenv import load_dotenv
+import os
 
-# Credenciales de la base de datos Supabase
-# Se recomienda usar urllib.parse.quote_plus para la contraseña ya que contiene un caracter especial '?'
-#USER = "postgres"
-#PASSWORD = quote_plus("Altiora2026?")
-#HOST = "db.bqbqlebnoxlqxwdovwhq.supabase.co"
-#PORT = "5432"
-#DBNAME = "postgres"
+load_dotenv() #carga variables de entorno
 
 # Construimos la URL de conexión de forma segura
-SQLALCHEMY_DATABASE_URL = f"postgresql://postgres.bqbqlebnoxlqxwdovwhq:Altiora2026?@aws-1-sa-east-1.pooler.supabase.com:5432/postgres"
+SQLALCHEMY_DATABASE_URL = f"{os.getenv("DATABASE_URL")}" #mantiene la url en variable de entorno. Los .env no se suben a github
 
 # Creamos el motor de base de datos
 engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
