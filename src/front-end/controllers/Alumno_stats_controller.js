@@ -16,7 +16,7 @@ const modo = params.get('modo') ; const alumno_dni = params.get('alumno');
 const alumno = HandleGet_alumnos(alumno_dni)
 alumno = alumno[0]; //como la funcion devuelve un arreglo entonces me quedo con el primero porque es el unico que trae, podria verificar si que es que me trae algo
 */
-var alumno = {
+const alumno = {
     nombre: "fulano",
     apellido:"fernandez",
     documento: "31243214",
@@ -34,6 +34,13 @@ window.addEventListener('load', func =>{
         //set_encuestas(); //funcion a desarrollar
 
 })
+
+document.getElementById("go_back_Btn").addEventListener('click', () =>{
+    window.location.href = "../iframes/semaforo_alumnos.html";
+    console.log("volviendo a la pagina de semaforo");
+})
+    
+
 
 function set_state_panel(){
     const stats = document.getElementById('status-section');

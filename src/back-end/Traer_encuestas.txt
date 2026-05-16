@@ -1,0 +1,339 @@
+"""
+A continuacion tengo una pequeña alternativa para traer las encuestas a traves del web-service de moodle, mediante el cual podriamos obtener un json con todas las respuestas del ultimo quizz de la siguiente manera:
+
+dependencias del web servide:
+	- mod_quiz_get_quizzes_by_courses Paso 1 — obtener nombre y nota máxima del quiz
+	' mod_quiz_get_user_attempts Paso 2 — traer todos los intentos finalizados
+	- mod_quiz_get_attempt_review Paso 3 — obtener el detalle de cada intento
+	- core_user_get_users_by_field Paso 4 — obtener nombre y email de cada alumno
+	
+	
+fetch_resultados_encuestas.py
+─────────────────────────────────────────────────────────────────────────────
+Obtiene los resultados del último intento finalizado de un quiz de Moodle
+para todos los alumnos de un curso, usando la API REST de Moodle.
+
+Dependencias:
+    pip install requests
+
+Uso:
+    from fetch_resultados_encuestas import Fetch_Resultados_encuestas
+
+    resultados = Fetch_Resultados_encuestas(
+        base_url = "https://tu-moodle.com",
+        token    = "TU_TOKEN",
+        curso_id = 7,
+        quiz_id  = 42
+    )
+    
+retorna:
+	dict con la estructura:
+    {
+        "curso_id"    : int,
+        "quiz_id"     : int,
+        "quiz_nombre" : str,
+        "total_alumnos_con_intento": int,
+        "resultados"  : [
+            {
+                "userid"           : int,
+                "nombre"           : str,
+                "email"            : str,
+                "intento_id"       : int,
+                "fecha_inicio"     : str,  # ISO 8601
+                "fecha_fin"        : str,  # ISO 8601
+                "nota_total"       : float,
+                "nota_maxima"      : float,
+                "porcentaje"       : float,
+                "preguntas"        : [
+                    {
+                        "numero"           : int,
+                        "tipo"             : str,
+                        "estado"           : str,
+                        "estado_legible"   : str,
+                        "puntaje_obtenido" : float,
+                        "puntaje_maximo"   : float,
+                    }
+                ]
+            }
+        ]
+    }
+    
+ uso minimo: 
+ 
+ from fetch_resultados_encuestas import Fetch_Resultados_encuestas
+
+	resultados = Fetch_Resultados_encuestas( base_url = "https://tu-moodle.com", token    = "TU_TOKEN", curso_id = 7, quiz_id  = 42,)
+─────────────────────────────────────────────────────────────────────────────
+"""
+
+import requests
+from datetime import datetime
+from typing import Optional
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# CLIENTE BASE
+# ─────────────────────────────────────────────────────────────────────────────
+
+class MoodleClient:
+    """Cliente liviano para la API REST de Moodle."""
+
+    def __init__(self, base_url: str, token: str, timeout: int = 30):
+        self.base_url = base_url.rstrip("/")
+        self.token    = token
+        self.timeout  = timeout
+        self.endpoint = f"{self.base_url}/webservice/rest/server.php"
+
+    def call(self, wsfunction: str, **params) -> dict:
+        """Llama a una función del Web Service y devuelve el JSON."""
+        payload = {
+            "wstoken":            self.token,
+            "moodlewsrestformat": "json",
+            "wsfunction":         wsfunction,
+            **params,
+        }
+        response = requests.get(self.endpoint, params=payload, timeout=self.timeout)
+        response.raise_for_status()
+        data = response.json()
+
+        # Moodle devuelve excepciones dentro del JSON con status 200
+        if isinstance(data, dict) and "exception" in data:
+            raise RuntimeError(
+                f"[Moodle API Error] {data.get('errorcode', 'UNKNOWN')}: "
+                f"{data.get('message', 'Sin mensaje')}"
+            )
+        return data
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# FUNCIÓN PRINCIPAL
+# ─────────────────────────────────────────────────────────────────────────────
+
+def Fetch_Resultados_encuestas(
+    base_url: str,
+    token: str,
+    curso_id: int,
+    quiz_id: int,
+    usuario_id: Optional[int] = None,
+) -> dict:
+    """
+    Retorna los resultados del último intento finalizado del quiz indicado.
+
+    Si `usuario_id` es None, obtiene los resultados de TODOS los alumnos
+    del curso que hayan completado al menos un intento.
+
+    Parámetros
+    ----------
+    base_url   : URL raíz de Moodle, ej. "https://mi-moodle.com"
+    token      : Token de autenticación del Web Service
+    curso_id   : ID del curso en Moodle
+    quiz_id    : ID del quiz/encuesta
+    usuario_id : (Opcional) ID de un alumno específico. None = todos.
+
+    Retorna
+    -------
+    dict con la estructura:
+    {
+        "curso_id"    : int,
+        "quiz_id"     : int,
+        "quiz_nombre" : str,
+        "total_alumnos_con_intento": int,
+        "resultados"  : [
+            {
+                "userid"           : int,
+                "nombre"           : str,
+                "email"            : str,
+                "intento_id"       : int,
+                "fecha_inicio"     : str,  # ISO 8601
+                "fecha_fin"        : str,  # ISO 8601
+                "nota_total"       : float,
+                "nota_maxima"      : float,
+                "porcentaje"       : float,
+                "preguntas"        : [
+                    {
+                        "numero"           : int,
+                        "tipo"             : str,
+                        "estado"           : str,
+                        "estado_legible"   : str,
+                        "puntaje_obtenido" : float,
+                        "puntaje_maximo"   : float,
+                    }
+                ]
+            }
+        ]
+    }
+    """
+    client = MoodleClient(base_url, token)
+
+    # ── 1. Obtener nombre del quiz ──────────────────────────────────────────
+    print(f"[1/4] Obteniendo datos del curso {curso_id}...")
+    quiz_data = client.call(
+        "mod_quiz_get_quizzes_by_courses",
+        **{"courseids[0]": curso_id}
+    )
+    quizzes     = quiz_data.get("quizzes", [])
+    quiz_info   = next((q for q in quizzes if q["id"] == quiz_id), None)
+    quiz_nombre = quiz_info["name"] if quiz_info else f"Quiz {quiz_id}"
+    nota_maxima = float(quiz_info["grade"]) if quiz_info else 0.0
+    print(f"    Quiz encontrado: '{quiz_nombre}' (nota máxima: {nota_maxima})")
+
+    # ── 2. Obtener todos los intentos finalizados ───────────────────────────
+    print(f"[2/4] Obteniendo intentos finalizados del quiz {quiz_id}...")
+    intentos_data = client.call(
+        "mod_quiz_get_user_attempts",
+        quizid          = quiz_id,
+        userid          = usuario_id if usuario_id else 0,
+        status          = "finished",
+        includepreviews = 0,
+    )
+    todos_intentos = intentos_data.get("attempts", [])
+    print(f"    Total de intentos encontrados: {len(todos_intentos)}")
+
+    if not todos_intentos:
+        return _estructura_vacia(curso_id, quiz_id, quiz_nombre)
+
+    # ── 3. Agrupar por usuario y quedarse con el último intento ─────────────
+    print("[3/4] Seleccionando el último intento por alumno...")
+    ultimos_intentos: dict[int, dict] = {}
+    for intento in todos_intentos:
+        uid = intento["userid"]
+        if uid not in ultimos_intentos or intento["timefinish"] > ultimos_intentos[uid]["timefinish"]:
+            ultimos_intentos[uid] = intento
+
+    print(f"    Alumnos con al menos un intento finalizado: {len(ultimos_intentos)}")
+
+    # ── 4. Obtener datos de usuarios y review de cada intento ───────────────
+    print("[4/4] Obteniendo detalle de cada intento...")
+    resultados = []
+
+    for uid, intento in ultimos_intentos.items():
+
+        # Datos del usuario
+        usuario = _get_usuario(client, uid)
+
+        # Review del intento
+        review = client.call(
+            "mod_quiz_get_attempt_review",
+            attemptid = intento["id"],
+        )
+
+        # Parsear preguntas
+        preguntas = _parsear_preguntas(review.get("questions", []))
+
+        # Nota obtenida
+        nota_obtenida = float(intento.get("sumgrades") or 0)
+        porcentaje    = round((nota_obtenida / nota_maxima) * 100, 2) if nota_maxima else 0.0
+
+        resultado = {
+            "userid"           : uid,
+            "nombre"           : usuario.get("fullname", f"Usuario {uid}"),
+            "email"            : usuario.get("email", ""),
+            "intento_id"       : intento["id"],
+            "fecha_inicio"     : _ts(intento.get("timestart")),
+            "fecha_fin"        : _ts(intento.get("timefinish")),
+            "nota_total"       : nota_obtenida,
+            "nota_maxima"      : nota_maxima,
+            "porcentaje"       : porcentaje,
+            "preguntas"        : preguntas,
+        }
+        resultados.append(resultado)
+        print(f"    ✓ {resultado['nombre']} — nota: {nota_obtenida}/{nota_maxima} ({porcentaje}%)")
+
+    return {
+        "curso_id"                   : curso_id,
+        "quiz_id"                    : quiz_id,
+        "quiz_nombre"                : quiz_nombre,
+        "total_alumnos_con_intento"  : len(resultados),
+        "resultados"                 : resultados,
+    }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# HELPERS PRIVADOS
+# ─────────────────────────────────────────────────────────────────────────────
+
+def _get_usuario(client: MoodleClient, userid: int) -> dict:
+    """Obtiene los datos básicos de un usuario por su ID."""
+    try:
+        data    = client.call("core_user_get_users_by_field", field="id", **{"values[0]": userid})
+        usuarios = data if isinstance(data, list) else data.get("users", [])
+        return usuarios[0] if usuarios else {}
+    except Exception:
+        return {}
+
+
+def _parsear_preguntas(preguntas_raw: list) -> list:
+    """Extrae los campos relevantes de cada pregunta del review."""
+    preguntas = []
+    for p in preguntas_raw:
+        mark_str = p.get("mark", "0 / 0")
+        obtenido, maximo = _parsear_mark(mark_str)
+
+        preguntas.append({
+            "numero"          : p.get("number") or p.get("slot"),
+            "tipo"            : p.get("type", "desconocido"),
+            "estado"          : p.get("state", ""),
+            "estado_legible"  : p.get("status", ""),
+            "puntaje_obtenido": obtenido,
+            "puntaje_maximo"  : maximo,
+        })
+    return preguntas
+
+
+def _parsear_mark(mark_str: str) -> tuple[float, float]:
+    """
+    Parsea el campo 'mark' de Moodle que viene como '2,00 / 4,00' o '2.00 / 4.00'.
+    Retorna (obtenido, maximo).
+    """
+    try:
+        partes    = mark_str.replace(",", ".").split("/")
+        obtenido  = float(partes[0].strip())
+        maximo    = float(partes[1].strip()) if len(partes) > 1 else 0.0
+        return obtenido, maximo
+    except Exception:
+        return 0.0, 0.0
+
+
+def _ts(timestamp: Optional[int]) -> str:
+    """Convierte un Unix timestamp a string ISO 8601. Devuelve '' si es None."""
+    if not timestamp:
+        return ""
+    return datetime.fromtimestamp(timestamp).isoformat()
+
+
+def _estructura_vacia(curso_id: int, quiz_id: int, quiz_nombre: str) -> dict:
+    return {
+        "curso_id"                  : curso_id,
+        "quiz_id"                   : quiz_id,
+        "quiz_nombre"               : quiz_nombre,
+        "total_alumnos_con_intento" : 0,
+        "resultados"                : [],
+    }
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# EJECUCIÓN DIRECTA (modo standalone)
+# ─────────────────────────────────────────────────────────────────────────────
+
+if __name__ == "__main__":
+    import json
+
+    # ── Configuración ────────────────────────────────────────────────────────
+    BASE_URL = "https://tu-moodle.com"
+    TOKEN    = "TU_TOKEN_AQUI"
+    CURSO_ID = 7
+    QUIZ_ID  = 42
+
+    # Descomentá si querés filtrar por un alumno específico:
+    # USUARIO_ID = 18
+
+    resultados = Fetch_Resultados_encuestas(
+        base_url = BASE_URL,
+        token    = TOKEN,
+        curso_id = CURSO_ID,
+        quiz_id  = QUIZ_ID,
+        # usuario_id = USUARIO_ID,
+    )
+
+    print("\n─── RESULTADO FINAL ───────────────────────────────────────────")
+    print(json.dumps(resultados, indent=2, ensure_ascii=False))

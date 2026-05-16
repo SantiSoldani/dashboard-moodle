@@ -30,6 +30,37 @@ body {
     box-shadow: 0 20px 60px rgba(15, 23, 42, 0.1);
 }
 
+.back-button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 24px;
+    border-radius: 50%;
+    border: 2px solid #3b82f6;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 800;
+    font-size: 1.35rem;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: 0 12px 28px rgba(59, 130, 246, 0.14);
+    transition: background 180ms ease, transform 180ms ease, box-shadow 180ms ease, border-color 180ms ease;
+}
+
+.back-button:hover {
+    background: #dbeafe;
+    transform: translateY(-1px);
+    box-shadow: 0 16px 32px rgba(59, 130, 246, 0.2);
+    border-color: #2563eb;
+}
+
+.back-button:focus {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.18);
+}
+
 .stats-header {
     display: flex;
     align-items: flex-start;
