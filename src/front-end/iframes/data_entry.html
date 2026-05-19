@@ -1,63 +1,76 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../styles/msj.css">
-    <link rel="stylesheet" href="../styles/data_entry_style.css">
-    <script type="module" src="../controllers/data_entry_controller.js"></script>
-    <title>Document</title>
-   
-</head>
-<body>
-    <div id = "container" class="container">
-        <h1>Gestor de Alumnos y Notas</h1>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link rel="stylesheet" href="../styles/msj.css" />
+        <link rel="stylesheet" href="../styles/data_entry_style.css" />
+        <script
+            type="module"
+            src="../controllers/data_entry_controller.js"
+        ></script>
+        <title>Document</title>
+    </head>
+    <body>
+        <div id="container" class="container">
+            <h1>Gestor de Alumnos y Notas</h1>
 
-        <div class="upload-section">
-            <div id="alumnosCard" class="card">
-                <h2>CSV de Alumnos</h2>
-                <div class="file-input-group">
-                    <input type="file" id="alumnosFile" accept=".csv">
-                    <button type="button" id="btnLimpiarAlumnos" class="btn-limpiar hidden">✕</button>
+            <div class="upload-section">
+                <div id="alumnosCard" class="card">
+                    <h2>CSV de Alumnos</h2>
+                    <div class="file-input-group">
+                        <input type="file" id="alumnosFile" />
+                        <button
+                            type="button"
+                            id="btnLimpiarAlumnos"
+                            class="btn-limpiar hidden"
+                        >
+                            ✕
+                        </button>
+                    </div>
+                </div>
+
+                <div id="notasCard" class="card">
+                    <h2>CSV de Notas</h2>
+                    <div class="file-input-group">
+                        <input type="file" id="notasFile" />
+                        <button
+                            type="button"
+                            id="btnLimpiarNotas"
+                            class="btn-limpiar hidden"
+                        >
+                            ✕
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div id="notasCard" class="card">
-                <h2>CSV de Notas</h2>
-                <div class="file-input-group">
-                    <input type="file" id="notasFile" accept=".csv">
-                    <button type="button" id="btnLimpiarNotas" class="btn-limpiar hidden">✕</button>
+            <button id="x">Subir Archivos</button>
+
+            <div id="mensaje"></div>
+
+            <div class="preview-controls">
+                <button id="btnVerAlumnos" class="btn-preview active">
+                    Ver Alumnos
+                </button>
+                <button id="btnVerNotas" class="btn-preview">Ver Notas</button>
+            </div>
+
+            <div class="table-container">
+                <div id="emptyMessage" class="empty-message">
+                    Nada que ver aquí aún
                 </div>
+                <table id="tablaResultados" style="display: none">
+                    <thead>
+                        <tr id="headerRow">
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
         </div>
-
-        <button id="x">
-            Subir Archivos
-        </button>
-
-        <div id="mensaje"></div>
-
-        <div class="preview-controls">
-            <button id="btnVerAlumnos" class="btn-preview active">Ver Alumnos</button>
-            <button id="btnVerNotas" class="btn-preview">Ver Notas</button>
-        </div>
-
-        <div class="table-container">
-            <div id="emptyMessage" class="empty-message">
-                Nada que ver aquí aún
-            </div>
-            <table id="tablaResultados" style="display: none;">
-                <thead>
-                    <tr id="headerRow">
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
-
-</body>
+    </body>
 </html>

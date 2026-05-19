@@ -26,12 +26,11 @@ const alumno = {
     telefono:"123456",
     estado:"amarillo"
 }
-
-window.addEventListener('load', func =>{
+window.addEventListener('load', () =>{
 
         set_state_panel();
         set_info_panel();
-        //set_encuestas(); //funcion a desarrollar
+        set_dashboard();  
 
 })
 
@@ -103,4 +102,10 @@ function set_info_panel(){
 }
 
 
+function set_dashboard(){
+    console.log("set dashboard");
 
+    //Carga de la informacion estadistica del alumno
+    //carga del dashboard desde looker studio o podriamos pedirle a la ia un modulo de dashboards dinamicos que recbia al alumno como parametro y que se adapte a su informacion estadistica, por ejemplo si el alumno tiene un estado rojo entonces el dashboard podria mostrarle graficos de su rendimiento historico para que pueda entender mejor su situacion academica y como mejorarla, mientras que si el alumno tiene un estado verde el dashboard podria mostrarle graficos de su rendimiento actual para que pueda seguir manteniendo ese buen rendimiento
+
+}
