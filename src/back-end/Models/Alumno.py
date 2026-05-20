@@ -1,27 +1,36 @@
-from this import d
-from pydantic import BaseModel
-from typing import List, Optional
+from dataclasses import dataclass
 
 from pydantic.networks import EmailStr
 
-class Alumno(BaseModel):
 
+@dataclass
+class AlumnoDto:
     id: int
-    dni: str
     nombre: str
     apellido: str
     email: EmailStr
+    dni: str
     estado: str
-    anio: int
-    carrera: str
+    fecha_inicio: str
 
 
-  #definicion de los metodos propios de los alumnos
+def Post_Alumnos(alumnos: list[AlumnoDto]):
 
-  def alumno_by_dni(dni: str) -> Alumno:
+    # SQL QUERY INSERT INTO alumnos VALUES ()
 
-    #seccion de sql query a la base de datos donde se busca el alumno por dni
+    return
 
 
+def Get_alumno(dni: str) -> AlumnoDto:
+    # SQL QUERY SELECT * FROM alumnos WHERE dni = ? VALUES(dni)
+    return
 
-    return alumno;
+
+def Get_alumnos() -> list[AlumnoDto]:
+    # SQL QUERY SELECT * FROM alumnos ORDER BY nombre
+    return
+
+
+def set_state(dni: str, estado: str):
+    # SQL QUERY UPDATE alumnos SET estado = ? WHERE dni = ? VALUES(estado, dni)
+    return

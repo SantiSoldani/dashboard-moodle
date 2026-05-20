@@ -1,53 +1,45 @@
-from Routers.moodleRequest import moodle_request
+from multiprocessing import Semaphore
+from turtle import update
 
-class DataController:
-    
-    @staticmethod
-    def obtener_promedios_primer_anio():
-        """
-        Contiene toda la lógica de negocio para obtener los promedios
-        de los alumnos de primer año.
-        """
-        # 1. Traemos la información del curso
-        data = moodle_request('core_enrol_get_enrolled_users', {'courseid': 2})
-        grupos = moodle_request('core_group_get_course_groups', {'courseid': 2})
-        
-        id_grupo_primero = next((g["id"] for g in grupos if g['name'] == 'Primer Año'), None)
-        
-        # 2. Filtramos alumnos del grupo de Primer Año
-        id_alumnos_primero = []
-        if id_grupo_primero:
-            id_alumnos_primero = [
-                user["id"] 
-                for user in data 
-                if any(group["id"] == id_grupo_primero for group in user["groups"])
-            ]
-        
-        # 3. Buscamos las materias de esos alumnos
-        materias = []
-        for id_alumno in id_alumnos_primero:
-            materias_x_alumno = moodle_request('core_enrol_get_users_courses', {'userid': id_alumno})
-            materias.extend(materias_x_alumno)
-            
-        materias_unicas = list({m["id"]: m for m in materias if m["id"] != 2}.values())
+from Controllers import AlumnoController
+from Models import Alumno, Materia, Notas
+from Services import Data_transformer, SemaforoCalculator
 
-        # 4. Buscamos las notas de cada alumno en esas materias
-        notas = []
-        for id_alumno in id_alumnos_primero:
-            for materia in materias_unicas:
-                alumno_notas = moodle_request('gradereport_user_get_grade_items', {
-                    'courseid': materia["id"], 
-                    'userid': id_alumno
-                })
-                
-                # Accedemos de forma segura usando .get() por si la respuesta no tiene el formato esperado
-                for alumno in alumno_notas.get("usergrades", []):
-                    for grade in alumno.get("gradeitems", []):
-                        if grade.get("graderaw") is not None:
-                            notas.append(grade["graderaw"])
-                            
-        return {
-            "grupos": grupos, 
-            "IDS alumnos de Primero": id_alumnos_primero, 
-            "Notas": notas
-        }
+
+def Handle_alumnos(file_path: str):
+
+    # 1) limpia los dato, eliminando duplicados, campos nulos, etc y los guarda en la seccion de procesed_data
+    final_path = Data_transformer.Limpiar_csv_alumnos(file_path)
+    # 2)Una vez limpios los datos paso los datos a un arreglo objetos con los atributos del alumno
+    Alumnos = Data_transformer.To_object_list(final_path)
+    # 3)handleo los datos del alumno al modelo de alumnos para que los guarde en la base de datos
+    try:
+        AlumnoController.Post_alumnos(Alumnos)
+    except Exception as e:
+        print(e)
+
+
+def Handle_encuestas(file_path: str):
+
+    # 1) Limpia los datos de las encuestas pasandolos a un archivo normalizado cuantitativo de con resultados de las encuestas y los guarda en la seccion de procesed_data
+    final_path = Data_transformer.Limpiar_csv(file_path)
+    # 2)opcional: Una vez los datos estan limpios genero el arreglo de objetos tipo encuesta con los resultados de las encustas si es que decidimos persistirlas
+    # Encuestas = Data_transformer.To_object_List(final_path)
+
+    # 3)paso el data set de encuestas limpias y normalizadas al modulo de calculo de semaforos, devuelve tuplas de (estado_semaforo,dni_alumno)
+    update = SemaforoCalculator.get_states_From_encuestas(final_path)
+    # 4)paso las tuplas al modelo para que modifiquen el estado en la base de datos
+    AlumnosController.Actualizar_estado(update)
+
+
+def Handle_notas(file_path: str):
+
+    # 1) leo el archivo de notas crudas y los paso por la seccion de calculo de datos para limpiarlos y normalizarlos
+    final_path = Data_transformer.Limpiar_csv(file_path)
+    # 2) Una vez limpios los datos paso los datos a un arreglo objetos con los atributos de las notas y los paso al modelo de notas para que los persista
+    notas = Data_transformer.To_object_List(final_path)
+    Notas.Post_notas(notas)
+    # 3) paso el data set de notas limpias y normalizadas al modulo de calculo de semaforo que me devuelve tuplas de (promedio,alumno)
+    update = SemaforoCalculator.get_states_From_notas(final_path)
+    # 4) paso las tuplas al modelo de alumnos para que genere el estado del alumno dentro de la base de datos     AlumnosController.Actualizar_estado(update)
+    AlumnosController.Actualizar_estado(update)
