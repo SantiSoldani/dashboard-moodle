@@ -1,18 +1,49 @@
+from types import SimpleNamespace
+
 from Models import Alumno
 
 
-def Post_alumnos(Alumnos: list[AlumoDto]):
+def Post_alumnos(Alumnos: list[SimpleNamespace], db):
+
+    for alumno in Alumnos:
+        Alumno.Post_Alumno(
+            Alumno.AlumnoDto(
+                id=alumno.id,
+                nombre=alumno.nombre,
+                apellido=alumno.apellido,
+                email=alumno.email,
+                dni=alumno.dni,
+                estado=alumno.estado,
+                fecha_inicio=alumno.fecha_inicio,
+            ),
+            db,
+        )
+
     return
 
 
-def Actualizar_estado(alumnos: list[tuple]):
+def Actualizar_estado(alumnos: list[tuple], db):
+
+    for alumno in alumnos:
+        Alumno.set_state(toState(alumno[0]), alumno[1], db)
     return
 
 
-def Get_alumnos() -> list[AlumnoDto]:
-    return
+def Get_alumnos(db) -> list[SimpleNamespace]:
+    alumnos = Alumno.Get_alumnos(db)
+    return [SimpleNamespace(**alumno.__dict__) for alumno in alumnos]
 
 
-def Get_alumno_Bydni(dni: str) -> AlumnoDto:
+def Get_alumno_Bydni(dni: str, db) -> SimpleNamespace:
+    alumno = Alumno.Get_alumno(dni, db)
+    return SimpleNamespace(**alumno.__dict__)
 
-    return
+
+def toState(aprobacion: float) -> str:
+
+    if aprobacion < 0.2:
+        return "rojo"
+    elif aprobacion <= 0.6:
+        return "amarillo"
+    else:
+        return "verde"

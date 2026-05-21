@@ -6,7 +6,7 @@ import pandas as pd
 ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 
 
-def Limpiar_csv_alumnos(file_path: str) -> str:
+def Limpiar_csv(file_path: str, type: str) -> str:
     """
     Limpia un CSV de alumnos:
     1. Normaliza campos numéricos (elimina espacios, convierte a tipo numérico)
@@ -49,7 +49,7 @@ def Limpiar_csv_alumnos(file_path: str) -> str:
         os.makedirs(procesed_data_path, exist_ok=True)
 
         # 4. Guardar CSV limpio
-        output_file = os.path.join(procesed_data_path, "alumnos_limpios.csv")
+        output_file = os.path.join(procesed_data_path, f"{type}_clean.csv")
         df.to_csv(output_file, index=False, encoding="utf-8")
 
         return output_file

@@ -1,6 +1,7 @@
 import os
 import shutil
 
+import server
 from Controllers import DataController
 from fastapi import APIRouter, File, UploadFile, status
 from pydantic import BaseModel
@@ -15,7 +16,7 @@ router = APIRouter(prefix="/data")
 
 
 @router.post("/Uploadalumnos", status_code=201)
-async def upload_alumnos(file: UploadFile = File(...)):
+async def upload_alumnos(file: UploadFile = File(...), db=server.get_db()):
     """
     Recibe un archivo CSV de alumnos cargado desde el front, lo guarda en una carpeta de datos sin procesar en la seccion de raw_data
     ,donde sera procesado por el servicio de limpieza de datos
@@ -33,7 +34,7 @@ async def upload_alumnos(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
 
         # Aca es donde le paso la ruta donde guarde el arcivo a la seccion de tratamiento de datos
-        DataController.Handle_alumnos(file_path)
+        DataController.Handle_alumnos(file_path, db)
         return {
             "status": "success",
             "message": f"Archivo '{file.filename}' cargado correctamente",
@@ -45,7 +46,7 @@ async def upload_alumnos(file: UploadFile = File(...)):
 
 
 @router.post("/Uploadnotas", status_code=201)
-async def upload_notas(file: UploadFile = File(...)):
+async def upload_notas(file: UploadFile = File(...), db=server.get_db()):
     """
     Recibe un archivo CSV de notas cargado desde el front, lo guarda en una carpeta de datos sin procesar en la seccion de raw_data
     una, donde sera procesado por el servicio de limpieza de datos
@@ -63,7 +64,7 @@ async def upload_notas(file: UploadFile = File(...)):
             shutil.copyfileobj(file.file, buffer)
 
         # Aca es donde le paso la ruta donde guarde el arcivo a la seccion de tratamiento de datos
-        DataController.Handle_notas(file_path)
+        DataController.Handle_notas(file_path, db)
         return {
             "status": "success",
             "message": f"Archivo '{file.filename}' cargado correctamente",
@@ -75,7 +76,7 @@ async def upload_notas(file: UploadFile = File(...)):
 
 
 @router.post("/UploadEncuestas", status_code=201)
-async def upload_encuestas(file: UploadFile = File(...)):
+async def upload_encuestas(file: UploadFile = File(...), db=server.get_db()):
     try:
         upload_dir = "/var/www/html/dashboard-moodle/src/back-end/raw_data"
         os.makedirs(upload_dir, exist_ok=True)
@@ -88,7 +89,7 @@ async def upload_encuestas(file: UploadFile = File(...)):
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         # Aca es donde le paso la ruta donde guarde el arcivo a la seccion de tratamiento de datos
-        DataController.Handle_encuestas(file_path)
+        DataController.Handle_encuestas(file_path, db)
         return {
             "status": "success",
             "message": f"Archivo '{file.filename}' cargado correctamente",
