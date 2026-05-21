@@ -7,7 +7,7 @@ from Materia import MateriaDto
 @dataclass
 class NotasDto:
     id: int
-    materia: MateriaDto
+    materia_id: int
     nota: int
     alumno_dni: str
 
@@ -15,7 +15,7 @@ class NotasDto:
 def post_nota(nota: NotasDto, db):
 
     query = "INSERT INTO notas (id, materia_id, nota, alumno_id) VALUES (?, ?, ?, ?)"
-    db.execute(query, (nota.id, nota.materia.id, nota.nota, nota.alumno_dni))
+    db.execute(query, (nota.id, nota.materia_id, nota.nota, nota.alumno_dni))
     return db.commit().rowcount == 1
 
 

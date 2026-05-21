@@ -4,8 +4,14 @@
 
 TO-DO: 
 - Diseñar los cuestionarios (definir preguntas, escalas).
-- Crear db, diseñar tablas etc.
+- Definir concretamente el formato de los csv de la ingesta de datos para poder manejar bien toda la transferencia de datos
+- Terminar de moldear los controladores y las respectivas querys de los modelos
 - Looker Studio
+
+SIGUIENTE: <Una vez completados los TO-DO>
+- Moldear la base de datos mas consistentemente para el primer testeo
+- Testear toda la ingesta de datos y muestra de la informacion pertinente del front-end
+- Definir los parametros de calculo de semaforo para los modulo <SemaforoCalculator.py>
 
 
 ### 🔗 Seguir estos pasos en terminal (la de vscode por ejemplo) para levantar el backend y el servidor.
@@ -40,4 +46,3 @@ Este repositorio contiene el backend (API) del Proyecto Travesía, desarrollado 
 2.  **Transformación:** El backend cruza todas estas fuentes de datos fragmentadas para armar el perfil de riesgo actualizado de cada estudiante .
 3.  **Salida (Output):** Mediante librerías de visualización, el sistema exporta los tableros de control y semáforos en formato HTML .
 4.  **Integración final:** Estos reportes gráficos se inyectan como *Iframes* dentro del Campus Virtual, permitiendo embeber contenidos personalizados según el rol del usuario (Dashboard Estudiante o Dashboard Docente) .
-
