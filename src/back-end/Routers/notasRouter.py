@@ -1,4 +1,4 @@
-import os
+"""import os
 
 from Controllers import DataController
 from dotenv import load_dotenv
@@ -18,3 +18,4 @@ def getPromedio():
     # El Router ahora está "limpio". Solo se encarga de definir la ruta
     # y llamar al Controlador que contiene la lógica de negocio.
     return DataController.obtener_promedios_primer_anio()
+"""

@@ -85,3 +85,7 @@ def To_object_list(procesed_path: str) -> list[SimpleNamespace]:
     except Exception as e:
         print(f"❌ Error al convertir CSV a objetos: {e}")
         return []
+
+
+# PROXIMA FUNCION --> FUNCION QUE PASE EL RESULTADO DE LAS ENCUESTAS SUBIDAS AL FORMATO ESPERADO POR LAS FUNCIONES DE CALCULO
+#

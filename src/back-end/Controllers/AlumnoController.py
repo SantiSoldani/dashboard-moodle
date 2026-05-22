@@ -1,6 +1,7 @@
 from types import SimpleNamespace
 
 from Models import Alumno
+from Models.Alumno import AlumnoDto
 
 
 def Post_alumnos(Alumnos: list[SimpleNamespace], db):
@@ -29,7 +30,7 @@ def Actualizar_estado(alumnos: list[tuple], db):
     return
 
 
-def Get_alumnos(db) -> list[dict]:
+def Get_alumnos(db) -> list[AlumnoDto]:
     alumnos = Alumno.Get_alumnos(db)
     return alumnos
 
