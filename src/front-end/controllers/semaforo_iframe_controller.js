@@ -65,7 +65,7 @@ import { HandleGet_alumnos } from "../models/Alumno.js";
     { id: 50, nombre: 'Noelia', apellido: 'Barrios', documento: '94000990', carrera: 'Ingeniería Biomédica', curso: '4to año', estado: 'Verde' }
 ];
 **/
-var alumnos = HandleGet_alumnos();
+var alumnos;
 var alumnos_filtrados = alumnos; //esta variable se actualiza cada vez que se aplica un filtro o una busqueda, y es la que se muestra en pantalla, mientras que la variable alumnos siempre contiene todos los alumnos sin filtrar
 //------------------------------------------------SECTOR DE EVENT LISTENERS--------------------------------------------------------------------------------------------
 
@@ -90,7 +90,7 @@ searchInput.addEventListener("input", () => {
   // muestra resultados parciales mientras se escribe (opcional)
   alumnos_filtrados = alumnos.filter(
     (alumno) =>
-      alumno.documento.includes(value) ||
+      alumno.dni.includes(value) ||
       alumno.nombre.toLowerCase().includes(value.toLowerCase()) ||
       alumno.apellido.toLowerCase().includes(value.toLowerCase()) ||
       alumno.carrera.toLowerCase().includes(value.toLowerCase()),
@@ -185,20 +185,23 @@ document
     const fila = event.target.closest("tr");
     if (!fila || fila.classList.contains("placeholder-row")) return; // Ignorar clics fuera de filas o en filas de mensaje
 
-    const dni = fila.cells[3].textContent; // Suponiendo que el DNI está en la cuarta columna (índice 3)
+    const dni = fila.cells[0].textContent; // Suponiendo que el DNI está en la cuarta columna (índice 3)
     console.log("DNI del alumno seleccionado:", dni);
     console.log(fila.cells[1].textContent);
-    window.location.href = `../iframes/Alumnos_stats.html?modo=x&alumno=${fila.cells[1].textContent}`; // Agregar en el controlador un url param para identificar el alumno del que debe cargar los datos
+    window.location.href = `../iframes/Alumnos_stats.html?modo=x&alumno=${fila.cells[0].textContent}`; // Agregar en el controlador un url param para identificar el alumno del que debe cargar los datos
 
     //aqui tendria una especie de logica para abrir otra pagina que me muestre las metricas personales del alumno, con su rendimiento academico
   });
 
 //------------------------------------------------SECTOR DE FUNCIONES PRINCIPALES--------------------------------------------------------------------------------
 
-function cargar_alumnos() {
-  //traer alumnos del modelo que devolveria un arreglo de alumnos
-  //alumnos = HandleGet_alumnos();
-  //mostrarlos abajo
+async function cargar_alumnos() {
+  alumnos = await HandleGet_alumnos();
+  alumnos = JSON.parse(alumnos);
+  console.log(alumnos);
+  console.log(typeof alumnos);
+  console.log(Array.isArray(alumnos));
+  console.log(alumnos);
   mostrar_alumnos(alumnos);
 }
 
@@ -228,7 +231,7 @@ function mostrar_alumnos(alumnos) {
     fila.innerHTML += `<td>${alumno.email}</td>`;
     fila.innerHTML += `<td>${alumno.carrera}</td>`;
     fila.innerHTML += `<td>${alumno.curso}</td>`;
-    fila.innerHTML += `<td class="estado-text ${claseEstado}">verde</td>`;
+    fila.innerHTML += `<td class="estado-text ${claseEstado}">${alumno.estado}</td>`;
     Tbody.appendChild(fila);
   });
 

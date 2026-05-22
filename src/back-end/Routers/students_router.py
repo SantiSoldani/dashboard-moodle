@@ -11,11 +11,12 @@ router = APIRouter(
 )
 
 
-@router.get("/{student_dni}")
+@router.get("/Bydni/{student_dni}")
 async def get_student(student_dni: str, db: Session = Depends(server.get_db)):
 
     alumno = AlumnoController.Get_alumno_Bydni(student_dni, db)
-    json_alumno = json.dumps(alumno)
+    json_alumno = json.dumps(alumno.__dict__)
+    print(json_alumno)
 
     return json_alumno
 
@@ -31,7 +32,8 @@ async def get_students(db: Session = Depends(server.get_db)):
     """
     try:
         alumnos = AlumnoController.Get_alumnos(db)
-        json_alumnos = json.dumps(alumnos)
+        json_alumnos = json.dumps([a.__dict__ for a in alumnos], indent=4)
+        print(json_alumnos)
         return json_alumnos
     except Exception as e:
         print(e)

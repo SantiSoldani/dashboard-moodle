@@ -13,6 +13,8 @@ def Post_alumnos(Alumnos: list[SimpleNamespace], db):
                 email=str(alumno.email),
                 dni=str(alumno.dni),
                 fecha_inicio=alumno.fecha_inicio,
+                carrera=alumno.carrera,
+                estado="",
             ),
             db,
         )
@@ -27,9 +29,9 @@ def Actualizar_estado(alumnos: list[tuple], db):
     return
 
 
-def Get_alumnos(db) -> list[SimpleNamespace]:
+def Get_alumnos(db) -> list[dict]:
     alumnos = Alumno.Get_alumnos(db)
-    return [SimpleNamespace(**alumno.__dict__) for alumno in alumnos]
+    return alumnos
 
 
 def Get_alumno_Bydni(dni: str, db) -> SimpleNamespace:

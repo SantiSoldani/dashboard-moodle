@@ -34,23 +34,26 @@ def Post_Alumno(alumno: AlumnoDto, db):
 
     return db.commit()
 
-    def Get_alumno(dni: str, db) -> AlumnoDto:
-        # SQL QUERY SELECT * FROM alumnos WHERE dni = ? VALUES(dni)
-        query = text("""SELECT * FROM "Alumnos" WHERE dni = :dni""")
 
-        return AlumnoDto(**(db.execute(query, {"dni": dni}).mappings().fetchone()))
+def Get_alumno(dni: str, db) -> AlumnoDto:
+    # SQL QUERY SELECT * FROM alumnos WHERE dni = ? VALUES(dni)
+    query = text("""SELECT * FROM "Alumnos" WHERE dni = :dni""")
 
-    def Get_alumnos(db) -> list[AlumnoDto]:
-        # SQL QUERY SELECT * FROM alumnos ORDER BY nombre
-        alumnos = []
-        query = text("""SELECT * FROM "Alumnos" ORDER BY nombre""")
-        fetched = (db.execute(query)).mappings().fetchall()
-        for row in fetched:
-            alumnos.append(AlumnoDto(**row))
-        return alumnos
+    return AlumnoDto(**(db.execute(query, {"dni": dni}).mappings().fetchone()))
 
-    def set_state(dni: str, estado: str, db):
-        # SQL QUERY UPDATE alumnos SET estado = ? WHERE dni = ? VALUES(estado, dni)
-        query = text("""UPDATE "Alumnos" SET estado = :estado WHERE dni = :dni""")
-        db.execute(query, {"estado": estado, "dni": dni})
-        return db.commit()
+
+def Get_alumnos(db) -> list[AlumnoDto]:
+    # SQL QUERY SELECT * FROM alumnos ORDER BY nombre
+    alumnos = []
+    query = text("""SELECT * FROM "Alumnos" ORDER BY nombre""")
+    fetched = (db.execute(query)).mappings().fetchall()
+    for row in fetched:
+        alumnos.append(AlumnoDto(**row))
+    return alumnos
+
+
+def set_state(dni: str, estado: str, db):
+    # SQL QUERY UPDATE alumnos SET estado = ? WHERE dni = ? VALUES(estado, dni)
+    query = text("""UPDATE "Alumnos" SET estado = :estado WHERE dni = :dni""")
+    db.execute(query, {"estado": estado, "dni": dni})
+    return db.commit()
