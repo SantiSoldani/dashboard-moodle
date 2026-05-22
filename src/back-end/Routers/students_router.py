@@ -2,16 +2,17 @@ import json
 
 import server
 from Controllers import AlumnoController
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlalchemy.orm import Session
 
 router = APIRouter(
-    prefix="/students",
-    tags=["students"],
+    prefix="/alumnos",
+    tags=["alumnos"],
 )
 
 
 @router.get("/{student_dni}")
-async def get_student(student_dni: str, db=server.get_db()):
+async def get_student(student_dni: str, db: Session = Depends(server.get_db)):
 
     alumno = AlumnoController.Get_alumno_Bydni(student_dni, db)
     json_alumno = json.dumps(alumno)
@@ -23,7 +24,7 @@ async def get_student(student_dni: str, db=server.get_db()):
     "/all",
     status_code=200,
 )
-async def get_students(db=server.get_db()):
+async def get_students(db: Session = Depends(server.get_db)):
     """
     la idea es dependiendo del url param del front obtener un estudiante particualar o traer todos los estudiantes
     para reciclar codigo. Tal vez vamos a necesitar una clase que tenga una coleccion de alumnos por ejemplo.

@@ -24,21 +24,11 @@ def Limpiar_csv(file_path: str, type: str) -> str:
         df = pd.read_csv(file_path)
 
         # 1. Normalizar campos numéricos
-        numeric_columns = df.select_dtypes(include=["float64", "int64"]).columns
-        print(
-            f"📊 Normalizando {len(numeric_columns)} campos numéricos: {list(numeric_columns)}"
-        )
-
-        for col in numeric_columns:
-            # Convertir a string, eliminar espacios, convertir de vuelta a numérico
-            df[col] = pd.to_numeric(df[col].astype(str).str.strip(), errors="coerce")
-
-        # Eliminar filas con valores NaN después de normalizar
-        df = df.dropna()
+        # numeric_columns = df.select_dtypes(include=["float64", "int64"]).columns
 
         # 2. Eliminar duplicados por DNI (mantener el primero)
-        if "DNI" in df.columns:
-            df = df.drop_duplicates(subset=["DNI"], keep="first")
+        if "dni" in df.columns:
+            df = df.drop_duplicates(subset=["dni"], keep="first")
         else:
             print("Columna 'DNI' no encontrada. No se eliminaron duplicados")
 

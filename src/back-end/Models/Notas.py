@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
-from Alumno import AlumnoDto
-from Materia import MateriaDto
+from Models.Alumno import AlumnoDto
+from Models.Materia import MateriaDto
 
 
 @dataclass

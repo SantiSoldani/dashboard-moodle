@@ -1,50 +1,56 @@
 from dataclasses import dataclass
 
 from pydantic.networks import EmailStr
+from sqlalchemy import text
 
 
 @dataclass
 class AlumnoDto:
-    id: int
     nombre: str
     apellido: str
     email: EmailStr
+    carrera: str
     dni: str
-    estado: str
     fecha_inicio: str
+    estado: str
 
 
-def Post_Alumno(alumnos: AlumnoDto, db):
+def Post_Alumno(alumno: AlumnoDto, db):
 
     # SQL QUERY INSERT INTO alumnos VALUES ()
-    query = "INSERT INTO alumnos VALUES (?, ?, ?, ?, ?, ?, ?) IF NOT EXISTS"
+    query = text(
+        """INSERT INTO "Alumnos" (dni, nombre, apellido, email, fecha_inicio) VALUES (:dni, :nombre, :apellido, :email, :fecha_inicio) ON CONFLICT (dni) DO NOTHING"""
+    )
     db.execute(
         query,
-        (
-            alumnos.id,
-            alumnos.nombre,
-            alumnos.apellido,
-            alumnos.email,
-            alumnos.dni,
-            alumnos.estado,
-            alumnos.fecha_inicio,
-        ),
+        {
+            "nombre": alumno.nombre,
+            "apellido": alumno.apellido,
+            "email": alumno.email,
+            "dni": alumno.dni,
+            "fecha_inicio": alumno.fecha_inicio,
+        },
     )
 
-    return db.commit().rowcount == 1
+    return db.commit()
 
+    def Get_alumno(dni: str, db) -> AlumnoDto:
+        # SQL QUERY SELECT * FROM alumnos WHERE dni = ? VALUES(dni)
+        query = text("""SELECT * FROM "Alumnos" WHERE dni = :dni""")
 
-def Get_alumno(dni: str, db) -> AlumnoDto:
-    # SQL QUERY SELECT * FROM alumnos WHERE dni = ? VALUES(dni)
-    query = "SELECT * FROM alumnos WHERE dni = ?"
-    return AlumnoDto(**db.execute(query, (dni,)).fetchone()[1])
+        return AlumnoDto(**(db.execute(query, {"dni": dni}).mappings().fetchone()))
 
+    def Get_alumnos(db) -> list[AlumnoDto]:
+        # SQL QUERY SELECT * FROM alumnos ORDER BY nombre
+        alumnos = []
+        query = text("""SELECT * FROM "Alumnos" ORDER BY nombre""")
+        fetched = (db.execute(query)).mappings().fetchall()
+        for row in fetched:
+            alumnos.append(AlumnoDto(**row))
+        return alumnos
 
-def Get_alumnos(db) -> list[AlumnoDto]:
-    # SQL QUERY SELECT * FROM alumnos ORDER BY nombre
-    return
-
-
-def set_state(dni: str, estado: str, db):
-    # SQL QUERY UPDATE alumnos SET estado = ? WHERE dni = ? VALUES(estado, dni)
-    return
+    def set_state(dni: str, estado: str, db):
+        # SQL QUERY UPDATE alumnos SET estado = ? WHERE dni = ? VALUES(estado, dni)
+        query = text("""UPDATE "Alumnos" SET estado = :estado WHERE dni = :dni""")
+        db.execute(query, {"estado": estado, "dni": dni})
+        return db.commit()

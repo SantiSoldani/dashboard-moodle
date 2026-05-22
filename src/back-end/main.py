@@ -6,7 +6,7 @@ import uvicorn
 from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from Routers import data_router, notasRouter
+from Routers import data_router, notasRouter, students_router
 
 app = FastAPI(title="API Proyecto Travesía")
 
@@ -20,6 +20,8 @@ app.add_middleware(
 
 app.include_router(notasRouter.router)
 app.include_router(data_router.router)
+app.include_router(students_router.router)
+
 
 load_dotenv()
 

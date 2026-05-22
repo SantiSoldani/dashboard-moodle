@@ -1,20 +1,18 @@
 /**CONTROLADOR DE EL IFRAME DE LOS SEMAFOROS -> TRABAJOS:
- * 
+ *
  * - COMUNICARSE CON EL MODELO DE ALUMNOS PARA OBTENER LOS DATOS DE LOS SEMAFOROS DE LOS ALUMNOS
  * - CARGAR LOS SEMAFOROS Y LA INFORMACION DE CADA ALUMNOS POR MEDIO DE UN IFRAME
  * - ACTUALIZAR LOS SEMAFOROS EN TIEMPO REAL SI ES NECESARIO
  * - PODRIA DESARROLLARSE ALGUN CAMPO PARA FILTRAR LOS ALUMNOS POR NOMBRE, Y SITUACION DEL SEMAFORO
- * 
- * 
+ *
+ *
  */
 
-import { HandleGet_alumnos } from '../models/Alumno.js';
-
-
+import { HandleGet_alumnos } from "../models/Alumno.js";
 
 //IMPORTAR DATOS DE TODOS LOS ALUMNOS DE LA BASE DE DATOS
 //POR AHORA USO EL SIGUIENTE DATA_SET DE PRUEBA, PERO SE DEBERIA REEMPLAZAR POR UNA CONSULTA A LA BASE DE DATOS PARA OBTENER LOS DATOS REALES DE LOS ALUMNOS Y SUS SEMAFOROS
-var alumnos = [
+/**var alumnos =[
     { id: 1, nombre: 'Mateo', apellido: 'González', documento: '44322111', carrera: 'Ingeniería Civil', curso: '1er año', estado: 'Verde' },
     { id: 2, nombre: 'Sofía', apellido: 'Pérez', documento: '45133445', carrera: 'Ingeniería Industrial', curso: '2do año', estado: 'Amarillo' },
     { id: 3, nombre: 'Lucas', apellido: 'Rodríguez', documento: '46988723', carrera: 'Ingeniería Informática', curso: '3er año', estado: 'Rojo' },
@@ -66,195 +64,198 @@ var alumnos = [
     { id: 49, nombre: 'Marcos', apellido: 'Olivares', documento: '92999889', carrera: 'Ingeniería en Telecomunicaciones', curso: '3er año', estado: 'Amarillo' },
     { id: 50, nombre: 'Noelia', apellido: 'Barrios', documento: '94000990', carrera: 'Ingeniería Biomédica', curso: '4to año', estado: 'Verde' }
 ];
-
+**/
+var alumnos = HandleGet_alumnos();
 var alumnos_filtrados = alumnos; //esta variable se actualiza cada vez que se aplica un filtro o una busqueda, y es la que se muestra en pantalla, mientras que la variable alumnos siempre contiene todos los alumnos sin filtrar
 //------------------------------------------------SECTOR DE EVENT LISTENERS--------------------------------------------------------------------------------------------
 
-const searchInput = document.getElementById('searchAlumno');
-const btnBuscar = document.getElementById('btnBuscar');
-const filterField = document.getElementById('filterField');
-const filterValue = document.getElementById('filterValue');
-const btnAgregarFiltro = document.getElementById('btnAgregarFiltro');
-const btnLimpiarFiltros = document.getElementById('btnLimpiarFiltros');
+const searchInput = document.getElementById("searchAlumno");
+const btnBuscar = document.getElementById("btnBuscar");
+const filterField = document.getElementById("filterField");
+const filterValue = document.getElementById("filterValue");
+const btnAgregarFiltro = document.getElementById("btnAgregarFiltro");
+const btnLimpiarFiltros = document.getElementById("btnLimpiarFiltros");
 
-searchInput.addEventListener('input', () => {
-    const value = searchInput.value.trim();
-    btnBuscar.disabled = value.length === 0;
+searchInput.addEventListener("input", () => {
+  const value = searchInput.value.trim();
+  btnBuscar.disabled = value.length === 0;
 
-    if (value.length === 0) {
-        alumnos_filtrados = alumnos;
-        mostrar_alumnos(alumnos);
-        //mostrar mensaje de error o
-        return;
-    }
+  if (value.length === 0) {
+    alumnos_filtrados = alumnos;
+    mostrar_alumnos(alumnos);
+    //mostrar mensaje de error o
+    return;
+  }
 
-    // muestra resultados parciales mientras se escribe (opcional)
-    alumnos_filtrados = alumnos.filter(alumno =>
-        alumno.documento.includes(value) || 
-        alumno.nombre.toLowerCase().includes(value.toLowerCase()) ||
-        alumno.apellido.toLowerCase().includes(value.toLowerCase()) ||
-        alumno.carrera.toLowerCase().includes(value.toLowerCase())
-    );
+  // muestra resultados parciales mientras se escribe (opcional)
+  alumnos_filtrados = alumnos.filter(
+    (alumno) =>
+      alumno.documento.includes(value) ||
+      alumno.nombre.toLowerCase().includes(value.toLowerCase()) ||
+      alumno.apellido.toLowerCase().includes(value.toLowerCase()) ||
+      alumno.carrera.toLowerCase().includes(value.toLowerCase()),
+  );
 });
 
-searchInput.addEventListener('keypress', function(event) {
-    if (event.key === 'Enter') {
-        event.preventDefault();
-        mostrar_alumnos(alumnos_filtrados)
-        //searchInput.value = '';
-    }
-});
-document.getElementById('btnBuscar').addEventListener('click', function(event){
+searchInput.addEventListener("keypress", function (event) {
+  if (event.key === "Enter") {
     event.preventDefault();
     mostrar_alumnos(alumnos_filtrados);
-
+    //searchInput.value = '';
+  }
 });
-
-document.getElementById('filterValue').addEventListener('change', function(event){
+document
+  .getElementById("btnBuscar")
+  .addEventListener("click", function (event) {
     event.preventDefault();
- 
+    mostrar_alumnos(alumnos_filtrados);
+  });
+
+document
+  .getElementById("filterValue")
+  .addEventListener("change", function (event) {
+    event.preventDefault();
+
     //todas las funciones relacionadas al valor que puede ser tomado como filtro para los alumnos por ejemplo estado_semaforo == rojo
+  });
+
+filterField.addEventListener("click", function (event) {
+  event.preventDefault();
+
+  filterField.disabled = false;
+  //todas las funciones relacionadas al filtro de los alumnos, por ejemplo, mostrar solo los alumnos con semaforo rojo, o mostrar solo los alumnos con semaforo verde, etc
 });
 
-filterField.addEventListener('click', function(event){
-    event.preventDefault();
-    
-    filterField.disabled = false;
-    //todas las funciones relacionadas al filtro de los alumnos, por ejemplo, mostrar solo los alumnos con semaforo rojo, o mostrar solo los alumnos con semaforo verde, etc
+btnLimpiarFiltros.addEventListener("click", function (event) {
+  event.preventDefault();
+
+  alumnos_filtrados = alumnos; //restablece la lista de alumnos filtrados a la lista completa de alumnos
+  mostrar_alumnos(alumnos_filtrados);
+
+  //limpiar de la lista de filtrados
+  const filtros = document.querySelectorAll(".filter-tag strong");
+  filtros.forEach((filtro) => (filtro.textContent = "")); //limpia el texto de cada filtro activo
+  //todas las funciones relacionadas a limpiar los filtros, vacia la lista de filtros cuando se presiona el boton
 });
 
-btnLimpiarFiltros.addEventListener('click', function(event){
-    event.preventDefault();
-
-    alumnos_filtrados = alumnos; //restablece la lista de alumnos filtrados a la lista completa de alumnos
-    mostrar_alumnos(alumnos_filtrados);
-
-    //limpiar de la lista de filtrados 
-    const filtros = document.querySelectorAll('.filter-tag strong');
-    filtros.forEach(filtro => filtro.textContent = ''); //limpia el texto de cada filtro activo
-    //todas las funciones relacionadas a limpiar los filtros, vacia la lista de filtros cuando se presiona el boton
-});
-
-document.getElementById('btnAgregarFiltro').addEventListener('click', function(event){
+document
+  .getElementById("btnAgregarFiltro")
+  .addEventListener("click", function (event) {
     event.preventDefault();
     const campo = filterField.value;
     const valor = filterValue.value;
-    console.log('Campo seleccionado:', campo);
-    console.log('Valor ingresado:', valor);
-    console.log('Alumnos antes de aplicar filtro:', alumnos_filtrados);
-    if(campo === '' || valor === ''){
-        //mostrar mensaje de error o algo asi, porque no se puede agregar un filtro sin campo o sin valor
-        return;
+    console.log("Campo seleccionado:", campo);
+    console.log("Valor ingresado:", valor);
+    console.log("Alumnos antes de aplicar filtro:", alumnos_filtrados);
+    if (campo === "" || valor === "") {
+      //mostrar mensaje de error o algo asi, porque no se puede agregar un filtro sin campo o sin valor
+      return;
+    } else {
+      alumnos_filtrados = alumnos_filtrados.filter((alumno) => {
+        switch (campo) {
+          case "nombre":
+            return alumno.nombre.toLowerCase() === valor.toLowerCase();
+          case "apellido":
+            return alumno.apellido.toLowerCase() === valor.toLowerCase();
+          case "carrera":
+            return alumno.carrera.toLowerCase() === valor.toLowerCase();
+          case "estado":
+            return alumno.estado.toLowerCase() === valor.toLowerCase();
+          default:
+            return false; // Si el campo no coincide, no filtrar
+        }
+      });
+      document
+        .getElementById(
+          `filterTag${campo.charAt(0).toUpperCase() + campo.slice(1)}`,
+        )
+        .querySelector("strong").textContent = valor;
+      mostrar_alumnos(alumnos_filtrados);
     }
-    else{
-        alumnos_filtrados = alumnos_filtrados.filter(alumno => {
-            switch(campo){
-                case 'nombre':
-                    return alumno.nombre.toLowerCase() === valor.toLowerCase();
-                case 'apellido':
-                    return alumno.apellido.toLowerCase() === valor.toLowerCase();
-                case 'carrera':
-                    return alumno.carrera.toLowerCase() === valor.toLowerCase();
-                case 'estado':
-                    return alumno.estado.toLowerCase() === valor.toLowerCase();
-                default:
-                    return false; // Si el campo no coincide, no filtrar
-            }
-        });
-        document.getElementById(`filterTag${campo.charAt(0).toUpperCase() + campo.slice(1)}`).querySelector('strong').textContent = valor;
-        mostrar_alumnos(alumnos_filtrados);
-    } 
 
     //todas las funciones relacionadas a agregar un filtro, se habilita cuando haya al menos un campo seleccionado y cuando se presiona toma los valores del filtro y .los agrega a lista de filtros
-});
+  });
 
-document.getElementById('studentsTable').querySelector('tbody').addEventListener('click', function(event){
-
+document
+  .getElementById("studentsTable")
+  .querySelector("tbody")
+  .addEventListener("click", function (event) {
     event.preventDefault();
 
-    const fila = event.target.closest('tr');
-    if (!fila || fila.classList.contains('placeholder-row')) return; // Ignorar clics fuera de filas o en filas de mensaje
+    const fila = event.target.closest("tr");
+    if (!fila || fila.classList.contains("placeholder-row")) return; // Ignorar clics fuera de filas o en filas de mensaje
 
     const dni = fila.cells[3].textContent; // Suponiendo que el DNI está en la cuarta columna (índice 3)
-    console.log('DNI del alumno seleccionado:', dni);
-    console.log(fila.cells[1].textContent)
+    console.log("DNI del alumno seleccionado:", dni);
+    console.log(fila.cells[1].textContent);
     window.location.href = `../iframes/Alumnos_stats.html?modo=x&alumno=${fila.cells[1].textContent}`; // Agregar en el controlador un url param para identificar el alumno del que debe cargar los datos
 
     //aqui tendria una especie de logica para abrir otra pagina que me muestre las metricas personales del alumno, con su rendimiento academico
-
-})
+  });
 
 //------------------------------------------------SECTOR DE FUNCIONES PRINCIPALES--------------------------------------------------------------------------------
 
-
-function cargar_alumnos(){
-
-    //traer alumnos del modelo que devolveria un arreglo de alumnos 
-    //alumnos = HandleGet_alumnos();
-    //mostrarlos abajo
-    mostrar_alumnos(alumnos);
-
-
+function cargar_alumnos() {
+  //traer alumnos del modelo que devolveria un arreglo de alumnos
+  //alumnos = HandleGet_alumnos();
+  //mostrarlos abajo
+  mostrar_alumnos(alumnos);
 }
 
-function mostrar_alumnos(alumnos){
+function mostrar_alumnos(alumnos) {
+  /**
+   * esta funcion es llamada cada vez que se actualizan los datos de los alaumnos, ya sea por una busqueda, o por un filtro, o por una actualizacion en tiempo real, etc.
+   */
 
-    /**
-     * esta funcion es llamada cada vez que se actualizan los datos de los alaumnos, ya sea por una busqueda, o por un filtro, o por una actualizacion en tiempo real, etc.
-     */
+  const Tbody = document.getElementById("studentsTable").querySelector("tbody");
+  Tbody.innerHTML = "";
 
-    const Tbody = document.getElementById('studentsTable').querySelector('tbody');
-    Tbody.innerHTML = '';
+  if (alumnos.length === 0) {
+    const filaMensaje = document.createElement("tr");
+    filaMensaje.classList.add("placeholder-row");
+    filaMensaje.innerHTML = `<td colspan="7">No se encontraron alumnos para la búsqueda.</td>`;
+    Tbody.appendChild(filaMensaje);
+    actualizarTotalAlumnos(0);
+    return;
+  }
+  console.log(alumnos);
+  alumnos.forEach((alumno) => {
+    const fila = document.createElement("tr");
+    const claseEstado = obtenerClaseEstado(alumno.estado);
+    fila.innerHTML += `<td>${alumno.dni}</td>`;
+    fila.innerHTML += `<td>${alumno.nombre}</td>`;
+    fila.innerHTML += `<td>${alumno.apellido}</td>`;
+    fila.innerHTML += `<td>${alumno.email}</td>`;
+    fila.innerHTML += `<td>${alumno.carrera}</td>`;
+    fila.innerHTML += `<td>${alumno.curso}</td>`;
+    fila.innerHTML += `<td class="estado-text ${claseEstado}">verde</td>`;
+    Tbody.appendChild(fila);
+  });
 
-    if (alumnos.length === 0) {
-        const filaMensaje = document.createElement('tr');
-        filaMensaje.classList.add('placeholder-row');
-        filaMensaje.innerHTML = `<td colspan="7">No se encontraron alumnos para la búsqueda.</td>`;
-        Tbody.appendChild(filaMensaje);
-        actualizarTotalAlumnos(0);
-        return;
-    }
-    console.log(alumnos);
-    alumnos.forEach(alumno =>{
-        const fila = document.createElement('tr');
-        const claseEstado = obtenerClaseEstado(alumno.estado);
-        fila.innerHTML += `<td>${alumno.id}</td>`;
-        fila.innerHTML += `<td>${alumno.nombre}</td>`;
-        fila.innerHTML += `<td>${alumno.apellido}</td>`;
-        fila.innerHTML += `<td>${alumno.documento}</td>`;
-        fila.innerHTML += `<td>${alumno.carrera}</td>`;
-        fila.innerHTML += `<td>${alumno.curso}</td>`;
-        fila.innerHTML += `<td class="estado-text ${claseEstado}">${alumno.estado}</td>`;
-        Tbody.appendChild(fila);
-    });
-
-    actualizarTotalAlumnos(alumnos.length);
+  actualizarTotalAlumnos(alumnos.length);
 }
 
 function obtenerClaseEstado(estado) {
-    const valor = String(estado).trim().toLowerCase();
-    switch (valor) {
-        case 'verde':
-            return 'estado-verde';
-        case 'amarillo':
-            return 'estado-amarillo';
-        case 'rojo':
-            return 'estado-rojo';
-        default:
-            return 'estado-desconocido';
-    }
+  const valor = String(estado).trim().toLowerCase();
+  switch (valor) {
+    case "verde":
+      return "estado-verde";
+    case "amarillo":
+      return "estado-amarillo";
+    case "rojo":
+      return "estado-rojo";
+    default:
+      return "estado-desconocido";
+  }
 }
 
 function actualizarTotalAlumnos(cantidad) {
-    const totalCount = document.getElementById('totalAlumnosCount');
-    if (totalCount) {
-        totalCount.textContent = cantidad;
-    }
+  const totalCount = document.getElementById("totalAlumnosCount");
+  if (totalCount) {
+    totalCount.textContent = cantidad;
+  }
 }
-
 
 //--------------------------------SECTOR DE FUNCIONES SECUNDARIAS-------------------------------------------------------------------------------------------------------
 
-
-
-window.addEventListener('load', cargar_alumnos);
+window.addEventListener("load", cargar_alumnos);

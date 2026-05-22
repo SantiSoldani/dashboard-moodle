@@ -3,8 +3,9 @@ import shutil
 
 import server
 from Controllers import DataController
-from fastapi import APIRouter, File, UploadFile, status
+from fastapi import APIRouter, Depends, File, UploadFile, status
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/data")
 
@@ -16,7 +17,9 @@ router = APIRouter(prefix="/data")
 
 
 @router.post("/Uploadalumnos", status_code=201)
-async def upload_alumnos(file: UploadFile = File(...), db=server.get_db()):
+async def upload_alumnos(
+    file: UploadFile = File(...), db: Session = Depends(server.get_db)
+):
     """
     Recibe un archivo CSV de alumnos cargado desde el front, lo guarda en una carpeta de datos sin procesar en la seccion de raw_data
     ,donde sera procesado por el servicio de limpieza de datos
@@ -46,7 +49,9 @@ async def upload_alumnos(file: UploadFile = File(...), db=server.get_db()):
 
 
 @router.post("/Uploadnotas", status_code=201)
-async def upload_notas(file: UploadFile = File(...), db=server.get_db()):
+async def upload_notas(
+    file: UploadFile = File(...), db: Session = Depends(server.get_db)
+):
     """
     Recibe un archivo CSV de notas cargado desde el front, lo guarda en una carpeta de datos sin procesar en la seccion de raw_data
     una, donde sera procesado por el servicio de limpieza de datos
@@ -76,7 +81,9 @@ async def upload_notas(file: UploadFile = File(...), db=server.get_db()):
 
 
 @router.post("/UploadEncuestas", status_code=201)
-async def upload_encuestas(file: UploadFile = File(...), db=server.get_db()):
+async def upload_encuestas(
+    file: UploadFile = File(...), db: Session = Depends(server.get_db)
+):
     try:
         upload_dir = "/var/www/html/dashboard-moodle/src/back-end/raw_data"
         os.makedirs(upload_dir, exist_ok=True)

@@ -8,9 +8,7 @@ import { getConfig } from "../config/config.js";
  */
 export async function HandleGet_alumnos(which = "all") {
   try {
-    const response = await fetch(
-      `${getConfig().env.api_url}/endpoint/alumnos/${which}`,
-    );
+    const response = await fetch(`${getConfig().env.api_url}/alumnos/${which}`);
 
     if (!response.ok) {
       throw new Error("Error en el fetch de los alumnos");

@@ -1,14 +1,17 @@
 import os
+from pathlib import Path
 from urllib.parse import quote_plus
 
 from dotenv import load_dotenv
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-load_dotenv()  # carga variables de entorno
+# Cargamos el .env de la raíz del proyecto
+env_path = Path(__file__).parent.parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 # Construimos la URL de conexión de forma segura
-SQLALCHEMY_DATABASE_URL = f"{os.getenv('DATABASE_URL')}"  # ma    ntiene la url en variable de entorno. Los .env no se suben a github
+SQLALCHEMY_DATABASE_URL = f"{os.getenv('DATABASE_URL')}"  # mantiene la url en variable de entorno. Los .env no se suben a github
 # Creamos el motor de base de datos
 engine = create_engine(SQLALCHEMY_DATABASE_URL, echo=True)
 # Creamos una clase para las sesiones

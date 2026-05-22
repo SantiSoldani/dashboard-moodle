@@ -8,12 +8,10 @@ def Post_alumnos(Alumnos: list[SimpleNamespace], db):
     for alumno in Alumnos:
         Alumno.Post_Alumno(
             Alumno.AlumnoDto(
-                id=alumno.id,
-                nombre=alumno.nombre,
-                apellido=alumno.apellido,
-                email=alumno.email,
-                dni=alumno.dni,
-                estado=alumno.estado,
+                nombre=str(alumno.nombre),
+                apellido=str(alumno.apellido),
+                email=str(alumno.email),
+                dni=str(alumno.dni),
                 fecha_inicio=alumno.fecha_inicio,
             ),
             db,

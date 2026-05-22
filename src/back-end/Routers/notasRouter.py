@@ -1,6 +1,6 @@
 import os
 
-from Controllers.DataController import DataController
+from Controllers import DataController
 from dotenv import load_dotenv
 from fastapi import APIRouter
 
