@@ -1,3 +1,5 @@
+from sys import prefix
+
 from Controllers import AlumnoController, NotasController
 from Services import Data_transformer, SemaforoCalculator
 
@@ -15,17 +17,20 @@ def Handle_alumnos(file_path: str, db):
         print(e)
 
 
-def Handle_encuestas(file_path: str, db):
+def Handle_encuesta_cuatrimestral(file_path: str, db):
 
     # 1) Limpia los datos de las encuestas pasandolos a un archivo normalizado cuantitativo de con resultados de las encuestas y los guarda en la seccion de procesed_data
-    final_path = Data_transformer.Limpiar_csv(file_path, "encuestas")
+    final_path = Data_transformer.Limpiar_csv(
+        file_path, "encuestas"
+    )  # en este caso la informacion se guarda en un csv con un formato listo para hacer calculos
+
     # 2)opcional: Una vez los datos estan limpios genero el arreglo de objetos tipo encuesta con los resultados de las encustas si es que decidimos persistirlas
     # Encuestas = Data_transformer.To_object_List(final_path)
 
     # 3)paso el data set de encuestas limpias y normalizadas al modulo de calculo de semaforos, devuelve tuplas de (estado_semaforo,dni_alumno)
-    # update = SemaforoCalculator.get_states_From_encuestas(final_path, type="cuatrimestral")
+    estado = SemaforoCalculator.calculo_cuatrimestral(final_path)
     # 4)paso las tuplas al modelo para que modifiquen el estado en la base de datos
-    # AlumnoController.Actualizar_estado(update, db)
+    AlumnoController.Actualizar_estado(estado, db)
 
 
 def Handle_notas(file_path: str, db):
@@ -34,8 +39,9 @@ def Handle_notas(file_path: str, db):
     final_path = Data_transformer.Limpiar_csv(file_path, "notas")
     # 2) Una vez limpios los datos paso los datos a un arreglo objetos con los atributos de las notas y los paso al modelo de notas para que los persista
     notas = Data_transformer.To_object_list(final_path)
-    NotasController.post_notas(notas, db)
+    # NotasController.post_notas(db, notas)
     # 3) paso el data set de notas limpias y normalizadas al modulo de calculo de semaforo que me devuelve tuplas de (promedio,alumno)
-    # update = SemaforoCalculator.get_states_From_notas(final_path, db)
+    resultados = SemaforoCalculator.get_states_From_notas(final_path, db)
+    # print(resultados)
     # 4) paso las tuplas al modelo de alumnos para que genere el estado del alumno dentro de la base de datos     AlumnosController.Actualizar_estado(update)
-    # AlumnoController.Actualizar_estado(update, db)
+    AlumnoController.Actualizar_estado(resultados, db)

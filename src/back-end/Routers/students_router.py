@@ -33,7 +33,7 @@ async def get_students(db: Session = Depends(server.get_db)):
     try:
         alumnos = AlumnoController.Get_alumnos(db)
         json_alumnos = json.dumps([a.__dict__ for a in alumnos], indent=4)
-        print(json_alumnos)
+        # print(json_alumnos)
         return json_alumnos
     except Exception as e:
         print(e)

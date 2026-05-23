@@ -13,6 +13,7 @@ class AlumnoDto:
     dni: str
     fecha_inicio: str
     estado: str
+    score: float
 
 
 def Post_Alumno(alumno: AlumnoDto, db):
@@ -32,7 +33,7 @@ def Post_Alumno(alumno: AlumnoDto, db):
         },
     )
 
-    return db.commit()
+    return  # db.commit()
 
 
 def Get_alumno(dni: str, db) -> AlumnoDto:
@@ -52,8 +53,17 @@ def Get_alumnos(db) -> list[AlumnoDto]:
     return alumnos
 
 
-def set_state(dni: str, estado: str, db):
+def set_state(dni: str, estado: str, score: float, db):
     # SQL QUERY UPDATE alumnos SET estado = ? WHERE dni = ? VALUES(estado, dni)
-    query = text("""UPDATE "Alumnos" SET estado = :estado WHERE dni = :dni""")
-    db.execute(query, {"estado": estado, "dni": dni})
-    return db.commit()
+    query = text(
+        """UPDATE "Alumnos" SET estado = :estado, score = :score WHERE dni = :dni"""
+    )
+    db.execute(query, {"estado": estado, "dni": str(dni), "score": score})
+    return
+
+
+def get_score(dni: str, db) -> float:
+    query = text("""SELECT score FROM "Alumnos" WHERE dni = :dni""")
+    result = db.execute(query, {"dni": dni}).fetchone()
+    print("score", result)
+    return result[0]

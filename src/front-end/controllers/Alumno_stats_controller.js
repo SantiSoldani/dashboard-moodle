@@ -32,7 +32,6 @@ window.addEventListener("load", async () => {
   const alumno_dni = params.get("alumno");
   let alumno = await HandleGet_alumnos(alumno_dni);
   alumno = JSON.parse(alumno);
-  alumno.estado = "verde";
   console.log(alumno);
   set_state_panel(alumno);
   set_info_panel(alumno);
@@ -48,6 +47,7 @@ function set_state_panel(alumno) {
   const stats = document.getElementById("status-section");
   const estados = document.querySelectorAll(".estado-verde");
   estados.forEach((estado) => {
+    console.log(alumno.estado);
     estado.classList.replace("estado-verde", `estado-${alumno.estado}`);
 
     if (estado.querySelector("strong")) {
@@ -64,7 +64,7 @@ function set_state_panel(alumno) {
   });
 
   let nombre = stats.querySelector("h1");
-  nombre.textContent = alumno.nombre;
+  nombre.textContent = alumno.nombre + " " + alumno.apellido;
 }
 function set_info_panel(alumno) {
   const info_panel = document.querySelectorAll("#info-panel .info-item");
@@ -73,7 +73,7 @@ function set_info_panel(alumno) {
     switch (panel.querySelector("span").textContent) {
       case "Nombre":
         panel.querySelector("strong").textContent =
-          alumno.nombre + alumno.apellido;
+          alumno.nombre + " " + alumno.apellido;
         break;
 
       case "Documento":

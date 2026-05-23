@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 
+from sqlalchemy import text
+
 
 @dataclass
 class MateriaDto:
@@ -7,12 +9,14 @@ class MateriaDto:
     nombre: str
     coeficiente: float
     cuatrimestre: int
-    nota_minima: float
+    notaMinima: float
 
 
-def get_materias(db):
+def get_materias(db) -> list[MateriaDto]:
 
-    query = "SELECT * FROM materias"
-
+    query = text("""SELECT * FROM "Materia" ORDER BY id""")
     rows = db.execute(query).mappings().fetchall()
-    return [MateriaDto(**row) for row in rows]
+    # print("filas", rows)
+    devuelve = [MateriaDto(**row) for row in rows]
+    # print("devuelve", devuelve)
+    return devuelve

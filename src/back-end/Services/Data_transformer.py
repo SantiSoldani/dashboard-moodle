@@ -79,7 +79,7 @@ def To_object_list(procesed_path: str) -> list[SimpleNamespace]:
             # SimpleNamespace convierte dict a objeto con atributos
             registro_obj = SimpleNamespace(**registro_dict)
             objetos.append(registro_obj)
-
+        print("lista final: ", objetos)
         return objetos
 
     except Exception as e:
@@ -88,4 +88,3 @@ def To_object_list(procesed_path: str) -> list[SimpleNamespace]:
 
 
 # PROXIMA FUNCION --> FUNCION QUE PASE EL RESULTADO DE LAS ENCUESTAS SUBIDAS AL FORMATO ESPERADO POR LAS FUNCIONES DE CALCULO
-#

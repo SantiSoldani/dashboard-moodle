@@ -96,7 +96,7 @@ async def upload_encuestas(
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         # Aca es donde le paso la ruta donde guarde el arcivo a la seccion de tratamiento de datos
-        DataController.Handle_encuestas(file_path, db)
+        DataController.Handle_encuesta_cuatrimestral(file_path, db)
         return {
             "status": "success",
             "message": f"Archivo '{file.filename}' cargado correctamente",

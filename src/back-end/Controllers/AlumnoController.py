@@ -20,14 +20,15 @@ def Post_alumnos(Alumnos: list[SimpleNamespace], db):
             db,
         )
 
-    return
+    return db.commit()
 
 
 def Actualizar_estado(alumnos: list[tuple], db):
 
     for alumno in alumnos:
-        Alumno.set_state(toState(alumno[0]), alumno[1], db)
-    return
+        Alumno.set_state(alumno[1], str(alumno[0]), alumno[2], db)
+        print(alumno[1], str(alumno[0]), alumno[2])
+    return db.commit()
 
 
 def Get_alumnos(db) -> list[AlumnoDto]:
@@ -48,3 +49,7 @@ def toState(aprobacion: float) -> str:
         return "amarillo"
     else:
         return "verde"
+
+
+def get_score(dni: str, db) -> float:
+    return Alumno.get_score(dni, db)
