@@ -1,5 +1,3 @@
-from sys import prefix
-
 from Controllers import AlumnoController, NotasController
 from Services import Data_transformer, SemaforoCalculator
 
@@ -39,9 +37,9 @@ def Handle_notas(file_path: str, db):
     final_path = Data_transformer.Limpiar_csv(file_path, "notas")
     # 2) Una vez limpios los datos paso los datos a un arreglo objetos con los atributos de las notas y los paso al modelo de notas para que los persista
     notas = Data_transformer.To_object_list(final_path)
-    # NotasController.post_notas(db, notas)
+    NotasController.post_notas(db, notas)
     # 3) paso el data set de notas limpias y normalizadas al modulo de calculo de semaforo que me devuelve tuplas de (promedio,alumno)
     resultados = SemaforoCalculator.get_states_From_notas(final_path, db)
     # print(resultados)
     # 4) paso las tuplas al modelo de alumnos para que genere el estado del alumno dentro de la base de datos     AlumnosController.Actualizar_estado(update)
-    AlumnoController.Actualizar_estado(resultados, db)
+    status = AlumnoController.Actualizar_estado(resultados, db)

@@ -4,11 +4,12 @@
 
 ```
 backend/
-├── main.py
-├── router/
-├── controller/
-├── models/
-└── services/
+├── main.py                  # Punto de entrada, registra routers
+├── server.py               # Configuración de BD (SessionLocal, engine)
+├── Routers/                # Rutas HTTP
+├── Controllers/            # Coordinadores de flujo
+├── Models/                 # DTOs y queries SQL
+└── Services/               # Lógica de negocio
 ```
 
 ---
@@ -17,107 +18,208 @@ backend/
 
 | Capa | Carpeta | Qué hace | Qué NO hace |
 |---|---|---|---|
-| **Router** | `router/` | Define las rutas HTTP (`GET`, `POST`, etc.) y los parámetros que recibe cada endpoint. Recibe el request y lo delega al controller. | Lógica de ningún tipo. Si hay un `if`, algo está mal. |
-| **Controller** | `controller/` | Coordina el flujo: valida que los datos estén bien formados, llama a los servicios necesarios y arma la respuesta HTTP. Conoce HTTP. | Queries a la DB ni reglas de negocio complejas. |
-| **Service** | `services/` | Toda la inteligencia del sistema vive acá. Calcula promedios, scores de riesgo, decide qué materias incluir en cada cálculo, llama a la API de Moodle, orquesta operaciones. | Importar nada de FastAPI (`Request`, `Response`, etc.). No sabe que existe HTTP. |
-| **Model** | `models/` | Define las tablas (SQLAlchemy ORM) y los schemas de validación (Pydantic). Es la única capa que habla con la base de datos. | Lógica de negocio. Solo persiste y recupera datos. |
+| **Router** | `Routers/` | Define las rutas HTTP (`GET`, `POST`, etc.) y recibe requests. Llama al controller y retorna la respuesta JSON. | Lógica de negocio. Si hay un `if` o `for`, pertenece al controller. |
+| **Controller** | `Controllers/` | Coordina el flujo: valida datos, llama a Models y Services, arma la respuesta. Convierte SimpleNamespace en DTOs. Conoce HTTP. | Queries SQL directas. Lógica de negocio compleja. |
+| **Service** | `Services/` | Toda la inteligencia y cálculos complejos: transformaciones de datos, orquestación. Calcula scores, scores de riesgo, etc. | Importar FastAPI. Acceder a BD. Sabe que existe HTTP. |
+| **Model** | `Models/` | Estructura de datos (DTOs con `@dataclass`) y queries SQL. Es la única capa que habla con la base de datos. | Lógica de negocio. Cálculos complejos. Solo persiste y recupera datos. |
 
 ---
 
 ## Flujo de un request
 
 ```
-Request HTTP
+GET /alumnos/all
     │
     ▼
-router/          → recibe la ruta y llama al controller
+Routers/students_router.py    → recibe la ruta, valida Depends(get_db)
+    │ Llama a: AlumnoController.Get_alumnos(db)
+    ▼
+Controllers/AlumnoController.py → coordina, llama a Models
+    │ Llama a: Alumno.Get_alumnos(db)
+    ▼
+Models/Alumno.py              → ejecuta query SQL
+    │ Query: SELECT * FROM "Alumnos" ORDER BY nombre
+    ▼
+server.py (SessionLocal)       → conexión a BD
     │
     ▼
-controller/      → valida, coordina y arma la respuesta
-    │
-    ▼
-services/        → ejecuta la lógica de negocio
-    │
-    ▼
-models/          → accede a la base de datos
-    │
-    ▼
-Response HTTP
+Response JSON
 ```
 
 ---
 
-## Ejemplo concreto: `GET /dashboard/{alumno_id}`
+## Ejemplo real: `GET /alumnos/Bydni/{student_dni}`
 
-### `router/dashboard.py`
+### `Routers/students_router.py`
 ```python
-@router.get("/dashboard/{alumno_id}")
-async def get_dashboard(alumno_id: int, token: str):
-    return await dashboard_controller.get(alumno_id, token)
+@router.get("/Bydni/{student_dni}")
+async def get_student(student_dni: str, db: Session = Depends(server.get_db)):
+    alumno = AlumnoController.Get_alumno_Bydni(student_dni, db)
+    json_alumno = json.dumps(alumno.__dict__)
+    return json_alumno
 ```
-Solo define la ruta y delega. Sin lógica.
+✅ Solo define la ruta y delega. Sin lógica.
 
 ---
 
-### `controller/dashboard.py`
+### `Controllers/AlumnoController.py`
 ```python
-async def get(alumno_id: int, token: str):
-    user = verify_token(token)          # valida identidad
-    if user.id != alumno_id:
-        raise HTTPException(403)        # controla acceso
-
-    data = await dashboard_service.calcular(alumno_id)
-    return JSONResponse(data)           # arma respuesta HTTP
+def Get_alumno_Bydni(dni: str, db) -> SimpleNamespace:
+    # Llama al Model para obtener los datos
+    alumno = Alumno.Get_alumno(dni, db)
+    # Convierte DTO a SimpleNamespace para el frontend
+    return SimpleNamespace(**alumno.__dict__)
 ```
-Conoce HTTP, pero no sabe cómo se calcula un promedio.
+✅ Coordina: obtiene del Model y transforma para responder.
 
 ---
 
-### `services/dashboard.py`
+### `Models/Alumno.py`
 ```python
-async def calcular(alumno_id: int) -> dict:
-    materias = alumno_model.get_materias(alumno_id)
+@dataclass
+class AlumnoDto:
+    nombre: str
+    apellido: str
+    email: EmailStr
+    carrera: str
+    dni: str
+    fecha_inicio: str
+    estado: str
+    score: float
 
-    # Solo incluye materias con nota final aprobada
-    aprobadas = [m for m in materias if m.nota_final is not None]
+def Get_alumno(dni: str, db) -> AlumnoDto:
+    query = text("""SELECT * FROM "Alumnos" WHERE dni = :dni""")
+    return AlumnoDto(**(db.execute(query, {"dni": dni}).mappings().fetchone()))
+```
+✅ Define estructura (DTO) y query SQL. Nada más.
 
-    promedio = (
-        sum(m.nota_final for m in aprobadas) / len(aprobadas)
-        if aprobadas else None
+---
+
+## Ejemplo completo: `POST /alumnos` (crear varios)
+
+### `Routers/data_router.py`
+```python
+@router.post("/UploadData")
+async def upload_file(file: UploadFile = File(...), db: Session = Depends(server.get_db)):
+    # Lee el CSV
+    contents = await file.read()
+    # Llama al controller
+    return DataController.upload_data(contents, db)
+```
+
+### `Controllers/DataController.py`
+```python
+def upload_data(contents: bytes, db):
+    # Transforma CSV a lista de SimpleNamespace
+    alumnos = Data_transformer.To_object_list(contents)
+    # Llama al controller específico
+    AlumnoController.Post_alumnos(alumnos, db)
+    return {"status": "success"}
+```
+
+### `Services/Data_transformer.py`
+```python
+def To_object_list(csv_path: str) -> list[SimpleNamespace]:
+    """Convierte CSV a lista de objetos dinámicos"""
+    df = pd.read_csv(csv_path)
+    records = df.to_dict(orient='records')
+    return [SimpleNamespace(**record) for record in records]
+```
+✅ Lógica de transformación centralizada. No importa FastAPI.
+
+### `Controllers/AlumnoController.py`
+```python
+def Post_alumnos(Alumnos: list[SimpleNamespace], db):
+    for alumno in Alumnos:
+        Alumno.Post_Alumno(
+            Alumno.AlumnoDto(
+                nombre=str(alumno.nombre),
+                apellido=str(alumno.apellido),
+                email=str(alumno.email),
+                dni=str(alumno.dni),
+                fecha_inicio=alumno.fecha_inicio,
+                carrera=alumno.carrera,
+                estado="",
+            ),
+            db,
+        )
+    return db.commit()
+```
+✅ Convierte SimpleNamespace a DTO y coordina inserciones.
+
+### `Models/Alumno.py`
+```python
+def Post_Alumno(alumno: AlumnoDto, db):
+    query = text(
+        """INSERT INTO "Alumnos" (dni, nombre, apellido, email, fecha_inicio) 
+           VALUES (:dni, :nombre, :apellido, :email, :fecha_inicio) 
+           ON CONFLICT (dni) DO NOTHING"""
     )
-
-    return {
-        "promedio_finales": round(promedio, 2) if promedio else None,
-        "materias_aprobadas": len(aprobadas),
-        "finales_pendientes": len([m for m in materias if m.estado == "final_pendiente"]),
-    }
+    db.execute(query, {
+        "nombre": alumno.nombre,
+        "apellido": alumno.apellido,
+        "email": alumno.email,
+        "dni": alumno.dni,
+        "fecha_inicio": alumno.fecha_inicio,    
+    })
 ```
-Toda la inteligencia está acá. No importa nada de FastAPI.
+✅ Ejecuta SQL. Nada más.
 
 ---
 
-### `models/alumno.py`
-```python
-# Tabla (SQLAlchemy)
-class Inscripcion(Base):
-    __tablename__ = "inscripciones"
-    id         = Column(Integer, primary_key=True)
-    alumno_id  = Column(Integer, nullable=False)
-    materia    = Column(String, nullable=False)
-    estado     = Column(String, nullable=False)   # en_curso | final_pendiente | aprobada | no_cursada
-    nota_final = Column(Float, nullable=True)
+## Flujo visual: POST alumnos
 
-# Query
-def get_materias(alumno_id: int) -> list[Inscripcion]:
-    return db.query(Inscripcion).filter(Inscripcion.alumno_id == alumno_id).all()
 ```
-Solo define estructura y recupera datos. No decide nada.
+CSV file (50 alumnos)
+    │
+    ▼
+Data_transformer.To_object_list()     → 50 SimpleNamespace
+    │
+    ▼
+AlumnoController.Post_alumnos()       → iteramos cada uno
+    │ Para cada SimpleNamespace:
+    ▼
+    AlumnoController convierte → AlumnoDto
+        │
+        ▼
+    Alumno.Post_Alumno(dto, db)       → INSERT query
+        │
+        ▼
+db.commit()                           → todas al BD juntas
+    │
+    ▼
+Response: {"status": "success"}
+```
 
 ---
 
 ## Reglas del equipo
 
-- **Nunca saltear capas**: el router no llama directamente al model.
-- **Un archivo por entidad**: `router/dashboard.py`, `services/dashboard.py`, etc.
-- **Los services no importan FastAPI**: si ves `from fastapi import ...` en `services/`, está mal.
-- **Los models no tienen lógica de negocio**: si ves un cálculo en `models/`, está mal.
+- ✅ **Nunca saltear capas**: Router → Controller → Model (o Service)
+- ✅ **Un archivo por entidad**: `Routers/students_router.py`, `Controllers/AlumnoController.py`, etc.
+- ✅ **Los Services no importan FastAPI**: si ves `from fastapi import ...`, está mal.
+- ✅ **Los Models solo tienen DTOs y queries**: si ves lógica de negocio, está mal.
+- ✅ **Commit al final del flujo**: no hagas commit en cada iteración.
+- ✅ **DTOs para estructurar datos**: usar `@dataclass` con tipos definidos.
+- ✅ **SimpleNamespace para datos dinámicos**: cuando el schema viene de un CSV.
+
+---
+
+## Startup
+
+```bash
+# Instalar dependencias
+pip install -r requirements.txt
+
+# Ejecutar con reload (desarrollo)
+uvicorn main:app --reload --port 8001
+
+# O desde main.py
+python main.py
+```
+
+Está configurado en `main.py` línea 36:
+```python
+if __name__ == "__main__":
+    uvicorn.run("main:app", reload=True, port=8001)
+```

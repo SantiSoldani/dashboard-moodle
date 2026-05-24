@@ -69,7 +69,7 @@ async def upload_notas(
             shutil.copyfileobj(file.file, buffer)
 
         # Aca es donde le paso la ruta donde guarde el arcivo a la seccion de tratamiento de datos
-        DataController.Handle_notas(file_path, db)
+        status = DataController.Handle_notas(file_path, db)
         return {
             "status": "success",
             "message": f"Archivo '{file.filename}' cargado correctamente",
