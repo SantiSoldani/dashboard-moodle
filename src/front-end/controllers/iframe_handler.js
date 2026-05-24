@@ -6,6 +6,9 @@ console.log('Tipo de iframe solicitado:', tipo);
 
 const Iframe_tipes = {
 
+    'home':{
+        src: 'src/front-end/iframes/Home.html'
+    },
     'data_entry':{
         src: 'src/front-end/iframes/data_entry.html'
     },
@@ -18,9 +21,8 @@ const Iframe_tipes = {
     //pendiente en agregar mas iframes en caso de necesitarlos
 }
 
-//(Iframe_tipes[tipo].src)? 
-window.location.href = Iframe_tipes[tipo].src 
-//: console.error('Tipo de iframe no reconocido:', tipo);
+const target = Iframe_tipes[tipo] ? tipo : 'home';
+window.location.href = Iframe_tipes[target].src;
 
 /**function Handle_which_iframe(){
 

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - Dashboard Docente</title>
+    <link rel="stylesheet" href="../styles/home_style.css">
+    <script type="module" src="../controllers/home_controller.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- BARRA DE NAVEGACIÓN SUPERIOR (PORTAL DE PESTAÑAS) -->
+        <nav class="admin-navbar">
+            <ul class="nav-tabs">
+                <li class="active"><a href="Home.html">📊 Inicio</a></li>
+                <li><a href="semaforo_alumnos.html">🟢 Semáforo Académico</a></li>
+                <li><a href="data_entry.html">📁 Cargar Datos</a></li>
+            </ul>
+            <div class="teacher-profile">
+                <div class="teacher-avatar">CG</div>
+                <div class="teacher-info">
+                    <span>Moodle Docente</span>
+                    <strong>Prof. Carlos Gómez</strong>
+                </div>
+            </div>
+        </nav>
+
+        <!-- CABECERA PRINCIPAL -->
+        <header class="page-header">
+            <div>
+                <h1>Panel del Docente</h1>
+                <p class="subtitle">Monitoreo académico en tiempo real y alertas tempranas de deserción.</p>
+                <p id="currentDate" style="font-weight: 600; color: #3b82f6; margin-top: 6px; font-size: 0.92rem;"></p>
+            </div>
+            <button id="btnCargarDatos" class="btn-primary">
+                📁 Cargar Datos (CSV)
+            </button>
+        </header>
+
+        <!-- GRID DE MÉTRICAS -->
+        <section class="metrics-grid">
+            <article class="metric-card total">
+                <div class="metric-content">
+                    <span class="metric-label">Alumnos Inscriptos</span>
+                    <strong id="totalAlumnosCount" class="metric-value">0</strong>
+                    <span class="metric-trend">Total en el sistema</span>
+                </div>
+                <div class="metric-icon">👤</div>
+            </article>
+
+            <article class="metric-card average">
+                <div class="metric-content">
+                    <span class="metric-label">Promedio 1er Año</span>
+                    <strong id="avgScore1erAnio" class="metric-value">0.00</strong>
+                    <span class="metric-trend">Cohorte de Ingreso</span>
+                </div>
+                <div class="metric-icon">📈</div>
+            </article>
+
+            <article class="metric-card critical">
+                <div class="metric-content">
+                    <span class="metric-label">En Riesgo Crítico</span>
+                    <strong id="criticalAlumnosCount" class="metric-value">0</strong>
+                    <span class="metric-trend">Semáforo en Rojo</span>
+                </div>
+                <div class="metric-icon">⚠️</div>
+            </article>
+        </section>
+
+        <!-- ALUMNOS EN RIESGO DE DESERCION -->
+        <section class="critical-section">
+            <div class="critical-header">
+                <h2 class="critical-title">
+                    🚨 Alumnos en Riesgo Inminente de Deserción
+                </h2>
+                <span class="critical-indicator">Prioridad de Acompañamiento</span>
+            </div>
+            <div id="criticalList" class="critical-list">
+                <!-- Se cargará dinámicamente -->
+                <div style="text-align: center; color: #94a3b8; font-style: italic; grid-column: 1 / -1; padding: 20px;">
+                    Cargando alertas de riesgo...
+                </div>
+            </div>
+        </section>
+
+        <!-- LISTADO GENERAL Y FILTRADO -->
+        <section class="table-card">
+            <div class="table-header">
+                <h2>Listado Completo de Estudiantes</h2>
+                
+                <div class="search-filter-panel">
+                    <div class="search-input-wrapper">
+                        <input id="searchAlumno" type="search" placeholder="🔍 Buscar por nombre, apellido, DNI o carrera...">
+                    </div>
+                    <div class="filter-select-wrapper">
+                        <select id="filterEstado">
+                            <option value="">Filtro: Todos los estados</option>
+                            <option value="verde">🟢 Verde (Estable)</option>
+                            <option value="amarillo">🟡 Amarillo (Alerta)</option>
+                            <option value="rojo">🔴 Rojo (Crítico)</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th>DNI / ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Email</th>
+                            <th>Carrera</th>
+                            <th>Curso / Cohorte</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="placeholder-row">
+                            <td colspan="7">Los alumnos se cargarán aquí automáticamente.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+    </div>
+</body>
+</html>

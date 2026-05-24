@@ -230,7 +230,7 @@ function mostrar_alumnos(alumnos) {
     fila.innerHTML += `<td>${alumno.apellido}</td>`;
     fila.innerHTML += `<td>${alumno.email}</td>`;
     fila.innerHTML += `<td>${alumno.carrera}</td>`;
-    fila.innerHTML += `<td>${alumno.curso}</td>`;
+    fila.innerHTML += `<td>${alumno.curso || alumno.fecha_inicio}</td>`;
     fila.innerHTML += `<td class="estado-text ${claseEstado}">${alumno.estado}</td>`;
     Tbody.appendChild(fila);
   });
