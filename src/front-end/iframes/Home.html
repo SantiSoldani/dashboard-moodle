@@ -40,75 +40,84 @@
         </header>
 
         <!-- GRID DE MÉTRICAS -->
-        <section class="metrics-grid">
-            <article class="metric-card total">
-                <div class="metric-content">
-                    <span class="metric-label">Alumnos Inscriptos</span>
-                    <strong id="totalAlumnosCount" class="metric-value">0</strong>
-                    <span class="metric-trend">Total en el sistema</span>
+        <section class="kpi-grid">
+            <article class="kpi-card total">
+                <div class="kpi-icon-wrap">
+                    <span class="material-symbols-outlined">person</span>
                 </div>
-                <div class="metric-icon">👤</div>
+                <div class="kpi-details">
+                    <p class="label">Alumnos Inscriptos</p>
+                    <h2 id="totalAlumnosCount">0</h2>
+                    <p class="subtext">Total en el sistema</p>
+                </div>
             </article>
 
-            <article class="metric-card average">
-                <div class="metric-content">
-                    <span class="metric-label">Promedio 1er Año</span>
-                    <strong id="avgScore1erAnio" class="metric-value">0.00</strong>
-                    <span class="metric-trend">Cohorte de Ingreso</span>
+            <article class="kpi-card success average">
+                <div class="kpi-icon-wrap">
+                    <span class="material-symbols-outlined">monitoring</span>
                 </div>
-                <div class="metric-icon">📈</div>
+                <div class="kpi-details">
+                    <p class="label">Promedio 1er Año</p>
+                    <h2 id="avgScore1erAnio">0.00</h2>
+                    <p class="subtext">Cohorte de Ingreso</p>
+                </div>
             </article>
 
-            <article class="metric-card critical">
-                <div class="metric-content">
-                    <span class="metric-label">En Riesgo Crítico</span>
-                    <strong id="criticalAlumnosCount" class="metric-value">0</strong>
-                    <span class="metric-trend">Semáforo en Rojo</span>
+            <article class="kpi-card critical">
+                <div class="kpi-icon-wrap">
+                    <span class="material-symbols-outlined">report_problem</span>
                 </div>
-                <div class="metric-icon">⚠️</div>
+                <div class="kpi-details">
+                    <p class="label">En Riesgo Crítico</p>
+                    <h2 id="criticalAlumnosCount">0</h2>
+                    <p class="subtext">Semáforo en Rojo</p>
+                </div>
             </article>
         </section>
 
         <!-- ALUMNOS EN RIESGO DE DESERCION -->
-        <section class="critical-section">
-            <div class="critical-header">
-                <h2 class="critical-title">
-                    🚨 Alumnos en Riesgo Inminente de Deserción
-                </h2>
-                <span class="critical-indicator">Prioridad de Acompañamiento</span>
+        <section class="alert-panel">
+            <div class="alert-header">
+                <div class="alert-title-wrap">
+                    <span class="material-symbols-outlined">notification_important</span>
+                    <h3>Riesgo Inminente</h3>
+                </div>
+                <span class="alert-badge">Prioridad de Acompañamiento</span>
             </div>
-            <div id="criticalList" class="critical-list">
+            
+            <div id="criticalList" class="alert-content critical-list">
                 <!-- Se cargará dinámicamente -->
-                <div
-                    style="text-align: center; color: #94a3b8; font-style: italic; grid-column: 1 / -1; padding: 20px;">
-                    Cargando alertas de riesgo...
+                <div class="alert-empty">
+                    <div class="alert-empty-icon">
+                        <span class="material-symbols-outlined" style="color:var(--critical); font-size: 32px;">hourglass_empty</span>
+                    </div>
+                    <p>Cargando alertas de riesgo...</p>
                 </div>
             </div>
         </section>
 
         <!-- LISTADO GENERAL Y FILTRADO -->
-        <section class="table-card">
+        <section class="table-section">
             <div class="table-header">
-                <h2>Listado Completo de Estudiantes</h2>
-
-                <div class="search-filter-panel">
-                    <div class="search-input-wrapper">
-                        <input id="searchAlumno" type="search"
-                            placeholder="🔍 Buscar por nombre, apellido, DNI o carrera...">
+                <h3>Listado Completo de Estudiantes</h3>
+                
+                <div class="table-controls">
+                    <div class="search-wrap">
+                        <span class="material-symbols-outlined">search</span>
+                        <input id="searchAlumno" type="search" placeholder="Buscar por DNI o nombre...">
                     </div>
-                    <div class="filter-select-wrapper">
-                        <select id="filterEstado">
-                            <option value="">Filtro: Todos los estados</option>
-                            <option value="verde">🟢 Verde (Estable)</option>
-                            <option value="amarillo">🟡 Amarillo (Alerta)</option>
-                            <option value="rojo">🔴 Rojo (Crítico)</option>
-                            <option value="null">🔘 Gris (Desconocido)</option>
-                        </select>
-                    </div>
+                    
+                    <select id="filterEstado" class="filter-select">
+                        <option value="">Todos los Estados</option>
+                        <option value="verde">Verde (Estable)</option>
+                        <option value="amarillo">Amarillo (Alerta)</option>
+                        <option value="rojo">Rojo (Crítico)</option>
+                        <option value="null">Gris (Desconocido)</option>
+                    </select>
                 </div>
             </div>
 
-            <div class="table-wrapper">
+            <div class="table-container">
                 <table id="studentsTable">
                     <thead>
                         <tr>
@@ -123,10 +132,28 @@
                     </thead>
                     <tbody>
                         <tr class="placeholder-row">
-                            <td colspan="7">Los alumnos se cargarán aquí automáticamente.</td>
+                            <td colspan="7">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">
+                                        <span class="material-symbols-outlined" style="font-size: 32px;">folder_open</span>
+                                    </div>
+                                    <p>Los alumnos se cargarán aquí automáticamente.</p>
+                                </div>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- CONTROLES DE PAGINACIÓN -->
+            <div class="pagination-controls" id="paginationControls">
+                <button id="btnPrevPage" class="btn-pagination" disabled>
+                    <span class="material-symbols-outlined">chevron_left</span> Anterior
+                </button>
+                <span id="pageIndicator" class="page-indicator">Página 1 de 1</span>
+                <button id="btnNextPage" class="btn-pagination" disabled>
+                    Siguiente <span class="material-symbols-outlined">chevron_right</span>
+                </button>
             </div>
         </section>
     </div>
