@@ -2,6 +2,8 @@ import { HandleGet_alumnos } from "../models/Alumno.js";
 
 let allStudents = [];
 let filteredStudents = [];
+let currentPage = 1;
+const PAGE_SIZE = 20;
 
 // Elementos del DOM
 const searchInput = document.getElementById("searchAlumno");
@@ -14,6 +16,10 @@ const criticalListElement = document.getElementById("criticalList");
 const currentDateElement = document.getElementById("currentDate");
 const btnCargarDatos = document.getElementById("btnCargarDatos");
 const strongDocente = document.getElementById("docente_name");
+
+const btnPrevPage = document.getElementById("btnPrevPage");
+const btnNextPage = document.getElementById("btnNextPage");
+const pageIndicator = document.getElementById("pageIndicator");
 
 
 
@@ -63,6 +69,26 @@ function setupNavigation() {
             const dni = row.dataset.dni;
             if (dni) {
                 window.location.href = `Alumnos_stats.html?modo=x&alumno=${dni}`;
+            }
+        });
+    }
+
+    // Configuración de los botones de paginación
+    if (btnPrevPage) {
+        btnPrevPage.addEventListener("click", () => {
+            if (currentPage > 1) {
+                currentPage--;
+                mostrarListadoGeneral();
+            }
+        });
+    }
+
+    if (btnNextPage) {
+        btnNextPage.addEventListener("click", () => {
+            const totalPages = Math.ceil(filteredStudents.length / PAGE_SIZE) || 1;
+            if (currentPage < totalPages) {
+                currentPage++;
+                mostrarListadoGeneral();
             }
         });
     }
@@ -207,14 +233,24 @@ function aplicarFiltros() {
         return matchesSearch && matchesEstado;
     });
 
+    currentPage = 1;
     mostrarListadoGeneral();
 }
 
-// Renderizar el listado general en la tabla
+// Renderizar el listado general en la tabla con paginación
 function mostrarListadoGeneral() {
     if (!studentsTableBody) return;
 
     studentsTableBody.innerHTML = "";
+
+    const totalPages = Math.ceil(filteredStudents.length / PAGE_SIZE) || 1;
+    if (currentPage > totalPages) currentPage = totalPages;
+    if (currentPage < 1) currentPage = 1;
+
+    // Actualizar controles de paginación del DOM
+    if (btnPrevPage) btnPrevPage.disabled = currentPage === 1;
+    if (btnNextPage) btnNextPage.disabled = currentPage === totalPages;
+    if (pageIndicator) pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
 
     if (filteredStudents.length === 0) {
         const row = document.createElement("tr");
@@ -224,7 +260,10 @@ function mostrarListadoGeneral() {
         return;
     }
 
-    filteredStudents.forEach(alumno => {
+    const startIndex = (currentPage - 1) * PAGE_SIZE;
+    const paginatedStudents = filteredStudents.slice(startIndex, startIndex + PAGE_SIZE);
+
+    paginatedStudents.forEach(alumno => {
         const row = document.createElement("tr");
         row.dataset.dni = alumno.dni;
 
