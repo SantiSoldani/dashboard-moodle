@@ -58,5 +58,5 @@ def get_notas(db):
 
 def get_nota_by_dni(dni: str, db):
     query = """SELECT * FROM "Notas" WHERE dni = :dni"""
-    row = db.execute(query, {"dni": dni}).mappings().fetchone()
-    return NotasDto(**row) if row else None
+    rows = db.execute(query, {"dni": dni}).mappings().fetchone()
+    return [NotasDto(**row) for row in rows]

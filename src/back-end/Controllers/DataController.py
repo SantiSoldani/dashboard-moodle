@@ -42,4 +42,4 @@ def Handle_notas(file_path: str, db):
     resultados = SemaforoCalculator.get_states_From_notas(final_path, db)
     # print(resultados)
     # 4) paso las tuplas al modelo de alumnos para que genere el estado del alumno dentro de la base de datos     AlumnosController.Actualizar_estado(update)
-    status = AlumnoController.Actualizar_estado(resultados, db)
+    AlumnoController.Actualizar_estado(resultados, db)

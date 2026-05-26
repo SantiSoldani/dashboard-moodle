@@ -8,7 +8,7 @@ def fetch_notas(db):
     return Notas.get_notas(db)
 
 
-def fetch_nota(db, dni):
+def fetch_notas_alumno(db, dni):
     return Notas.get_nota_by_dni(db, dni)
 
 
@@ -32,3 +32,17 @@ def post_notas(db, notas: list[SimpleNamespace]):
         db.rollback()
         print(f"error al insertar {e}")
         raise
+
+
+def get_stats(indicador: str, dni: str, db):
+
+    if dni == "all":
+        notas = fetch_notas(db)
+    else:
+        notas = fetch_notas_alumno(db, dni)
+
+    if indicador == "prom":
+        return [sum(nota.nota for nota in notas) / len(notas)]
+
+    else:
+        return 0

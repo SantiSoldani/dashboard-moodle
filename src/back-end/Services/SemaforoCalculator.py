@@ -4,7 +4,6 @@ from webbrowser import get
 import pandas as pd
 from Controllers import AlumnoController, MateriasController
 from Models import Materia
-from sqlalchemy.util.langhelpers import ro_memoized_property
 
 # ARCHIVO DE CALCULOS DE SEMAFORO DONDE SE ALMACENA LA LOGICA DE NEGOCIO
 #
@@ -150,7 +149,7 @@ def calculo_inicial(path_csv_resultados):
     return resultados
 
 
-def calculo_cuatrimestral(path_csv_resultados):
+def calculo_cuatrimestral(path_csv_resultados, db):
     """
     Procesa la Encuesta Cuatrimestral y calcula el SCORE_FINAL dinámico.
     paso previo:
@@ -170,19 +169,24 @@ def calculo_cuatrimestral(path_csv_resultados):
     - ¿En qué etapa está tu Trabajo Final? [tf_score] -> Valores: 0.0 (Graduado/Sin pendientes), 0.1 (Tema aprobado y en escritura), 0.5 (Tema asignado sin iniciar), 0.7 (Sin tema, próximo a iniciar), 1.0 (Sin definición ni planificación) [cite: 126, 127, 128, 129, 130, 131]
 
     Columnas esperadas en el CSV:
-    - dni, pre_score, trb_base_norm, anios_cursados, ma_c, apr_c, cur_c, fp_c, ca_c, trb_delta, disp_c, mot_c, conf_c, tf_score
+    - dni, pre_score, trb_base_norm, anio_actual, ma_c, apr_c, cur_c, fp_c, ca_c, trb_delta, disp_c, mot_c, conf_c, tf_score
     """
     resultados = []
 
     TOTAL_PLAN = 40.0
     DURACION_TEORICA = 5.0
+    ANIO = 2026
 
     with open(path_csv_resultados, mode="r", encoding="utf-8") as file:
         reader = csv.DictReader(file)
         for row in reader:
             dni = row["dni"]
-            pre = float(row["pre_score"])
-
+            alumno = AlumnoController.Get_alumno_Bydni(dni, db)
+            pre = (
+                alumno.pre if alumno.pre != None else 0.0
+            )  # busco el riesgo estructural desde la base de datos
+            anios_cursados = ANIO - alumno.fecha_inicio
+            anio_actual = int(row["anio_actual"])
             # --- 1. Sub-índice de Avance Cuatrimestral (SAC) ---
             apr_c = float(row["apr_c"])
             cur_c = max(float(row["cur_c"]), 1.0)
@@ -246,7 +250,9 @@ def calculo_cuatrimestral(path_csv_resultados):
             else:
                 score_final = irr_c
 
+            ir = anios_cursados + anio_actual - DURACION_TEORICA
+
             semaforo = obtener_color_semaforo(score_final)
-            resultados.append((dni, round(score_final, 4), semaforo))
+            resultados.append((dni, round(score_final, 4), semaforo, round(pre, 4), ir))
 
     return resultados
