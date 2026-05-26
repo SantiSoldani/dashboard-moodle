@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <link rel="stylesheet" href="../styles/home_style.css">
     <script type="module" src="../controllers/home_controller.js"></script>
 </head>
+
 <body>
     <div class="container">
         <!-- BARRA DE NAVEGACIÓN SUPERIOR (PORTAL DE PESTAÑAS) -->
@@ -20,7 +22,7 @@
                 <div class="teacher-avatar">CG</div>
                 <div class="teacher-info">
                     <span>Moodle Docente</span>
-                    <strong>Prof. Carlos Gómez</strong>
+                    <strong id="docente_name"></strong>
                 </div>
             </div>
         </nav>
@@ -77,7 +79,8 @@
             </div>
             <div id="criticalList" class="critical-list">
                 <!-- Se cargará dinámicamente -->
-                <div style="text-align: center; color: #94a3b8; font-style: italic; grid-column: 1 / -1; padding: 20px;">
+                <div
+                    style="text-align: center; color: #94a3b8; font-style: italic; grid-column: 1 / -1; padding: 20px;">
                     Cargando alertas de riesgo...
                 </div>
             </div>
@@ -87,10 +90,11 @@
         <section class="table-card">
             <div class="table-header">
                 <h2>Listado Completo de Estudiantes</h2>
-                
+
                 <div class="search-filter-panel">
                     <div class="search-input-wrapper">
-                        <input id="searchAlumno" type="search" placeholder="🔍 Buscar por nombre, apellido, DNI o carrera...">
+                        <input id="searchAlumno" type="search"
+                            placeholder="🔍 Buscar por nombre, apellido, DNI o carrera...">
                     </div>
                     <div class="filter-select-wrapper">
                         <select id="filterEstado">
@@ -98,6 +102,7 @@
                             <option value="verde">🟢 Verde (Estable)</option>
                             <option value="amarillo">🟡 Amarillo (Alerta)</option>
                             <option value="rojo">🔴 Rojo (Crítico)</option>
+                            <option value="null">🔘 Gris (Desconocido)</option>
                         </select>
                     </div>
                 </div>
@@ -126,4 +131,5 @@
         </section>
     </div>
 </body>
+
 </html>

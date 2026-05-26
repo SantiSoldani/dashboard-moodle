@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,6 +8,7 @@
     <script type="module" src="../controllers/semaforo_iframe_controller.js"></script>
     <title>Lista de Alumnos</title>
 </head>
+
 <body>
     <div class="container">
         <!-- BARRA DE NAVEGACIÓN SUPERIOR (PORTAL DE PESTAÑAS) -->
@@ -20,7 +22,7 @@
                 <div class="teacher-avatar">CG</div>
                 <div class="teacher-info">
                     <span>Moodle Docente</span>
-                    <strong>Prof. Carlos Gómez</strong>
+                    <strong id="docente_name"></strong>
                 </div>
             </div>
         </nav>
@@ -43,7 +45,8 @@
             <div class="filters-header">
                 <div>
                     <h2>Filtros rápidos</h2>
-                    <p class="subtitle">Filtra por cualquier campo del alumno: nombre, apellido, carrera, estado, documento, curso, etc.</p>
+                    <p class="subtitle">Filtra por cualquier campo del alumno: nombre, apellido, carrera, estado,
+                        documento, curso, etc.</p>
                 </div>
             </div>
             <div class="filters-row">
@@ -63,8 +66,8 @@
                     <input id="filterValue" type="text" placeholder="Escribir valor...">
                 </div>
                 <div class="filter-actions">
-                    <button id = "btnAgregarFiltro" class="btn-secondary">Agregar filtro</button>
-                    <button id = "btnLimpiarFiltros" class="btn-clear">Limpiar filtros</button>
+                    <button id="btnAgregarFiltro" class="btn-secondary">Agregar filtro</button>
+                    <button id="btnLimpiarFiltros" class="btn-clear">Limpiar filtros</button>
                 </div>
             </div>
             <div class="active-filters">
@@ -107,6 +110,7 @@
             </div>
         </section>
     </div>
-    <script type = "module" src="../controllers/semaforo_iframe_controller.js"></script>
+    <script type="module" src="../controllers/semaforo_iframe_controller.js"></script>
 </body>
+
 </html>

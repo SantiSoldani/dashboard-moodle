@@ -5,7 +5,6 @@ const tipo = params.get('tipo');
 console.log('Tipo de iframe solicitado:', tipo);
 
 const Iframe_tipes = {
-
     'home':{
         src: 'src/front-end/iframes/Home.html'
     },
