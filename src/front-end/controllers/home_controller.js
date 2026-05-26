@@ -13,11 +13,16 @@ const criticalCountElement = document.getElementById("criticalAlumnosCount");
 const criticalListElement = document.getElementById("criticalList");
 const currentDateElement = document.getElementById("currentDate");
 const btnCargarDatos = document.getElementById("btnCargarDatos");
+const strongDocente = document.getElementById("docente_name");
+
+
+
 
 // Carga inicial al cargar la página
 window.addEventListener("load", async () => {
     setupCurrentDate();
     setupNavigation();
+    strongDocente.textContent = '...!';
     await cargarDatosDashboard();
 });
 
@@ -103,10 +108,10 @@ function calcularYMostrarMetricas() {
     if (maxYear === 0) maxYear = new Date().getFullYear();
 
     const alumnos1erAnio = allStudents.filter(alumno => parseInt(alumno.fecha_inicio) === maxYear);
-    
+
     let sumScore = 0;
     let countScore = 0;
-    
+
     alumnos1erAnio.forEach(alumno => {
         if (alumno.score !== undefined && alumno.score !== null) {
             sumScore += parseFloat(alumno.score);
@@ -164,7 +169,7 @@ function mostrarAlumnosCriticos() {
     alumnosCriticos.forEach(alumno => {
         const card = document.createElement("div");
         card.className = "critical-card";
-        
+
         let scoreDisplay = (alumno.score !== undefined && alumno.score !== null) ? parseFloat(alumno.score) : 0;
         if (scoreDisplay <= 1.0) scoreDisplay = scoreDisplay * 10;
         if (scoreDisplay === 0) scoreDisplay = 3.5; // placeholder realista si no se ha calculado notas
@@ -190,7 +195,7 @@ function aplicarFiltros() {
     const selectEstado = filterEstado.value.trim().toLowerCase();
 
     filteredStudents = allStudents.filter(alumno => {
-        const matchesSearch = 
+        const matchesSearch =
             alumno.dni.includes(searchText) ||
             alumno.nombre.toLowerCase().includes(searchText) ||
             alumno.apellido.toLowerCase().includes(searchText) ||
@@ -227,6 +232,7 @@ function mostrarListadoGeneral() {
         let badgeClass = "verde";
         if (estadoLimpio === "amarillo") badgeClass = "amarillo";
         if (estadoLimpio === "rojo") badgeClass = "rojo";
+        if (estadoLimpio === "null") badgeClass = "gris";
 
         // Mapear fecha de ingreso como "año" académico para mayor realismo (ej. 2024 = 1er año, 2023 = 2do año, etc. o mostrar el año de ingreso directo)
         const yearIngreso = parseInt(alumno.fecha_inicio);

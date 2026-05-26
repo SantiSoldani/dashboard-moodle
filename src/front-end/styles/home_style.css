@@ -195,9 +195,17 @@ body {
     height: 100%;
 }
 
-.metric-card.total::before { background: #3b82f6; }
-.metric-card.average::before { background: #10b981; }
-.metric-card.critical::before { background: #ef4444; }
+.metric-card.total::before {
+    background: #3b82f6;
+}
+
+.metric-card.average::before {
+    background: #10b981;
+}
+
+.metric-card.critical::before {
+    background: #ef4444;
+}
 
 .metric-content {
     display: flex;
@@ -234,9 +242,20 @@ body {
     font-size: 1.4rem;
 }
 
-.metric-card.total .metric-icon { background: #eff6ff; color: #2563eb; }
-.metric-card.average .metric-icon { background: #ecfdf5; color: #10b981; }
-.metric-card.critical .metric-icon { background: #fef2f2; color: #ef4444; }
+.metric-card.total .metric-icon {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.metric-card.average .metric-icon {
+    background: #ecfdf5;
+    color: #10b981;
+}
+
+.metric-card.critical .metric-icon {
+    background: #fef2f2;
+    color: #ef4444;
+}
 
 /* ==========================================================================
    ALUMNOS EN RIESGO INMINENTE
@@ -287,10 +306,12 @@ body {
 .critical-list::-webkit-scrollbar {
     width: 6px;
 }
+
 .critical-list::-webkit-scrollbar-track {
     background: #fee2e2;
     border-radius: 999px;
 }
+
 .critical-list::-webkit-scrollbar-thumb {
     background: #fca5a5;
     border-radius: 999px;
@@ -500,6 +521,11 @@ tr:hover {
     font-size: 0.8rem;
     font-weight: 700;
     text-transform: capitalize;
+}
+
+.status-badge-pill.gris {
+    background: #dddddd;
+    color: #3f3f3f;
 }
 
 .status-badge-pill.verde {

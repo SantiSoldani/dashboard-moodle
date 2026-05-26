@@ -221,6 +221,7 @@ document
     event.preventDefault();
     document.getElementById("btnVerAlumnos").classList.add("active");
     document.getElementById("btnVerNotas").classList.remove("active");
+    document.getElementById("btnVerEncuestas").classList.remove("active");
     mostrarAlumnos();
   });
 
@@ -230,7 +231,21 @@ document
     event.preventDefault();
     document.getElementById("btnVerNotas").classList.add("active");
     document.getElementById("btnVerAlumnos").classList.remove("active");
+    document.getElementById("btnVerEncuestas").classList.remove("active");
     mostrarNotas();
+  });
+
+document
+  .getElementById("btnVerEncuestas")
+  .addEventListener("click", function (event) {
+    event.preventDefault();
+    document.getElementById("btnVerEncuestas").classList.add("active");
+    document.getElementById("btnVerAlumnos").classList.remove("active");
+    document.getElementById("btnVerNotas").classList.remove("active");
+    
+    // Al no estar conectado el procesamiento de encuestas, mostramos mensaje de vacío
+    document.getElementById("emptyMessage").style.display = "block";
+    document.getElementById("tablaResultados").style.display = "none";
   });
 
 const submit = document.getElementById("x");

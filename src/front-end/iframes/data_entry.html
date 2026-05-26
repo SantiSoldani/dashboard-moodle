@@ -23,7 +23,7 @@
                 <div class="teacher-avatar">CG</div>
                 <div class="teacher-info">
                     <span>Moodle Docente</span>
-                    <strong>Prof. Carlos Gómez</strong>
+                    <strong id="docente_name"></strong>
                 </div>
             </div>
         </nav>
@@ -32,7 +32,8 @@
         <header class="page-header">
             <div>
                 <h1>Gestor de Alumnos y Notas</h1>
-                <p class="subtitle">Subí y gestioná los archivos CSV de alumnos y calificaciones de Moodle para actualizar el panel de control.</p>
+                <p class="subtitle">Subí y gestioná los archivos CSV de alumnos y calificaciones de Moodle para
+                    actualizar el panel de control.</p>
             </div>
         </header>
 
@@ -56,6 +57,16 @@
                     </button>
                 </div>
             </div>
+
+            <div id="encuestasCard" class="card">
+                <h2>CSV de Encuestas</h2>
+                <div class="file-input-group">
+                    <input type="file" id="encuestasFile" />
+                    <button type="button" id="btnLimpiarEncuestas" class="btn-limpiar hidden">
+                        ✕
+                    </button>
+                </div>
+            </div>
         </div>
 
         <button id="x">Subir Archivos</button>
@@ -67,6 +78,7 @@
                 Ver Alumnos
             </button>
             <button id="btnVerNotas" class="btn-preview">Ver Notas</button>
+            <button id="btnVerEncuestas" class="btn-preview">Ver Encuestas</button>
         </div>
 
         <div class="table-container">

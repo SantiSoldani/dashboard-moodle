@@ -12,8 +12,8 @@ export async function HandleGet_alumnos(which = "all") {
     which == "all"
       ? (response = await fetch(`${getConfig().env.api_url}/alumnos/${which}`))
       : (response = await fetch(
-          `${getConfig().env.api_url}/alumnos/Bydni/${which}`,
-        ));
+        `${getConfig().env.api_url}/alumnos/Bydni/${which}`,
+      ));
 
     if (!response.ok) {
       throw new Error("Error en el fetch de los alumnos");
