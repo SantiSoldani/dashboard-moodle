@@ -28,6 +28,7 @@ window.addEventListener("load", async () => {
   await cargarDatosDashboard();
 });
 
+
 // Configurar la fecha actual de forma elegante en español
 function setupCurrentDate() {
   if (currentDateElement) {
@@ -270,3 +271,5 @@ function mostrarListadoGeneral() {
     studentsTableBody.appendChild(row);
   });
 }
+
+

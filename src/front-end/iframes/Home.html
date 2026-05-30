@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - Dashboard Docente</title>
+    <link rel="preload" href="../styles/home_style.css">
+
     <link rel="stylesheet" href="../styles/home_style.css">
     <script type="module" src="../controllers/home_controller.js"></script>
 </head>
@@ -84,12 +86,13 @@
                 </div>
                 <span class="alert-badge">Prioridad de Acompañamiento</span>
             </div>
-            
+
             <div id="criticalList" class="alert-content critical-list">
                 <!-- Se cargará dinámicamente -->
                 <div class="alert-empty">
                     <div class="alert-empty-icon">
-                        <span class="material-symbols-outlined" style="color:var(--critical); font-size: 32px;">hourglass_empty</span>
+                        <span class="material-symbols-outlined"
+                            style="color:var(--critical); font-size: 32px;">hourglass_empty</span>
                     </div>
                     <p>Cargando alertas de riesgo...</p>
                 </div>
@@ -100,13 +103,13 @@
         <section class="table-section">
             <div class="table-header">
                 <h3>Listado Completo de Estudiantes</h3>
-                
+
                 <div class="table-controls">
                     <div class="search-wrap">
                         <span class="material-symbols-outlined">search</span>
                         <input id="searchAlumno" type="search" placeholder="Buscar por DNI o nombre...">
                     </div>
-                    
+
                     <select id="filterEstado" class="filter-select">
                         <option value="">Todos los Estados</option>
                         <option value="verde">Verde (Estable)</option>
@@ -135,7 +138,8 @@
                             <td colspan="7">
                                 <div class="placeholder-content">
                                     <div class="placeholder-icon">
-                                        <span class="material-symbols-outlined" style="font-size: 32px;">folder_open</span>
+                                        <span class="material-symbols-outlined"
+                                            style="font-size: 32px;">folder_open</span>
                                     </div>
                                     <p>Los alumnos se cargarán aquí automáticamente.</p>
                                 </div>
@@ -144,7 +148,7 @@
                     </tbody>
                 </table>
             </div>
-            
+
             <!-- CONTROLES DE PAGINACIÓN -->
             <div class="pagination-controls" id="paginationControls">
                 <button id="btnPrevPage" class="btn-pagination" disabled>
