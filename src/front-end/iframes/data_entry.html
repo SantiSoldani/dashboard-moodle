@@ -4,8 +4,12 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="../styles/msj.css" />
-    <link rel="stylesheet" href="../styles/data_entry_style.css" />
+
+    <link rel="preload" href="../styles/msj.css" as="style">
+    <link rel="preload" href="../styles/data_entry_style.css" as="style">
+
+    <link rel="stylesheet" href="../styles/msj.css">
+    <link rel="stylesheet" href="../styles/data_entry_style.css">
     <script type="module" src="../controllers/data_entry_controller.js"></script>
     <title>Document</title>
 </head>
@@ -51,7 +55,8 @@
                         <h3>CSV Alumnos</h3>
                         <p>Arrastra o haz clic</p>
                     </div>
-                    <button type="button" id="btnLimpiarAlumnos" class="btn-limpiar hidden" onclick="event.stopPropagation();">✕</button>
+                    <button type="button" id="btnLimpiarAlumnos" class="btn-limpiar hidden"
+                        onclick="event.stopPropagation();">✕</button>
                 </div>
 
                 <!-- Dropzone 2 -->
@@ -66,7 +71,8 @@
                         <h3>CSV Notas</h3>
                         <p>Actualiza calificaciones</p>
                     </div>
-                    <button type="button" id="btnLimpiarNotas" class="btn-limpiar hidden" onclick="event.stopPropagation();">✕</button>
+                    <button type="button" id="btnLimpiarNotas" class="btn-limpiar hidden"
+                        onclick="event.stopPropagation();">✕</button>
                 </div>
 
                 <!-- Dropzone 3 -->
@@ -81,7 +87,8 @@
                         <h3>CSV Encuestas</h3>
                         <p>Resultados de satisfacción</p>
                     </div>
-                    <button type="button" id="btnLimpiarEncuestas" class="btn-limpiar hidden" onclick="event.stopPropagation();">✕</button>
+                    <button type="button" id="btnLimpiarEncuestas" class="btn-limpiar hidden"
+                        onclick="event.stopPropagation();">✕</button>
                 </div>
             </div>
 
