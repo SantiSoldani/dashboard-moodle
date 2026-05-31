@@ -5,7 +5,7 @@
  * -OTORGAR FLAGS DE QUE LOS DATOS FUERON CARGADOS EXITOSAMENTE
  */
 
-import { Post_csv } from "../models/files_model.js";
+import { Post_csv } from "../models/Files.js";
 
 //------------------------------------SECTOR DE FUNCIONES PRINCIPALES----------------------------------------------------
 async function procesarArchivos() {
@@ -26,31 +26,31 @@ async function procesarArchivos() {
   if (alumnos_file.files[0]) {
     (await Post_csv(alumnos_file.files[0], "alumnos"))
       ? msj(
-          "Archivo de alumnos cargado correctamente",
-          "success",
-          3000,
-          "mensaje",
-        )
+        "Archivo de alumnos cargado correctamente",
+        "success",
+        3000,
+        "mensaje",
+      )
       : msj("Error al cargar el archivo de alumnos", "error", 3000, "mensaje");
   }
   if (notas_file.files[0]) {
     (await Post_csv(notas_file.files[0], "notas"))
       ? msj(
-          "Archivo de notas cargado correctamente",
-          "success",
-          3000,
-          "mensaje",
-        )
+        "Archivo de notas cargado correctamente",
+        "success",
+        3000,
+        "mensaje",
+      )
       : msj("Error al cargar el archivo de notas", "error", 3000, "mensaje");
   }
   if (encuestas_file.files[0]) {
     (await Post_csv(encuestas_file.files[0], "Encuestas"))
       ? msj(
-          "Archivo de encuestas cargado correctamente",
-          "success",
-          3000,
-          "mensaje",
-        )
+        "Archivo de encuestas cargado correctamente",
+        "success",
+        3000,
+        "mensaje",
+      )
       : msj("Error al cargar el archivo de encuestas", "error", 3000, "mensaje");
   }
 }
@@ -253,7 +253,7 @@ document
     document.getElementById("btnVerEncuestas").classList.add("active");
     document.getElementById("btnVerAlumnos").classList.remove("active");
     document.getElementById("btnVerNotas").classList.remove("active");
-    
+
     // Al no estar conectado el procesamiento de encuestas, mostramos mensaje de vacío
     document.getElementById("emptyMessage").style.display = "block";
     document.getElementById("tablaResultados").style.display = "none";

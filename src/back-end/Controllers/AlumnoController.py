@@ -36,6 +36,10 @@ def Get_alumnos(db) -> list[AlumnoDto]:
     alumnos = Alumno.Get_alumnos(db)
     return alumnos
 
+def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
+    alumnos = Alumno.Get_alumnos_with_stats(db)
+    return alumnos    
+
 
 def Get_alumno_Bydni(dni: str, db) -> SimpleNamespace:
     alumno = Alumno.Get_alumno(dni, db)

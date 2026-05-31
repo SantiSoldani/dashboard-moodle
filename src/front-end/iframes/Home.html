@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../public/icon.png" type="image/x-icon">
     <title>Inicio - Dashboard Docente</title>
     <link class="styles" rel="stylesheet" href="../styles/home_style.css">
     <script type="module" src="../components/navbar.js"></script>
@@ -69,7 +70,8 @@
                 <!-- Se cargará dinámicamente -->
                 <div class="alert-empty">
                     <div class="alert-empty-icon">
-                        <span class="material-symbols-outlined" style="color:var(--critical); font-size: 32px;">hourglass_empty</span>
+                        <span class="material-symbols-outlined"
+                            style="color:var(--critical); font-size: 32px;">hourglass_empty</span>
                     </div>
                     <p>Cargando alertas de riesgo...</p>
                 </div>
@@ -92,7 +94,7 @@
                         <option value="verde">Verde (Estable)</option>
                         <option value="amarillo">Amarillo (Alerta)</option>
                         <option value="rojo">Rojo (Crítico)</option>
-                        <option value="null">Gris (Desconocido)</option>
+                        <option value="gris">Pendiente</option>
                     </select>
                 </div>
             </div>
@@ -115,7 +117,8 @@
                             <td colspan="7">
                                 <div class="placeholder-content">
                                     <div class="placeholder-icon">
-                                        <span class="material-symbols-outlined" style="font-size: 32px;">folder_open</span>
+                                        <span class="material-symbols-outlined"
+                                            style="font-size: 32px;">folder_open</span>
                                     </div>
                                     <p>Los alumnos se cargarán aquí automáticamente.</p>
                                 </div>

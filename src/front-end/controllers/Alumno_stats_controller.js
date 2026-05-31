@@ -24,7 +24,7 @@ window.addEventListener("load", async () => {
 });
 
 document.getElementById("go_back_Btn").addEventListener("click", () => {
-  window.location.href = "../iframes/semaforo_alumnos.html";
+  window.location.href = "../iframes/home.html";
   console.log("volviendo a la pagina de semaforo");
 });
 

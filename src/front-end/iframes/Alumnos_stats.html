@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../public/icon.png" type="image/x-icon">
     <title>Alumnos Stats</title>
-    <script type = "module"src = "../controllers/Alumno_stats_controller.js" ></script>
+    <script type="module" src="../controllers/Alumno_stats_controller.js"></script>
     <link rel="stylesheet" href="../styles/Alumno_stats_style.css">
 </head>
+
 <body>
     <div class="stats-page">
         <button id="go_back_Btn" class="back-button" type="button" aria-label="Volver">←</button>
@@ -14,7 +17,8 @@
             <div>
                 <p class="eyebrow">Panel de seguimiento</p>
                 <h1>Estadísticas del alumno</h1>
-                <p class="subtitle">Aquí podrá ver el estado del semáforo, información personal y la encuesta respondida.</p>
+                <p class="subtitle">Aquí podrá ver el estado del semáforo, información personal y la encuesta
+                    respondida.</p>
             </div>
             <div class="status-badge estado-verde">
                 <span class="status-dot estado-verde"></span>
@@ -24,11 +28,12 @@
 
         <section class="status-panel">
             <div class="status-card estado-verde">
-                <div id = "status-section" class="status-card-content">
+                <div id="status-section" class="status-card-content">
                     <p class="status-card-label">Estado actual</p>
                     <h1 class="student-name">Mateo González</h1>
                     <p class="status-card-state">Verde</p>
-                    <p class="status-card-description">Alumno sin alertas críticas; desempeño estable y avance correcto en su curso.</p>
+                    <p class="status-card-description">Alumno sin alertas críticas; desempeño estable y avance correcto
+                        en su curso.</p>
                 </div>
             </div>
         </section>
@@ -63,7 +68,7 @@
                 <h2>Información personal</h2>
                 <p>Datos básicos del alumno.</p>
             </div>
-            <div id = "info-panel" class="info-grid">
+            <div id="info-panel" class="info-grid">
                 <div class="info-item">
                     <span>Nombre</span>
                     <strong>Mateo González</strong>
@@ -117,4 +122,5 @@
         </section>
     </div>
 </body>
+
 </html>

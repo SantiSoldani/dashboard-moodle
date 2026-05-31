@@ -12,12 +12,17 @@ const alumnosAPI = `${getConfig()}/alumnos/`;
 export async function HandleGet_alumnos(which = "all") {
   try {
     let response;
-    which == "all"
-      ? (response = await fetch(`${alumnosAPI}${which}`)) // Si witch es == all, trae todos los alumnos
-      : (response = await fetch(
+    if (which == "all") {
+      (response = await fetch(`${alumnosAPI}${which}`)) // Si witch es == all, trae todos los alumnos
+    }
+    else if (which == "all-stats") {
+      (response = await fetch(`${alumnosAPI}${which}`))
+    }
+    else {
+      (response = await fetch(
         `${alumnosAPI}Bydni/${which}`,
-      ));
-
+      ))
+    }
     if (!response.ok) {
       throw new Error("Error en el fetch de los alumnos");
     }

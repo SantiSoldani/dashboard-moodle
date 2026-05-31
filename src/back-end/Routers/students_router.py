@@ -2,7 +2,7 @@ import json
 
 import server
 from Controllers import AlumnoController
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 router = APIRouter(
@@ -21,10 +21,7 @@ async def get_student(student_dni: str, db: Session = Depends(server.get_db)):
     return json_alumno
 
 
-@router.get(
-    "/all",
-    status_code=200,
-)
+@router.get("/all", status_code=200)
 async def get_students(db: Session = Depends(server.get_db)):
     """
     la idea es dependiendo del url param del front obtener un estudiante particualar o traer todos los estudiantes
@@ -37,3 +34,12 @@ async def get_students(db: Session = Depends(server.get_db)):
         return json_alumnos
     except Exception as e:
         print(e)
+
+@router.get("/all-stats", status_code=200)
+async def get_students_with_stats(db: Session = Depends(server.get_db)):
+    try:
+        alumnos = AlumnoController.Get_alumnos_with_stats(db)
+        return [a.__dict__ for a in alumnos]
+    except Exception as e:
+        print(f"Error en get_students_with_stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

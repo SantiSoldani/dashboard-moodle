@@ -12,7 +12,7 @@ class AlumnoDto:
     carrera: str
     dni: str
     fecha_inicio: str
-    estado: str
+    color: str
     score: float
     legajo: str
 
@@ -53,13 +53,43 @@ def Get_alumnos(db) -> list[AlumnoDto]:
         alumnos.append(AlumnoDto(**row))
     return alumnos
 
+def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
+    '''
+    Trae a todos los alumnos pero agregar la informacion de la nueva tabla 'Semaforo'
+    '''
+    alumnos = []
+    query = text("""
+        SELECT 
+            "Alumnos".nombre, 
+            "Alumnos".apellido, 
+            "Alumnos".email, 
+            "Alumnos".carrera, 
+            "Alumnos".dni, 
+            "Alumnos".fecha_inicio, 
+            "Alumnos".legajo, 
+            "Semaforo".color, 
+            "Semaforo".score 
+        FROM "Alumnos" 
+        LEFT JOIN "Semaforo" ON "Alumnos".dni = "Semaforo".dni_alumno 
+        ORDER BY "Alumnos".nombre
+    """)
+    fetched = (db.execute(query)).mappings().fetchall()
+    for row in fetched:
+        data = dict(row)
+        if data.get("color") is None:
+            data["color"] = "gris"
+        if data.get("score") is None:
+            data["score"] = -1.0
+        alumnos.append(AlumnoDto(**data))
+    return alumnos
 
-def set_state(dni: str, estado: str, score: float, db):
-    # SQL QUERY UPDATE alumnos SET estado = ? WHERE dni = ? VALUES(estado, dni)
+
+def set_state(dni: str, color: str, score: float, db):
+    # SQL QUERY UPDATE alumnos SET color = ? WHERE dni = ? VALUES(color, dni)
     query = text(
-        """UPDATE "Alumnos" SET estado = :estado, score = :score WHERE dni = :dni"""
+        """UPDATE "Alumnos" SET color = :color, score = :score WHERE dni = :dni"""
     )
-    db.execute(query, {"estado": estado, "dni": str(dni), "score": score})
+    db.execute(query, {"color": color, "dni": str(dni), "score": score})
     return
 
 
