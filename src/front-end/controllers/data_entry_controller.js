@@ -13,8 +13,9 @@ async function procesarArchivos() {
 
   const alumnos_file = document.getElementById("alumnosFile");
   const notas_file = document.getElementById("notasFile");
+  const encuestas_file = document.getElementById("encuestasFile");
 
-  if (!alumnos_file.files[0] && !notas_file.files[0]) {
+  if (!alumnos_file.files[0] && !notas_file.files[0] && !encuestas_file.files[0]) {
     msj("Debe cargar al menos un archivo", "error", 2000, "mensaje");
     document.getElementById("x").disabled = true;
     await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -41,6 +42,16 @@ async function procesarArchivos() {
           "mensaje",
         )
       : msj("Error al cargar el archivo de notas", "error", 3000, "mensaje");
+  }
+  if (encuestas_file.files[0]) {
+    (await Post_csv(encuestas_file.files[0], "Encuestas"))
+      ? msj(
+          "Archivo de encuestas cargado correctamente",
+          "success",
+          3000,
+          "mensaje",
+        )
+      : msj("Error al cargar el archivo de encuestas", "error", 3000, "mensaje");
   }
 }
 

@@ -1,4 +1,4 @@
-import { getConfig } from "../config/config";
+import { getConfig } from "../config.js";
 
 export async function Handle_get_Notas() {
   try {

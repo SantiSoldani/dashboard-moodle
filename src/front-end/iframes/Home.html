@@ -67,97 +67,74 @@
 
             <div id="criticalList" class="alert-content critical-list">
                 <!-- Se cargará dinámicamente -->
-                <<<<<<< HEAD <div
-                    style="text-align: center; color: #94a3b8; font-style: italic; grid-column: 1 / -1; padding: 20px;">
-                    Cargando alertas de riesgo...
-                    =======
-                    <div class="alert-empty">
-                        <div class="alert-empty-icon">
-                            <span class="material-symbols-outlined"
-                                style="color:var(--critical); font-size: 32px;">hourglass_empty</span>
-                        </div>
-                        <p>Cargando alertas de riesgo...</p>
-                        >>>>>>> 70ecb62582eeef294414e6a378d80627aa0c2230
+                <div class="alert-empty">
+                    <div class="alert-empty-icon">
+                        <span class="material-symbols-outlined" style="color:var(--critical); font-size: 32px;">hourglass_empty</span>
                     </div>
+                    <p>Cargando alertas de riesgo...</p>
+                </div>
             </div>
         </section>
 
         <!-- LISTADO GENERAL Y FILTRADO -->
         <section class="table-section">
             <div class="table-header">
-                <<<<<<< HEAD <h2>Listado Completo de Estudiantes</h2>
+                <h3>Listado Completo de Estudiantes</h3>
 
-                    <div class="search-filter-panel">
-                        <div class="search-input-wrapper">
-                            <input id="searchAlumno" type="search"
-                                placeholder="🔍 Buscar por nombre, apellido, DNI o carrera...">
-                        </div>
-                        <div class="filter-select-wrapper">
-                            <select id="filterEstado">
-                                <option value="">Filtro: Todos los estados</option>
-                                <option value="verde">🟢 Verde (Estable)</option>
-                                <option value="amarillo">🟡 Amarillo (Alerta)</option>
-                                <option value="rojo">🔴 Rojo (Crítico)</option>
-                            </select>
-                            =======
-                            <h3>Listado Completo de Estudiantes</h3>
+                <div class="table-controls">
+                    <div class="search-wrap">
+                        <span class="material-symbols-outlined">search</span>
+                        <input id="searchAlumno" type="search" placeholder="Buscar por DNI o nombre...">
+                    </div>
 
-                            <div class="table-controls">
-                                <div class="search-wrap">
-                                    <span class="material-symbols-outlined">search</span>
-                                    <input id="searchAlumno" type="search" placeholder="Buscar por DNI o nombre...">
-                                    >>>>>>> 70ecb62582eeef294414e6a378d80627aa0c2230
+                    <select id="filterEstado" class="filter-select">
+                        <option value="">Todos los Estados</option>
+                        <option value="verde">Verde (Estable)</option>
+                        <option value="amarillo">Amarillo (Alerta)</option>
+                        <option value="rojo">Rojo (Crítico)</option>
+                        <option value="null">Gris (Desconocido)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th>DNI / ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                            <th>Email</th>
+                            <th>Carrera</th>
+                            <th>Curso / Cohorte</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="placeholder-row">
+                            <td colspan="7">
+                                <div class="placeholder-content">
+                                    <div class="placeholder-icon">
+                                        <span class="material-symbols-outlined" style="font-size: 32px;">folder_open</span>
+                                    </div>
+                                    <p>Los alumnos se cargarán aquí automáticamente.</p>
                                 </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
-                                <select id="filterEstado" class="filter-select">
-                                    <option value="">Todos los Estados</option>
-                                    <option value="verde">Verde (Estable)</option>
-                                    <option value="amarillo">Amarillo (Alerta)</option>
-                                    <option value="rojo">Rojo (Crítico)</option>
-                                    <option value="null">Gris (Desconocido)</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <div class="table-container">
-                            <table id="studentsTable">
-                                <thead>
-                                    <tr>
-                                        <th>DNI / ID</th>
-                                        <th>Nombre</th>
-                                        <th>Apellido</th>
-                                        <th>Email</th>
-                                        <th>Carrera</th>
-                                        <th>Curso / Cohorte</th>
-                                        <th>Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr class="placeholder-row">
-                                        <td colspan="7">
-                                            <div class="placeholder-content">
-                                                <div class="placeholder-icon">
-                                                    <span class="material-symbols-outlined"
-                                                        style="font-size: 32px;">folder_open</span>
-                                                </div>
-                                                <p>Los alumnos se cargarán aquí automáticamente.</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-
-                        <!-- CONTROLES DE PAGINACIÓN -->
-                        <div class="pagination-controls" id="paginationControls">
-                            <button id="btnPrevPage" class="btn-pagination" disabled>
-                                <span class="material-symbols-outlined">chevron_left</span> Anterior
-                            </button>
-                            <span id="pageIndicator" class="page-indicator">Página 1 de 1</span>
-                            <button id="btnNextPage" class="btn-pagination" disabled>
-                                Siguiente <span class="material-symbols-outlined">chevron_right</span>
-                            </button>
-                        </div>
+            <!-- CONTROLES DE PAGINACIÓN -->
+            <div class="pagination-controls" id="paginationControls">
+                <button id="btnPrevPage" class="btn-pagination" disabled>
+                    <span class="material-symbols-outlined">chevron_left</span> Anterior
+                </button>
+                <span id="pageIndicator" class="page-indicator">Página 1 de 1</span>
+                <button id="btnNextPage" class="btn-pagination" disabled>
+                    Siguiente <span class="material-symbols-outlined">chevron_right</span>
+                </button>
+            </div>
         </section>
     </div>
 </body>

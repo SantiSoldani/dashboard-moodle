@@ -1,4 +1,4 @@
-class component_navbar extends HTMLElement {
+class navBar extends HTMLElement {
     connectedCallback() {
         const isHome = window.location.pathname.includes('Home.html') || window.location.pathname.endsWith('/') || (!window.location.pathname.includes('data_entry.html') && !window.location.pathname.includes('Home.html'));
         const isDataEntry = window.location.pathname.includes('data_entry.html');
@@ -19,4 +19,4 @@ class component_navbar extends HTMLElement {
         `;
     }
 }
-customElements.define('component-navbar', component_navbar);
+customElements.define('component-navbar', navBar);
