@@ -14,6 +14,7 @@ class AlumnoDto:
     fecha_inicio: str
     estado: str
     score: float
+    legajo: str
 
 
 def Post_Alumno(alumno: AlumnoDto, db):

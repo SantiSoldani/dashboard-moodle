@@ -21,16 +21,21 @@ def Limpiar_csv(file_path: str, type: str) -> str:
     """
     try:
         # Cargar CSV
-        df = pd.read_csv(file_path)
-
-        # 1. Normalizar campos numéricos
-        # numeric_columns = df.select_dtypes(include=["float64", "int64"]).columns
-
-        # 2. Eliminar duplicados por DNI (mantener el primero)
-        if "dni" in df.columns:
-            df = df.drop_duplicates(subset=["dni"], keep="first")
+        if type == "inicial":
+            df = limpiar_encuesta_inicial(file_path)
+        elif type == "cuatrimestral":
+            df = limpiar_encuesta_cuatrimestral(file_path)
         else:
-            print("Columna 'DNI' no encontrada. No se eliminaron duplicados")
+            df = pd.read_csv(file_path)
+
+            # 1. Normalizar campos numéricos
+            # numeric_columns = df.select_dtypes(include=["float64", "int64"]).columns
+
+            # 2. Eliminar duplicados por DNI (mantener el primero)
+            if "dni" in df.columns:
+                df = df.drop_duplicates(subset=["dni"], keep="first")
+            else:
+                print("Columna 'DNI' no encontrada. No se eliminaron duplicados")
 
         # 3. Crear carpeta procesed_data si no existe
         back_end_path = os.path.dirname(ROOT_PATH)  # Sube una carpeta desde Services
@@ -88,3 +93,65 @@ def To_object_list(procesed_path: str) -> list[SimpleNamespace]:
 
 
 # PROXIMA FUNCION --> FUNCION QUE PASE EL RESULTADO DE LAS ENCUESTAS SUBIDAS AL FORMATO ESPERADO POR LAS FUNCIONES DE CALCULO
+
+
+def limpiar_encuesta_inicial(path: str) -> pd.DataFrame:
+
+    df = pd.read_csv(path)
+    df_final = pd.DataFrame(
+        columns=[
+            "dni",
+            "soc",
+            "interrupciones",
+            "met",
+            "trb_base",
+            "cap_fam",
+            "loc",
+            "dependientes",
+        ]
+    )
+    # (dni, soc, interrupciones, met, trb_base, cap_fam, loc, dependientes) campos finales
+    df_final["dni"] = df["dni"]
+    df_final["soc"] = df[df.columns.__contains__("soc")].mean()
+    df_final["interrupciones"] = df[df.columns.__contains__("interrupciones")].mean()
+    df_final["met"] = df[df.columns.__contains__("met")].mean()
+    df_final["trb_base"] = df[df.columns.__contains__("trb_base")].mean()
+    df_final["cap_fam"] = df[df.columns.__contains__("cap_fam")].mean()
+    df_final["loc"] = df[df.columns.__contains__("loc")].mean()
+    df_final["dependientes"] = df[df.columns.__contains__("dependientes")].mean()
+
+    return df_final
+
+
+def limpiar_encuesta_cuatrimestral(path: str) -> pd.DataFrame:
+
+    # - dni, pre_score, trb_base_norm, anios_cursados, ma_c, apr_c, cur_c, fp_c, ca_c, trb_delta, disp_c, mot_c, conf_c, tf_score
+
+    df = pd.read_csv(path)
+    df_final = pd.DataFrame(
+        columns=[
+            "dni",
+            "pre_score",
+            "trb_base_norm",
+            "anios_cursados",
+            "ma_c",
+            "apr_c",
+            "cur_c",
+            "fp_c",
+            "ca_c",
+            "trb_delta",
+            "disp_c",
+            "mot_c",
+            "conf_c",
+            "tf_score",
+        ]
+    )
+    for alumno in df.iterrows():
+        dni = alumno[1]["dni"]
+        df_final["dni"] = dni
+        for campo in df.columns:
+            if campo != "dni":
+                datos = df.filter(like=campo)
+                df_final[campo] = datos.mean(axis=1)
+
+    return df_final

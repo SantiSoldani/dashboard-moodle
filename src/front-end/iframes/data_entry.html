@@ -20,54 +20,103 @@
         <component-header title="Gestor de Alumnos y Notas"
             subtitle="Subí y gestioná los archivos CSV de alumnos y calificaciones de Moodle para actualizar el panel de control."></component-header>
 
-        <div class="upload-section">
-            <div id="alumnosCard" class="card">
-                <h2>CSV de Alumnos</h2>
-                <div class="file-input-group">
-                    <input type="file" id="alumnosFile" />
-                    <button type="button" id="btnLimpiarAlumnos" class="btn-limpiar hidden">
-                        ✕
-                    </button>
+        <div class="top-section">
+            <div class="upload-grid">
+                <!-- Dropzone 1 -->
+                <div class="upload-card" onclick="document.getElementById('alumnosFile').click()">
+                    <div class="file-input-group">
+                        <input type="file" id="alumnosFile" accept=".csv" />
+                    </div>
+                    <div class="icon-box alumnos">
+                        <span class="material-symbols-outlined">upload_file</span>
+                    </div>
+                    <div class="card-text">
+                        <h3>CSV Alumnos</h3>
+                        <p>Arrastra o haz clic</p>
+                    </div>
+                    <button type="button" id="btnLimpiarAlumnos" class="btn-limpiar hidden"
+                        onclick="event.stopPropagation();">✕</button>
+                </div>
+
+                <!-- Dropzone 2 -->
+                <div class="upload-card" onclick="document.getElementById('notasFile').click()">
+                    <div class="file-input-group">
+                        <input type="file" id="notasFile" accept=".csv" />
+                    </div>
+                    <div class="icon-box notas">
+                        <span class="material-symbols-outlined">grade</span>
+                    </div>
+                    <div class="card-text">
+                        <h3>CSV Notas</h3>
+                        <p>Actualiza calificaciones</p>
+                    </div>
+                    <button type="button" id="btnLimpiarNotas" class="btn-limpiar hidden"
+                        onclick="event.stopPropagation();">✕</button>
+                </div>
+
+                <!-- Dropzone 3 -->
+                <div class="upload-card" onclick="document.getElementById('encuestasFile').click()">
+                    <div class="file-input-group">
+                        <input type="file" id="encuestasFile" accept=".csv" />
+                    </div>
+                    <div class="icon-box encuestas">
+                        <span class="material-symbols-outlined">poll</span>
+                    </div>
+                    <div class="card-text">
+                        <h3>CSV Encuestas</h3>
+                        <p>Resultados de satisfacción</p>
+                    </div>
+                    <button type="button" id="btnLimpiarEncuestas" class="btn-limpiar hidden"
+                        onclick="event.stopPropagation();">✕</button>
                 </div>
             </div>
 
-            <div id="notasCard" class="card">
-                <h2>CSV de Notas</h2>
-                <div class="file-input-group">
-                    <input type="file" id="notasFile" />
-                    <button type="button" id="btnLimpiarNotas" class="btn-limpiar hidden">
-                        ✕
-                    </button>
+            <!-- Action Card -->
+            <div class="action-card">
+                <div>
+                    <h3>Estado de Carga</h3>
+                    <p>Selecciona los archivos requeridos para previsualizar y procesar los datos.</p>
+                    <div id="mensaje"></div>
+                </div>
+                <button id="x" class="btn-upload">
+                    <span class="material-symbols-outlined">cloud_upload</span>
+                    Subir Archivos
+                </button>
+            </div>
+        </div>
+
+        <!-- Preview Section -->
+        <section class="preview-section">
+            <div class="preview-header">
+                <h2>Previsualización de Datos</h2>
+                <div class="preview-tabs">
+                    <button id="btnVerAlumnos" class="btn-preview active">Alumnos</button>
+                    <button id="btnVerNotas" class="btn-preview">Notas</button>
+                    <button id="btnVerEncuestas" class="btn-preview">Encuestas</button>
                 </div>
             </div>
-        </div>
 
-        <button id="x">Subir Archivos</button>
+            <div class="table-container">
+                <div id="emptyMessage" class="empty-state">
+                    <div class="empty-icon">
+                        <span class="material-symbols-outlined" style="font-size: 28px;">data_exploration</span>
+                    </div>
+                    <h3>Ningún archivo seleccionado</h3>
+                    <p>Selecciona un archivo CSV en los paneles superiores para previsualizar los datos aquí.</p>
+                </div>
 
-        <div id="mensaje"></div>
-
-        <div class="preview-controls">
-            <button id="btnVerAlumnos" class="btn-preview active">
-                Ver Alumnos
-            </button>
-            <button id="btnVerNotas" class="btn-preview">Ver Notas</button>
-        </div>
-
-        <div class="table-container">
-            <div id="emptyMessage" class="empty-message">
-                Nada que ver aquí aún
+                <table id="tablaResultados" style="display: none;">
+                    <thead>
+                        <tr id="headerRow">
+                            <th>ID</th>
+                            <th>Nombre</th>
+                            <th>Apellido</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
-            <table id="tablaResultados" style="display: none">
-                <thead>
-                    <tr id="headerRow">
-                        <th>ID</th>
-                        <th>Nombre</th>
-                        <th>Apellido</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
+        </section>
     </div>
 </body>
 

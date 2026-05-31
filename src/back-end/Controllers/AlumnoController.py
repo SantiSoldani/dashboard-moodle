@@ -14,7 +14,9 @@ def Post_alumnos(Alumnos: list[SimpleNamespace], db):
                 dni=str(alumno.dni),
                 fecha_inicio=alumno.fecha_inicio,
                 carrera=alumno.carrera,
+                score=-1,
                 estado="",
+                legajo="",
             ),
             db,
         )
