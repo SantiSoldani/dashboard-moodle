@@ -1,4 +1,4 @@
-import { getConfig } from "../config/config.js";
+import { getBackendURL } from "../config.js";
 
 /**
  *
@@ -10,10 +10,10 @@ export async function HandleGet_alumnos(which = "all") {
   try {
     let response;
     which == "all"
-      ? (response = await fetch(`${getConfig().env.api_url}/alumnos/${which}`))
+      ? (response = await fetch(`${getBackendURL()}/alumnos/${which}`))
       : (response = await fetch(
-          `${getConfig().env.api_url}/alumnos/Bydni/${which}`,
-        ));
+        `${getBackendURL()}/alumnos/Bydni/${which}`,
+      ));
 
     if (!response.ok) {
       throw new Error("Error en el fetch de los alumnos");

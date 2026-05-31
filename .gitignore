@@ -13,3 +13,5 @@ __pycache__/
 
 #claves de configuracion en js
 src/front-end/config/config.js
+
+design/

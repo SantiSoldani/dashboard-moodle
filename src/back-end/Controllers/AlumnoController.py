@@ -5,7 +5,6 @@ from Models.Alumno import AlumnoDto
 
 
 def Post_alumnos(Alumnos: list[SimpleNamespace], db):
-
     for alumno in Alumnos:
         Alumno.Post_Alumno(
             Alumno.AlumnoDto(

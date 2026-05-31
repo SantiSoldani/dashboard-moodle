@@ -6,35 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="../styles/msj.css" />
     <link rel="stylesheet" href="../styles/data_entry_style.css" />
+    <script type="module" src="../components/navbar.js"></script>
+    <script type="module" src="../components/header.js"></script>
     <script type="module" src="../controllers/data_entry_controller.js"></script>
-    <title>Document</title>
+    <title>Seguimiento</title>
 </head>
 
 <body>
     <div id="container" class="container">
-        <!-- BARRA DE NAVEGACIÓN SUPERIOR (PORTAL DE PESTAÑAS) -->
-        <nav class="admin-navbar">
-            <ul class="nav-tabs">
-                <li><a href="Home.html">📊 Inicio</a></li>
-                <li><a href="semaforo_alumnos.html">🟢 Semáforo Académico</a></li>
-                <li class="active"><a href="data_entry.html">📁 Cargar Datos</a></li>
-            </ul>
-            <div class="teacher-profile">
-                <div class="teacher-avatar">CG</div>
-                <div class="teacher-info">
-                    <span>Moodle Docente</span>
-                    <strong>Prof. Carlos Gómez</strong>
-                </div>
-            </div>
-        </nav>
+        <component-navbar></component-navbar>
 
         <!-- CABECERA PRINCIPAL -->
-        <header class="page-header">
-            <div>
-                <h1>Gestor de Alumnos y Notas</h1>
-                <p class="subtitle">Subí y gestioná los archivos CSV de alumnos y calificaciones de Moodle para actualizar el panel de control.</p>
-            </div>
-        </header>
+        <component-header title="Gestor de Alumnos y Notas"
+            subtitle="Subí y gestioná los archivos CSV de alumnos y calificaciones de Moodle para actualizar el panel de control."></component-header>
 
         <div class="upload-section">
             <div id="alumnosCard" class="card">

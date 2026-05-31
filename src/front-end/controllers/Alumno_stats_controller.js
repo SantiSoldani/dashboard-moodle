@@ -9,22 +9,7 @@
 
 import { HandleGet_alumnos } from "../models/Alumno.js";
 
-/**
-const alumno = HandleGet_alumnos(alumno_dni)
-alumno = alumno[0]; //como la funcion devuelve un arreglo entonces me quedo con el primero porque es el unico que trae, podria verificar si que es que me trae algo
-*/
-/**
-const alumno = {
-  nombre: "fulano",
-  apellido: "fernandez",
-  documento: "31243214",
-  carrera: "ingenieria civil",
-  curso: "1er anio",
-  email: "ax.com",
-  telefono: "123456",
-  estado: "amarillo",
-};
-**/
+
 window.addEventListener("load", async () => {
   const params = new URLSearchParams(window.location.search); //parametros esperados -> alumno && modo
 
