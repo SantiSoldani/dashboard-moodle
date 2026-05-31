@@ -79,7 +79,7 @@ def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
         if data.get("color") is None:
             data["color"] = "gris"
         if data.get("score") is None:
-            data["score"] = -1.0
+            data["score"] = 0
         alumnos.append(AlumnoDto(**data))
     return alumnos
 

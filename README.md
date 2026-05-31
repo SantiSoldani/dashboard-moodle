@@ -3,16 +3,11 @@
 ## 🚀 Guía de Inicio Rápido para el Equipo
 
 TO-DO: 
-- Diseñar los cuestionarios (definir preguntas, escalas).
-- Definir concretamente el formato de los csv de la ingesta de datos para poder manejar bien toda la transferencia de datos
-- Terminar de moldear los controladores y las respectivas querys de los modelos
-- Looker Studio
-
-SIGUIENTE: <Una vez completados los TO-DO>
-- Moldear la base de datos mas consistentemente para el primer testeo
-- Testear toda la ingesta de datos y muestra de la informacion pertinente del front-end
-- Definir los parametros de calculo de semaforo para los modulo <SemaforoCalculator.py>
-
+- Crear Encuestas (Inicial, Periodica, Entrevista).
+- Procesar CSV según naturaleza (Alumnos, Encuesta, Notas).
+- Elegir/Construir indicadores que nos interesen mostrar.
+- (Seguir) Diseñar Base de Datos.
+- Conectar endpoints para la visualizacion.
 
 ### 🔗 Seguir estos pasos en terminal (la de vscode por ejemplo) para levantar el backend y el servidor.
 1. git clone <URL_DEL_REPOSITORIO> 
