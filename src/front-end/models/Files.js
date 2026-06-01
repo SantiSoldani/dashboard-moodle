@@ -9,11 +9,15 @@ import { getBackendURL } from "../config.js";
 export async function Post_csv(file, which_file) {
   const formData = new FormData();
   formData.append("file", file);
-
-  console.log(`${getBackendURL()}/data/UploadData`);
   try {
+    // Hará un fetch a rutas similares a: 
+    // data/upload/notas; 
+    // data/upload/alumnos; 
+    // data/upload/encuestaInicial; 
+    // data/upload/encuestaPeriodica; 
+    // data/upload/entrevista 
     const response = await fetch(
-      `${getBackendURL()}/data/Upload${which_file} `,
+      `${getBackendURL()}/data/upload/${which_file}`,
       {
         method: "POST",
         body: formData,
@@ -21,7 +25,7 @@ export async function Post_csv(file, which_file) {
     );
 
     if (!response.ok) {
-      throw new Error(`HTTP Error: ${response.status}`);
+      throw new Error(`HTTP Error: ${response.status} `);
     }
 
     const data = await response.json();

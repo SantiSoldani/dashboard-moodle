@@ -11,8 +11,7 @@ const Iframe_tipes = {
     },
     'data_entry': {
         src: 'src/front-end/iframes/data_entry.html'
-    },
-    //pendiente en agregar mas iframes en caso de necesitarlos
+    }
 }
 
 const target = Iframe_tipes[tipo] ? tipo : 'home';

@@ -7,6 +7,10 @@ from fastapi import APIRouter, Depends, File, UploadFile, status
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+# Directorios relativos al archivo actual para portabilidad
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+UPLOAD_DIR = os.path.join(BASE_DIR, "raw_data")
+
 router = APIRouter(prefix="/data")
 
 # Este router lo que va a recibir es una de 3 archivos
@@ -16,6 +20,7 @@ router = APIRouter(prefix="/data")
 # vamos a crear un endpoint para cada uno de estos archivos
 
 
+'''
 @router.post("/Uploadalumnos", status_code=201)
 async def upload_alumnos(
     file: UploadFile = File(...), db: Session = Depends(server.get_db)
@@ -25,7 +30,7 @@ async def upload_alumnos(
     ,donde sera procesado por el servicio de limpieza de datos
     """
     try:
-        upload_dir = "/var/www/html/dashboard-moodle/src/back-end/raw_data"
+        upload_dir = UPLOAD_DIR
         os.makedirs(upload_dir, exist_ok=True)
 
         if file.filename:
@@ -57,7 +62,7 @@ async def upload_notas(
     una, donde sera procesado por el servicio de limpieza de datos
     """
     try:
-        upload_dir = "/var/www/html/dashboard-moodle/src/back-end/raw_data"
+        upload_dir = UPLOAD_DIR
         os.makedirs(upload_dir, exist_ok=True)
 
         if file.filename:
@@ -85,8 +90,8 @@ async def upload_encuestas(
     file: UploadFile = File(...), db: Session = Depends(server.get_db)
 ):
     try:
-        upload_dir = "/var/www/html/dashboard-moodle/src/back-end/raw_data"
-        os.makedirs(upload_dir, exist_ok=True)
+        upload_dir = UPLOAD_DIR
+            os.makedirs(upload_dir, exist_ok=True)
 
         if file.filename:
             file_path = os.path.join(upload_dir, "encuestas.csv")
@@ -103,5 +108,37 @@ async def upload_encuestas(
             "filename": file.filename,
             "file_path": file_path,
         }
+'''
+
+#ESTA NUEVA RUTA RECIBE COMO PARAMETRO {TYPE} Y DE AHI DISTRIBUYE AL CONTROLADOR ??
+@router.post("/upload/{type}", status_code=201)
+async def Upload(type:str, file: UploadFile = File(...), session: Session = Depends(server.get_db)):
+    try:
+        print(type)
+        match type:
+            case "notas":
+                print("ESTAS PASANDO POR NOTAS")
+                #return upload_notas(file, session)
+                pass
+            case "alumnos":
+                print("ESTAS PASANDO POR ALUMNOS")
+                #return upload_alumnos(file, session)
+                pass
+            case "encuestaInicial":
+                print("ESTAS PASANDO POR ENCUESTA INICIAL")
+                #return upload_encuestas(file, session)
+                pass
+            case "encuestaPeriodica":
+                print("ESTAS PASANDO POR ENCUESTA PERIODICA")
+                #return upload_encuestas(file, session)
+                pass
+            case "entrevista":
+                print("ESTAS PASANDO POR ENTREVISTA")
+                #return upload_entrevistas(file, session)
+                pass
+            case _:
+                return {"status": "error", "message": "Tipo de archivo no reconocido"}
+
+
     except Exception as e:
         return {"status": "error", "message": f"Error al cargar el archivo: {str(e)}"}

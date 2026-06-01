@@ -11,22 +11,35 @@ import { HandleGet_alumnos } from "../models/Alumno.js";
 
 
 window.addEventListener("load", async () => {
-  const params = new URLSearchParams(window.location.search); //parametros esperados -> alumno && modo
+  try {
+    const params = new URLSearchParams(window.location.search); //parametros esperados -> alumno && modo
 
-  const modo = params.get("modo");
-  const alumno_dni = params.get("alumno");
-  let alumno = await HandleGet_alumnos(alumno_dni);
-  alumno = JSON.parse(alumno);
-  console.log(alumno);
-  set_state_panel(alumno);
-  set_info_panel(alumno);
-  set_dashboard(alumno);
+    const modo = params.get("modo");
+    const alumno_dni = params.get("alumno");
+    if (!alumno_dni) {
+      console.warn("No se especificó un DNI de alumno. Mostrando datos hardcodeados.");
+      return;
+    }
+    
+    let alumno = await HandleGet_alumnos(alumno_dni);
+    if (alumno) {
+      alumno = JSON.parse(alumno);
+      console.log(alumno);
+      set_state_panel(alumno);
+      set_info_panel(alumno);
+      set_dashboard(alumno);
+    }
+  } catch (error) {
+    console.error("Error al cargar datos del alumno (posiblemente endpoint no implementado). Mostrando datos hardcodeados:", error);
+  }
 });
 
-document.getElementById("go_back_Btn").addEventListener("click", () => {
-  window.location.href = "../iframes/home.html";
-  console.log("volviendo a la pagina de semaforo");
-});
+const goBackBtn = document.getElementById("go_back_Btn");
+if (goBackBtn) {
+  goBackBtn.addEventListener("click", () => {
+    window.location.href = "../iframes/home.html"
+  });
+}
 
 function set_state_panel(alumno) {
   const stats = document.getElementById("status-section");

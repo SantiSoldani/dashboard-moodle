@@ -1,320 +1,264 @@
-/**ARCHIVO CONTROLADOR DEL MODULO IFRAME DEL DATA ENTRY
- *
- * -PERMITIR LA CARGA DE ARCHIVOS CSV / EXCEL PARA LA INGESTA DE DATOS
- * -PERMITIR LA INGESTA DE DATOS A MANO EN CASO DE SER NECESARIO
- * -OTORGAR FLAGS DE QUE LOS DATOS FUERON CARGADOS EXITOSAMENTE
- */
-
 import { Post_csv } from "../models/Files.js";
 
-//------------------------------------SECTOR DE FUNCIONES PRINCIPALES----------------------------------------------------
-async function procesarArchivos() {
-  //revisar que al menos uno de los archivos haya sido cargado
+const uploadZone = document.getElementById("uploadZone");
+const mainFileInput = document.getElementById("mainFileInput");
+const uploadZoneText = document.getElementById("uploadZoneText");
+const selectFileType = document.getElementById("selectFileType");
+const btnClearFile = document.getElementById("btnClearFile");
+const btnUpload = document.getElementById("x");
+const emptyMessage = document.getElementById("emptyMessage");
+const tablaResultados = document.getElementById("tablaResultados");
+const headerRow = document.getElementById("headerRow");
+const tbody = tablaResultados.querySelector("tbody");
 
-  const alumnos_file = document.getElementById("alumnosFile");
-  const notas_file = document.getElementById("notasFile");
-  const encuestas_file = document.getElementById("encuestasFile");
+// Controles de Paginación
+const paginationControls = document.getElementById("paginationControls");
+const btnPrevPage = document.getElementById("btnPrevPage");
+const btnNextPage = document.getElementById("btnNextPage");
+const pageIndicator = document.getElementById("pageIndicator");
 
-  if (!alumnos_file.files[0] && !notas_file.files[0] && !encuestas_file.files[0]) {
-    msj("Debe cargar al menos un archivo", "error", 2000, "mensaje");
-    document.getElementById("x").disabled = true;
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    document.getElementById("x").disabled = false;
-    return;
-  }
+let selectedFile = null;
+let parsedRows = []; // Almacena todas las filas leídas (incluyendo cabeceras en index 0)
+let currentPage = 1;
+const rowsPerPage = 20;
 
-  if (alumnos_file.files[0]) {
-    (await Post_csv(alumnos_file.files[0], "alumnos"))
-      ? msj(
-        "Archivo de alumnos cargado correctamente",
-        "success",
-        3000,
-        "mensaje",
-      )
-      : msj("Error al cargar el archivo de alumnos", "error", 3000, "mensaje");
+// Click en la zona abre el buscador de archivos
+uploadZone.addEventListener("click", () => {
+  mainFileInput.click();
+});
+
+// Cambiar archivo seleccionado desde el explorador
+mainFileInput.addEventListener("change", () => {
+  if (mainFileInput.files[0]) {
+    handleFileSelect(mainFileInput.files[0]);
   }
-  if (notas_file.files[0]) {
-    (await Post_csv(notas_file.files[0], "notas"))
-      ? msj(
-        "Archivo de notas cargado correctamente",
-        "success",
-        3000,
-        "mensaje",
-      )
-      : msj("Error al cargar el archivo de notas", "error", 3000, "mensaje");
-  }
-  if (encuestas_file.files[0]) {
-    (await Post_csv(encuestas_file.files[0], "Encuestas"))
-      ? msj(
-        "Archivo de encuestas cargado correctamente",
-        "success",
-        3000,
-        "mensaje",
-      )
-      : msj("Error al cargar el archivo de encuestas", "error", 3000, "mensaje");
-  }
+});
+
+// Procesar archivo seleccionado
+function handleFileSelect(file) {
+  selectedFile = file;
+  uploadZoneText.innerHTML = `Archivo seleccionado: <span style="color:var(--primary); font-weight:700;">${file.name}</span>`;
+  btnClearFile.classList.remove("hidden");
+
+  // Mostrar previsualización instantánea del archivo
+  mostrarPreview(file);
 }
 
-function leerCSV(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = function (event) {
-      const texto = event.target.result;
-      const filas = texto.trim().split("\n");
-
-      const datos = filas.map((fila) =>
-        fila.split(",").map((campo) => campo.trim()),
-      );
-
-      resolve(datos);
-    };
-
-    reader.onerror = function () {
-      reject("Error leyendo el archivo");
-    };
-
-    reader.readAsText(file);
-  });
-}
-
-async function mostrarAlumnos() {
+// Previsualizar cualquier CSV de manera dinámica y automática
+async function mostrarPreview(file) {
   try {
-    const tbody = document
-      .getElementById("tablaResultados")
-      .querySelector("tbody");
-    const headerRow = document.getElementById("headerRow");
-    const tabla = document.getElementById("tablaResultados");
-    const emptyMessage = document.getElementById("emptyMessage");
-    const btnLimpiar = document.getElementById("btnLimpiarAlumnos");
+    const text = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = e => resolve(e.target.result);
+      reader.onerror = () => reject("Error leyendo archivo");
+      reader.readAsText(file);
+    });
 
-    // Verificar si hay archivo cargado
-    if (!document.getElementById("alumnosFile").files[0]) {
+    // Dividir en líneas limpiando retornos de carro
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length === 0 || lines[0].trim() === "") {
       emptyMessage.style.display = "block";
-      tabla.style.display = "none";
-      btnLimpiar.classList.add("hidden");
+      tablaResultados.style.display = "none";
+      paginationControls.style.display = "none";
       return;
     }
 
-    // Mostrar botón de limpiar
-    btnLimpiar.classList.remove("hidden");
+    // Detectar si el separador es punto y coma (;) o coma (,)
+    const separator = lines[0].includes(";") ? ";" : ",";
 
-    // Limpiar tabla
-    tbody.innerHTML = "";
+    // Dividir en filas y columnas y guardar en buffer global
+    parsedRows = lines.map(row =>
+      row.split(separator).map(cell => cell.trim().replace(/^["']|["']$/g, "")) // Limpiar comillas
+    );
 
-    console.log("Mostrando previsualización de alumnos...");
-
-    let alumnosCSV = [];
-
-    if (document.getElementById("alumnosFile").files[0]) {
-      alumnosCSV = await leerCSV(
-        document.getElementById("alumnosFile").files[0],
-      );
-    }
+    // Generar cabeceras
     headerRow.innerHTML = "";
-    const campos = alumnosCSV[0];
-    for (let i = 0; i < campos.length; i++) {
-      campos[i] = campos[i].toLowerCase();
-      headerRow.innerHTML += `<th>${campos[i]}</th>`;
-    }
+    parsedRows[0].forEach(col => {
+      headerRow.innerHTML += `<th>${col}</th>`;
+    });
 
-    for (let i = 1; i < alumnosCSV.length; i++) {
-      const filas = alumnosCSV[i];
-      const fila = document.createElement("tr");
-      for (let j = 0; j < filas.length; j++) {
-        fila.innerHTML += `<td>${filas[j]}</td>`;
-      }
-      tbody.appendChild(fila);
-    }
+    // Inicializar paginación
+    currentPage = 1;
+    renderActivePage();
 
-    // Mostrar tabla y ocultar mensaje vacío
     emptyMessage.style.display = "none";
-    tabla.style.display = "table";
+    tablaResultados.style.display = "table";
   } catch (error) {
-    console.error("Error al mostrar alumnos:", error);
+    console.error("Error al previsualizar el archivo:", error);
+    showMessage("Error al intentar previsualizar el archivo CSV", "error");
   }
 }
 
-async function mostrarNotas() {
-  try {
-    const tbody = document
-      .getElementById("tablaResultados")
-      .querySelector("tbody");
-    const headerRow = document.getElementById("headerRow");
-    const tabla = document.getElementById("tablaResultados");
-    const emptyMessage = document.getElementById("emptyMessage");
-    const btnLimpiar = document.getElementById("btnLimpiarNotas");
+// Renderizar la página actual de la previsualización
+function renderActivePage() {
+  const dataRows = parsedRows.slice(1); // Excluir la cabecera
+  const totalPages = Math.ceil(dataRows.length / rowsPerPage) || 1;
 
-    // Verificar si hay archivo cargado
-    if (!document.getElementById("notasFile").files[0]) {
-      emptyMessage.style.display = "block";
-      tabla.style.display = "none";
-      btnLimpiar.classList.add("hidden");
-      return;
-    }
+  const startIndex = (currentPage - 1) * rowsPerPage;
+  const endIndex = startIndex + rowsPerPage;
+  const activePageData = dataRows.slice(startIndex, endIndex);
 
-    // Mostrar botón de limpiar
-    btnLimpiar.classList.remove("hidden");
+  // Generar cuerpo de la tabla
+  tbody.innerHTML = "";
+  activePageData.forEach(row => {
+    // Saltar filas vacías
+    if (row.length === 0 || row.join("") === "") return;
+    const tr = document.createElement("tr");
+    row.forEach(cell => {
+      tr.innerHTML += `<td>${cell}</td>`;
+    });
+    tbody.appendChild(tr);
+  });
 
-    // Limpiar tabla
-    tbody.innerHTML = "";
+  // Actualizar textos y estados de botones
+  pageIndicator.innerText = `Página ${currentPage} de ${totalPages}`;
+  btnPrevPage.disabled = currentPage === 1;
+  btnNextPage.disabled = currentPage === totalPages;
 
-    console.log("Mostrando previsualización de notas...");
-
-    let notasCSV = [];
-
-    if (document.getElementById("notasFile").files[0]) {
-      notasCSV = await leerCSV(document.getElementById("notasFile").files[0]);
-    }
-    headerRow.innerHTML = "";
-    const campos = notasCSV[0];
-    for (let i = 0; i < campos.length; i++) {
-      campos[i] = campos[i].toLowerCase();
-      headerRow.innerHTML += `<th>${campos[i]}</th>`;
-    }
-
-    for (let i = 1; i < notasCSV.length; i++) {
-      const datos = notasCSV[i];
-      const fila = document.createElement("tr");
-
-      for (let j = 0; j < campos.length; j++) {
-        fila.innerHTML += `<td>${datos[j]}</td>`;
-      }
-      tbody.appendChild(fila);
-    }
-
-    // Mostrar tabla y ocultar mensaje vacío
-    emptyMessage.style.display = "none";
-    tabla.style.display = "table";
-  } catch (error) {
-    console.error("Error al mostrar notas:", error);
+  // Mostrar u ocultar barra de paginación
+  if (dataRows.length > rowsPerPage) {
+    paginationControls.style.display = "flex";
+  } else {
+    paginationControls.style.display = "none";
   }
 }
 
-//----------------------------------SECTOR DE EVENT LISTENERS Y DISPARADORES DE FUNCIONES----------------------------------------------------
-document
-  .getElementById("alumnosFile")
-  .addEventListener("change", function (event) {
-    mostrarAlumnos();
-  });
-
-document
-  .getElementById("notasFile")
-  .addEventListener("change", function (event) {
-    const btnVerNotas = document.getElementById("btnVerNotas");
-    if (btnVerNotas) {
-      btnVerNotas.classList.add("active");
-    }
-    mostrarNotas();
-  });
-
-// Botones para limpiar archivos
-document
-  .getElementById("btnLimpiarAlumnos")
-  .addEventListener("click", function (event) {
-    event.preventDefault();
-    document.getElementById("alumnosFile").value = "";
-    mostrarAlumnos();
-  });
-
-document
-  .getElementById("btnLimpiarNotas")
-  .addEventListener("click", function (event) {
-    event.preventDefault();
-    document.getElementById("notasFile").value = "";
-    mostrarNotas();
-  });
-
-// Event listeners para los botones de vista
-document
-  .getElementById("btnVerAlumnos")
-  .addEventListener("click", function (event) {
-    event.preventDefault();
-    document.getElementById("btnVerAlumnos").classList.add("active");
-    document.getElementById("btnVerNotas").classList.remove("active");
-    document.getElementById("btnVerEncuestas").classList.remove("active");
-    mostrarAlumnos();
-  });
-
-document
-  .getElementById("btnVerNotas")
-  .addEventListener("click", function (event) {
-    event.preventDefault();
-    document.getElementById("btnVerNotas").classList.add("active");
-    document.getElementById("btnVerAlumnos").classList.remove("active");
-    document.getElementById("btnVerEncuestas").classList.remove("active");
-    mostrarNotas();
-  });
-
-document
-  .getElementById("btnVerEncuestas")
-  .addEventListener("click", function (event) {
-    event.preventDefault();
-    document.getElementById("btnVerEncuestas").classList.add("active");
-    document.getElementById("btnVerAlumnos").classList.remove("active");
-    document.getElementById("btnVerNotas").classList.remove("active");
-
-    // Al no estar conectado el procesamiento de encuestas, mostramos mensaje de vacío
-    document.getElementById("emptyMessage").style.display = "block";
-    document.getElementById("tablaResultados").style.display = "none";
-  });
-
-const submit = document.getElementById("x");
-submit.addEventListener("click", function (event) {
-  event.preventDefault();
-  procesarArchivos();
+// Listeners para controles de paginación
+btnPrevPage.addEventListener("click", (e) => {
+  e.stopPropagation();
+  if (currentPage > 1) {
+    currentPage--;
+    renderActivePage();
+  }
 });
 
-document.addEventListener("DOMContentLoaded", function () {
-  mostrarAlumnos();
+btnNextPage.addEventListener("click", (e) => {
+  e.stopPropagation();
+  const dataRows = parsedRows.slice(1);
+  const totalPages = Math.ceil(dataRows.length / rowsPerPage) || 1;
+  if (currentPage < totalPages) {
+    currentPage++;
+    renderActivePage();
+  }
 });
 
-//------------------------------SECTOR DE FUNCIONES UTILES----------------------------------------------------
-function msj(texto, tipo = "info", duracion = 3000, which_container) {
-  const container = document.getElementById(which_container);
+// Limpiar el archivo y restablecer la vista
+btnClearFile.addEventListener("click", (e) => {
+  e.stopPropagation();
+  resetUploadState();
+});
 
-  if (!container) {
-    console.error(`No existe el contenedor: ${which_container}`);
+function resetUploadState() {
+  selectedFile = null;
+  parsedRows = [];
+  currentPage = 1;
+  mainFileInput.value = "";
+  uploadZoneText.innerText = "Arrastrá o hacé clic para buscar un archivo CSV";
+  btnClearFile.classList.add("hidden");
+
+  // Ocultar tabla y mostrar vacío
+  tbody.innerHTML = "";
+  headerRow.innerHTML = "<th>ID</th><th>Nombre</th><th>Apellido</th>";
+  emptyMessage.style.display = "block";
+  tablaResultados.style.display = "none";
+  paginationControls.style.display = "none";
+}
+
+// Botón de subir archivo al servidor
+btnUpload.addEventListener("click", async (e) => {
+  e.stopPropagation();
+  if (!selectedFile) {
+    showMessage("Por favor, selecciona un archivo CSV primero.", "error");
     return;
   }
 
-  // CREAR MENSAJE
-  const mensaje = document.createElement("div");
+  const type = selectFileType.value;
+  // Mapeamos el tipo del frontend al endpoint correcto del backend
+  let backendType = null;
+  if (type === "alumnos") backendType = "alumnos";
+  if (type === "notas") backendType = "notas";
+  if (type === "encuestaInicial") backendType = "encuestaInicial";
+  if (type === "encuestaPeriodica") backendType = "encuestaPeriodica";
+  if (type === "entrevista") backendType = "entrevista";
 
-  // clase dinamica:
-  // error / success / warning / info
-  mensaje.classList.add(tipo);
+  if (!backendType) {
+    showMessage("Por favor, selecciona una clase (tipo de archivo) antes de subir.", "error");
+    return;
+  }
 
-  // TEXTO
-  const contenido = document.createElement("span");
+  btnUpload.disabled = true;
+  btnUpload.innerHTML = `<span class="material-symbols-outlined" style="font-size: 20px;">sync</span> Subiendo...`;
 
-  contenido.textContent = texto;
+  try {
+    const success = await Post_csv(selectedFile, backendType);
+    if (success) {
+      showMessage("¡Archivo cargado y procesado exitosamente!", "success");
+      resetUploadState();
+    } else {
+      showMessage("Error al cargar el archivo en el servidor. Revisa el formato.", "error");
+    }
+  } catch (error) {
+    console.error("Error al subir:", error);
+    showMessage("Ocurrió un error inesperado al subir el archivo.", "error");
+  } finally {
+    btnUpload.disabled = false;
+    btnUpload.innerHTML = `<span class="material-symbols-outlined">publish</span> Subir Archivo`;
+  }
+});
 
-  // BOTON
-  const boton = document.createElement("button");
+// Soporte de Drag and Drop
+uploadZone.addEventListener("dragover", (e) => {
+  e.preventDefault();
+  uploadZone.style.borderColor = "var(--primary)";
+  uploadZone.style.background = "var(--surface-container)";
+});
 
-  boton.textContent = "Ok";
+uploadZone.addEventListener("dragleave", () => {
+  uploadZone.style.borderColor = "var(--outline-variant)";
+  uploadZone.style.background = "var(--surface-container-low)";
+});
 
-  boton.addEventListener("click", () => {
-    mensaje.remove();
-  });
+uploadZone.addEventListener("drop", (e) => {
+  e.preventDefault();
+  uploadZone.style.borderColor = "var(--outline-variant)";
+  uploadZone.style.background = "var(--surface-container-low)";
 
-  // ARMAR MENSAJE
-  mensaje.appendChild(contenido);
+  if (e.dataTransfer.files.length > 0) {
+    handleFileSelect(e.dataTransfer.files[0]);
+  }
+});
 
-  mensaje.appendChild(boton);
+// Función para mostrar mensajes tipo toast en el contenedor
+function showMessage(text, type = "info") {
+  const container = document.getElementById("mensaje");
+  if (!container) return;
 
-  // INSERTAR EN EL HTML
-  container.appendChild(mensaje);
+  container.innerHTML = "";
+  const div = document.createElement("div");
+  div.style.padding = "8px 16px";
+  div.style.borderRadius = "8px";
+  div.style.fontSize = "14px";
+  div.style.fontWeight = "600";
+  div.style.display = "inline-block";
 
-  // AUTO ELIMINAR
+  if (type === "success") {
+    div.style.background = "var(--success-subtle)";
+    div.style.color = "var(--success)";
+    div.style.border = "1px solid var(--success)";
+  } else if (type === "error") {
+    div.style.background = "var(--critical-subtle)";
+    div.style.color = "var(--critical)";
+    div.style.border = "1px solid var(--critical)";
+  } else {
+    div.style.background = "var(--surface-container)";
+    div.style.color = "var(--on-surface-variant)";
+    div.style.border = "1px solid var(--outline-variant)";
+  }
+
+  div.innerText = text;
+  container.appendChild(div);
+
   setTimeout(() => {
-    if (mensaje.parentNode) {
-      mensaje.remove();
-    }
-  }, duracion);
+    div.remove();
+  }, 5000);
 }
-
-//revisar los datos que vamos a persistir y definir un formato claro de os csv para la carga y visualizacion de datos
-
-// Inicializar mostrando mensaje de vacío al cargar la página

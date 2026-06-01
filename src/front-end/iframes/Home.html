@@ -7,8 +7,10 @@
     <link rel="icon" href="../public/icon.png" type="image/x-icon">
     <title>Inicio - Dashboard Docente</title>
     <link class="styles" rel="stylesheet" href="../styles/home_style.css">
+    <link rel="stylesheet" href="../styles/modalAlumnoStats.css">
     <script type="module" src="../components/navbar.js"></script>
     <script type="module" src="../components/header.js"></script>
+    <script type="module" src="../components/alumnoStats.js"></script>
     <script type="module" src="../controllers/home_controller.js"></script>
 </head>
 
@@ -16,9 +18,7 @@
     <div class="container">
         <component-navbar></component-navbar>
         <!-- CABECERA PRINCIPAL -->
-        <component-header title="Panel del Docente"
-            subtitle="Monitoreo académico en tiempo real y alertas tempranas de deserción."
-            show-button="true"></component-header>
+        <component-header title="Panel del Docente" subtitle="Visualizador de Datos de Alumnos"></component-header>
 
         <!-- GRID DE MÉTRICAS -->
         <section class="kpi-grid">
@@ -139,6 +139,16 @@
                 </button>
             </div>
         </section>
+    </div>
+
+    <!-- MODAL DE ESTADÍSTICAS DEL ALUMNO -->
+    <div id="modalAlumnoStats" class="modal">
+        <div class="modal-content-wrapper">
+            <button class="modal-close-btn" onclick="cerrarModalAlumnoStats()" title="Cerrar Ficha">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+            <modal-alumnostats></modal-alumnostats>
+        </div>
     </div>
 </body>
 

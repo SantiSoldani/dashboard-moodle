@@ -63,7 +63,7 @@ function setupNavigation() {
         filterEstado.addEventListener("change", aplicarFiltros);
     }
 
-    // Agregar evento a la tabla para abrir ficha del alumno
+    // Agregar evento a la tabla para abrir ficha del alumno en el modal
     if (studentsTableBody) {
         studentsTableBody.addEventListener("click", (event) => {
             const row = event.target.closest("tr");
@@ -71,7 +71,7 @@ function setupNavigation() {
 
             const dni = row.dataset.dni;
             if (dni) {
-                window.location.href = `Alumnos_stats.html?modo=x&alumno=${dni}`;
+                window.abrirModalAlumnoStats(dni);
             }
         });
     }
@@ -200,7 +200,7 @@ function mostrarAlumnosCriticos() {
                     <span class="score-badge">Índice: ${scoreDisplay.toFixed(1)}/10</span>
                 </div>
             </div>
-            <a href="Alumnos_stats.html?modo=x&alumno=${alumno.dni}" class="btn-card-action">Ver Ficha</a>
+            <button onclick="abrirModalAlumnoStats('${alumno.dni}')" class="btn-card-action" style="outline: none; border: 1px solid #e5e7eb; font-family: inherit;">Ver Ficha</button>
         `;
         criticalListElement.appendChild(card);
     });
@@ -273,5 +273,52 @@ function mostrarListadoGeneral() {
         studentsTableBody.appendChild(row);
     });
 }
+
+// ==========================================================================
+// MODAL DE ESTADÍSTICAS DEL ALUMNO - CONTROLADORES GLOBALES
+// ==========================================================================
+
+window.abrirModalAlumnoStats = function(dni) {
+    const modal = document.getElementById("modalAlumnoStats");
+    if (!modal) return;
+    
+    const statsComponent = modal.querySelector("modal-alumnostats");
+    if (statsComponent) {
+        statsComponent.setAttribute("alumno-dni", dni);
+    }
+    
+    // Show the modal
+    modal.style.display = "flex";
+    // Force browser reflow to enable transition
+    modal.offsetHeight;
+    modal.classList.add("active");
+    
+    // Disable body scrolling
+    document.body.style.overflow = "hidden";
+    
+    console.log(`Abriendo ficha del alumno con DNI: ${dni}`);
+};
+
+window.cerrarModalAlumnoStats = function() {
+    const modal = document.getElementById("modalAlumnoStats");
+    if (!modal) return;
+    
+    modal.classList.remove("active");
+    
+    // Wait for transition to complete
+    setTimeout(() => {
+        if (!modal.classList.contains("active")) {
+            modal.style.display = "none";
+            const statsComponent = modal.querySelector("modal-alumnostats");
+            if (statsComponent) {
+                statsComponent.removeAttribute("alumno-dni"); // Reset iframe
+            }
+            // Restore body scroll
+            document.body.style.overflow = "";
+        }
+    }, 350);
+    
+    console.log("Cerrando ficha del alumno");
+};
 
 

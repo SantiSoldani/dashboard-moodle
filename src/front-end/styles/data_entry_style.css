@@ -294,6 +294,7 @@ body {
 .btn-upload:hover {
     filter: brightness(1.05);
     transform: translateY(-1px);
+    background-color: #22c55e;
 }
 
 #mensaje {
@@ -690,4 +691,4 @@ tr:hover td {
     font-size: 14px;
     font-weight: 600;
     color: var(--on-surface-variant);
-}
+}
