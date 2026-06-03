@@ -6,9 +6,12 @@
 
 import { getBackendURL } from "../config.js";
 
-export async function Post_csv(file, which_file) {
+export async function Post_csv(file, which_file, subject = null) {
   const formData = new FormData();
   formData.append("file", file);
+  if (subject) {
+    formData.append("materia", subject);
+  }
   try {
     // Hará un fetch a rutas similares a: 
     // data/upload/notas; 

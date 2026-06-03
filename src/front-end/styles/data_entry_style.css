@@ -249,6 +249,10 @@ body {
     display: none;
 }
 
+.hidden {
+    display: none !important;
+}
+
 
 .action-card {
     width: 100%;

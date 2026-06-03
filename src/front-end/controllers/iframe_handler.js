@@ -11,6 +11,9 @@ const Iframe_tipes = {
     },
     'data_entry': {
         src: 'src/front-end/iframes/data_entry.html'
+    },
+    'login': {
+        src: 'src/front-end/iframes/Login.html'
     }
 }
 

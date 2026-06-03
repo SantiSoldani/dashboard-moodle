@@ -6,6 +6,7 @@ env/
 # Caché de Python
 __pycache__/
 *.pyc
+.json
 
 # Variables de entorno
 .env
@@ -15,3 +16,4 @@ __pycache__/
 src/front-end/config/config.js
 
 design/
+.agents/

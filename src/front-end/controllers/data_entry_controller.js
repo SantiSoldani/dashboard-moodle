@@ -4,6 +4,7 @@ const uploadZone = document.getElementById("uploadZone");
 const mainFileInput = document.getElementById("mainFileInput");
 const uploadZoneText = document.getElementById("uploadZoneText");
 const selectFileType = document.getElementById("selectFileType");
+const selectSubject = document.getElementById("selectSubject");
 const btnClearFile = document.getElementById("btnClearFile");
 const btnUpload = document.getElementById("x");
 const emptyMessage = document.getElementById("emptyMessage");
@@ -31,6 +32,16 @@ uploadZone.addEventListener("click", () => {
 mainFileInput.addEventListener("change", () => {
   if (mainFileInput.files[0]) {
     handleFileSelect(mainFileInput.files[0]);
+  }
+});
+
+// Mostrar/ocultar select de materias al seleccionar Notas
+selectFileType.addEventListener("change", () => {
+  if (selectFileType.value === "notas") {
+    selectSubject.classList.remove("hidden");
+  } else {
+    selectSubject.classList.add("hidden");
+    selectSubject.value = "";
   }
 });
 
@@ -156,6 +167,11 @@ function resetUploadState() {
   uploadZoneText.innerText = "Arrastrá o hacé clic para buscar un archivo CSV";
   btnClearFile.classList.add("hidden");
 
+  // Restablecer selectores
+  selectFileType.selectedIndex = 0;
+  selectSubject.classList.add("hidden");
+  selectSubject.selectedIndex = 0;
+
   // Ocultar tabla y mostrar vacío
   tbody.innerHTML = "";
   headerRow.innerHTML = "<th>ID</th><th>Nombre</th><th>Apellido</th>";
@@ -186,11 +202,20 @@ btnUpload.addEventListener("click", async (e) => {
     return;
   }
 
+  let subject = null;
+  if (type === "notas") {
+    subject = selectSubject.value;
+    if (!subject) {
+      showMessage("Por favor, selecciona una materia antes de subir.", "error");
+      return;
+    }
+  }
+
   btnUpload.disabled = true;
   btnUpload.innerHTML = `<span class="material-symbols-outlined" style="font-size: 20px;">sync</span> Subiendo...`;
 
   try {
-    const success = await Post_csv(selectedFile, backendType);
+    const success = await Post_csv(selectedFile, backendType, subject);
     if (success) {
       showMessage("¡Archivo cargado y procesado exitosamente!", "success");
       resetUploadState();

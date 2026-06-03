@@ -12,15 +12,13 @@ import { HandleGet_alumnos } from "../models/Alumno.js";
 
 window.addEventListener("load", async () => {
   try {
-    const params = new URLSearchParams(window.location.search); //parametros esperados -> alumno && modo
-
-    const modo = params.get("modo");
+    const params = new URLSearchParams(window.location.search); // parametro esperado -> alumno
     const alumno_dni = params.get("alumno");
     if (!alumno_dni) {
       console.warn("No se especificó un DNI de alumno. Mostrando datos hardcodeados.");
       return;
     }
-    
+
     let alumno = await HandleGet_alumnos(alumno_dni);
     if (alumno) {
       alumno = JSON.parse(alumno);
@@ -33,13 +31,6 @@ window.addEventListener("load", async () => {
     console.error("Error al cargar datos del alumno (posiblemente endpoint no implementado). Mostrando datos hardcodeados:", error);
   }
 });
-
-const goBackBtn = document.getElementById("go_back_Btn");
-if (goBackBtn) {
-  goBackBtn.addEventListener("click", () => {
-    window.location.href = "../iframes/home.html"
-  });
-}
 
 function set_state_panel(alumno) {
   const stats = document.getElementById("status-section");
@@ -57,8 +48,7 @@ function set_state_panel(alumno) {
         .querySelector(".status-card-state")
         .textContent.replace("Verde", alumno.estado);
     }
-    //const texto = estado.querySelector("strong") || estado.querySelector("p .status-card-state")
-    //texto.textContent.replace("Verde", alumno.estado);
+
   });
 
   let nombre = stats.querySelector("h1");
