@@ -11,6 +11,7 @@ __pycache__/
 # Variables de entorno
 .env
 *.env
+*.txt
 
 #claves de configuracion en js
 src/front-end/config/config.js

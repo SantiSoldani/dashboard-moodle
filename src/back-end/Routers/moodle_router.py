@@ -8,16 +8,40 @@ from Models import Alumno
 
 router = APIRouter(tags=["moodle"])
 
+def capitalize_names(name:str):
+    parts = name.split()
+    for i in range(len(parts)):
+        if i == 0:
+            parts[i] = parts[i].lower().capitalize()
+        else:
+            parts[i] = parts[i].lower().capitalize()
+    return " ".join(parts)
+
 @router.post("/moodle/lti/launch")
 async def lti_launch(request: Request, db: Session = Depends(server.get_db)):
     form_data = await request.form()
+
     
+
     # Moodle LTI 1.1 suele mandar estos campos estándar
     dni_alumno = form_data.get("ext_user_username") 
     email_alumno = form_data.get("lis_person_contact_email_primary")
-    nombre_completo = form_data.get("lis_person_name_full")
+    nombre = capitalize_names(form_data.get("lis_person_name_given"))
+    apellido = capitalize_names(form_data.get("lis_person_name_family"))
+    rol = form_data.get("roles") # Return Instructor | Learner  
 
-    # --- LÓGICA DE JIT PROVISIONING (UPSERT) ---
+    
+    with (open("./log.txt", "a")) as archivo:
+        archivo.write(dni_alumno + "\n")
+        archivo.write(email_alumno + "\n")
+        archivo.write(nombre + " " + apellido + "\n")
+        archivo.write("rol: " + rol + "\n")
+        archivo.write("\n")
+
+    
+    ''' 
+    
+
     
     # Intentamos buscar al alumno. Usamos un try/except porque el Get_alumno
     # actual lanza TypeError si el fetchone() retorna None.
@@ -28,20 +52,6 @@ async def lti_launch(request: Request, db: Session = Depends(server.get_db)):
     
     if not alumno_db:
         # ¡Es la primera vez que entra! Lo damos de alta en el momento
-        nombre = ""
-        apellido = ""
-        if nombre_completo:
-            if "," in nombre_completo:
-                parts = [p.strip() for p in nombre_completo.split(",", 1)]
-                apellido = parts[0]
-                nombre = parts[1]
-            else:
-                parts = nombre_completo.split()
-                if len(parts) >= 2:
-                    nombre = parts[0]
-                    apellido = " ".join(parts[1:])
-                elif len(parts) == 1:
-                    nombre = parts[0]
 
         # Instanciamos el DTO del alumno 
         nuevo_alumno = Alumno.AlumnoDto(
@@ -53,7 +63,7 @@ async def lti_launch(request: Request, db: Session = Depends(server.get_db)):
             carrera="Pendiente",
             color="gris",
             score=0,
-            legajo=dni_alumno
+            legajo=None
         )
         
         # Lo guardamos en la base de datos
@@ -69,11 +79,30 @@ async def lti_launch(request: Request, db: Session = Depends(server.get_db)):
     # El front-end detectará el DNI desde el localStorage
     # Finalmente devolvemos el HTML con un iframe en lugar de redireccionar
     # para controlar mejor las dimensiones dentro de Moodle.
-    html = f"""
-    <!DOCTYPE html>
-    <html lang="es">
-    <head>
-        <meta charset="UTF-8">
+    if rol == 'Instructor':
+        html = f"""
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <style>
+                body {{ margin: 0; padding: 0; }}
+            </style>
+        </head>
+        <body>
+            <script>
+                localStorage.setItem('estudianteDNI', '{dni_alumno}');
+            </script>
+            <iframe src="/app/iframes/Home.html" style="width: 100%; height: 90vh; border: none;" allow="fullscreen"></iframe>
+        </body>
+        </html>
+        """
+    else:
+        html = f"""
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
         <style>
             body {{ margin: 0; padding: 0; }}
         </style>
@@ -82,8 +111,12 @@ async def lti_launch(request: Request, db: Session = Depends(server.get_db)):
         <script>
             localStorage.setItem('estudianteDNI', '{dni_alumno}');
         </script>
-        <iframe src="/app/iframes/Alumnos_stats.html" style="width: 100%; height: 900px; border: none;"></iframe>
+        <iframe src="/app/iframes/Alumnos_stats.html" style="width: 100%; height: 900px; border: none;" allow="fullscreen"></iframe>
     </body>
     </html>
     """
     return HTMLResponse(content=html)
+    
+
+    
+    '''

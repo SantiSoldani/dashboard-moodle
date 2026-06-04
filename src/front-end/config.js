@@ -1,4 +1,10 @@
-const BACKEND_URL = 'http://localhost:8000';
+let BACKEND_URL = 'http://localhost:8000';
+
+// Si estamos sirviendo el front desde FastAPI (la ruta incluye /app/)
+// usamos una URL relativa para evitar problemas de CORS o Mixed Content
+if (window.location.href.includes('/app')) {
+    BACKEND_URL = '';
+}
 
 export function getBackendURL() {
     return BACKEND_URL;
