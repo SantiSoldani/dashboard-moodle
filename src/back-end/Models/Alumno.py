@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-
 from pydantic.networks import EmailStr
 from sqlalchemy import text
 
@@ -9,12 +8,12 @@ class AlumnoDto:
     nombre: str
     apellido: str
     email: EmailStr
-    carrera: str
     dni: str
     fecha_inicio: str
-    color: str
-    score: float
-    legajo: str
+    carrera: str = ""
+    color: str = "gris"
+    score: float = -1.0
+    legajo: str = ""
 
 
 def Post_Alumno(alumno: AlumnoDto, db):
@@ -37,23 +36,25 @@ def Post_Alumno(alumno: AlumnoDto, db):
     return  # db.commit()
 
 
-def Get_alumno(dni: str, db) -> AlumnoDto:
-    # SQL QUERY SELECT * FROM alumnos WHERE dni = ? VALUES(dni)
-    query = text("""SELECT * FROM "Alumnos" WHERE dni = :dni""")
-
-    return AlumnoDto(**(db.execute(query, {"dni": dni}).mappings().fetchone()))
+def Get_alumno_by_dni(dni: str, db) -> AlumnoDto:
+    
+    query = text("""SELECT nombre, apellido, email, dni, fecha_inicio, carrera, legajo FROM "Alumnos" WHERE dni = :dni""")
+    alumno_by_dni = db.execute(query, {"dni": dni}).mappings().fetchone()
+    if (alumno_by_dni is None):
+        return None
+    return AlumnoDto(**alumno_by_dni)
 
 
 def Get_alumnos(db) -> list[AlumnoDto]:
     # SQL QUERY SELECT * FROM alumnos ORDER BY nombre
-    alumnos = []
-    query = text("""SELECT * FROM "Alumnos" ORDER BY nombre""")
-    fetched = (db.execute(query)).mappings().fetchall()
-    for row in fetched:
-        alumnos.append(AlumnoDto(**row))
-    return alumnos
+    alumnos_list = []
+    query = text("""SELECT nombre, apellido, email, dni, fecha_inicio, carrera, legajo FROM "Alumnos" ORDER BY dni""")
+    fetched_alumnos = (db.execute(query)).mappings().fetchall()
+    for alumno in fetched_alumnos:
+        alumnos_list.append(AlumnoDto(**alumno))
+    return alumnos_list
 
-def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
+def Get_alumnos_with_stats(db, dni: str = None) -> list[AlumnoDto]:
     '''
     Trae a todos los alumnos pero agregar la informacion de la nueva tabla 'Semaforo'
     '''
@@ -71,8 +72,15 @@ def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
             "Semaforo".score 
         FROM "Alumnos" 
         LEFT JOIN "Semaforo" ON "Alumnos".dni = "Semaforo".dni_alumno 
-        ORDER BY "Alumnos".nombre
+        ORDER BY "Semaforo".score ASC, "Alumnos".dni ASC
     """)
+
+
+    if (dni is not None):
+        query += text("""
+            WHERE "Alumnos".dni = """ + str(dni) + """
+        """)
+
     fetched = (db.execute(query)).mappings().fetchall()
     for row in fetched:
         data = dict(row)

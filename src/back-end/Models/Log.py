@@ -8,8 +8,7 @@ class Log:
     descripcion: str
     fecha: str
 
-    @staticmethod
-    def post_Log(log: 'Log', db):
+def post_Log(log: 'Log', db):
         query = text(
             """INSERT INTO "Logs" (dni_usuario, tipo_accion, descripcion, fecha) VALUES (:dni_usuario, :tipo_accion, :descripcion, :fecha) ON CONFLICT (dni_usuario) DO NOTHING"""
         )
@@ -24,8 +23,7 @@ class Log:
         )
         return db.commit()
 
-    @staticmethod
-    def get_logs(db):
+def get_logs(db):
         query = text("""SELECT * FROM "Logs" """)
         result = db.execute(query).fetchall()
         logs = []

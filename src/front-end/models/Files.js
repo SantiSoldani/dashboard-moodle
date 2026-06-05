@@ -24,6 +24,9 @@ export async function Post_csv(file, which_file, subject = null) {
       {
         method: "POST",
         body: formData,
+        headers: {
+          "ngrok-skip-browser-warning": "69420"
+        }
       },
     );
 

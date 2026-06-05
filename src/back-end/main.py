@@ -7,16 +7,20 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from Routers import data_router, moodle_router, notasRouter, students_router
+from Routers import data_router, moodle_router, notasRouter, students_router,tutores_router
 import os
 
-app = FastAPI(title="API Proyecto Travesía")
+app = FastAPI()
 
-# Construimos la ruta absoluta hacia la carpeta front-end
-frontend_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "front-end")
+from fastapi.responses import FileResponse
 
-# Montamos la carpeta front-end en la ruta /app del servidor
-app.mount("/app", StaticFiles(directory=frontend_path), name="front-end")
+# Construimos las rutas
+src_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+project_root = os.path.dirname(src_path)
+frontend_path = os.path.join(src_path, "front-end")
+
+# Montamos solo la carpeta front-end en su ruta correspondiente para que index.html encuentre los assets
+app.mount("/src/front-end", StaticFiles(directory=frontend_path), name="front-end")
 
 app.add_middleware(
     CORSMiddleware,
@@ -30,7 +34,7 @@ app.include_router(notasRouter.router)
 app.include_router(data_router.router)
 app.include_router(students_router.router)
 app.include_router(moodle_router.router)
-
+app.include_router(tutores_router.router)
 
 load_dotenv()
 
@@ -40,10 +44,7 @@ BASE_URL = os.getenv("MOODLE_BASE_URL")
 
 @app.get("/")
 def root():
-    return {"mensaje": "Conectado"}
-
-
-    
+    return FileResponse(os.path.join(project_root, "index.html"))
 
 
 if __name__ == "__main__":

@@ -41,10 +41,9 @@ def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
     return alumnos    
 
 
-def Get_alumno_Bydni(dni: str, db) -> SimpleNamespace:
-    alumno = Alumno.Get_alumno(dni, db)
-    return SimpleNamespace(**alumno.__dict__)
-
+def Get_alumno_Bydni(dni: str, db):
+    alumno = Alumno.Get_alumno_by_dni(dni, db)
+    return alumno
 
 def toState(aprobacion: float) -> str:
 

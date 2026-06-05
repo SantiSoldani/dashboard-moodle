@@ -13,26 +13,8 @@ class NotasDto:
     nota: int
 
 
-def post_nota(nota, db):
-    print("llegue hasta aca")
-    query = text(
-        """INSERT INTO "Examen" (dni_alumno, id_materia, nota) VALUES  (:dni_alumno, :id_materia, :nota)"""
-    )
-    print(nota)
-    db.execute(
-        query,
-        {
-            "dni_alumno": nota.dni_alumno,
-            "id_materia": nota.id_materia,
-            "nota": nota.nota,
-        },
-    )
-    print("termine de ejecutar")
-
-    return
-
-
 def post_notas(notas, db):
+    notas = list(notas) # ''CASTEA'' a List
     query = text(
         """INSERT INTO "Examen" (dni_alumno, id_materia, nota) VALUES  (:dni_alumno, :id_materia, :nota)"""
     )
@@ -48,7 +30,6 @@ def post_notas(notas, db):
         ],
     )
     return db.commit()
-
 
 def get_notas(db):
     query = """SELECT * FROM "Notas" """
