@@ -10,12 +10,12 @@ export async function Post_csv(file, which_file) {
   const formData = new FormData();
   formData.append("file", file);
   try {
-    // Hará un fetch a rutas similares a: 
-    // data/upload/notas; 
-    // data/upload/alumnos; 
-    // data/upload/encuestaInicial; 
-    // data/upload/encuestaPeriodica; 
-    // data/upload/entrevista 
+    // Hará un fetch a rutas similares a:
+    // data/upload/notas;
+    // data/upload/alumnos;
+    // data/upload/encuestaInicial;
+    // data/upload/encuestaPeriodica;
+    // data/upload/entrevista
     const response = await fetch(
       `${getBackendURL()}/data/upload/${which_file}`,
       {

@@ -1,157 +1,284 @@
-import os
+import io
 from types import SimpleNamespace
+from typing import BinaryIO, Union
 
 import pandas as pd
+from Controllers import AlumnoController, MateriasController
 
-ROOT_PATH = os.path.dirname(os.path.abspath(__file__))
 
-
-def Limpiar_csv(file_path: str, type: str) -> str:
+def read_csv_from_file(file: Union[BinaryIO, io.BytesIO]) -> pd.DataFrame:
     """
-    Limpia un CSV de alumnos:
-    1. Normaliza campos numéricos (elimina espacios, convierte a tipo numérico)
-    2. Elimina duplicados por DNI (mantiene el primero)
-    3. Guarda el resultado en procesed_data/alumnos_limpios.csv
+    Lee un CSV desde un file-like object (BinaryIO).
+    Rebobina el archivo al inicio antes de leer para asegurar lectura completa.
 
     Args:
-        file_path (str): Ruta del archivo CSV a limpiar
+        file: File-like object (ej: UploadFile.file, BytesIO)
 
     Returns:
-        str: Ruta del archivo limpio guardado
+        pd.DataFrame con los datos del CSV
+    """
+    file.seek(0)
+    return pd.read_csv(file)
+
+
+def Limpiar_csv(file: BinaryIO, type: str, db) -> pd.DataFrame:
+    """
+    Limpia un CSV recibido como file-like object en memoria:
+    1. Lee el archivo directamente del objeto file sin guardarlo a disco
+    2. Normaliza campos numéricos y elimina duplicados
+    3. Devuelve un DataFrame limpio (sin guardar a disco)
+
+    Args:
+        file (BinaryIO): File-like object del CSV a limpiar
+        type (str): Tipo de datos ('alumnos', 'notas', 'cuatrimestral', 'inicial')
+        db: Sesión de base de datos
+
+    Returns:
+        pd.DataFrame: DataFrame limpio y procesado
     """
     try:
-        # Cargar CSV
         if type == "inicial":
-            df = limpiar_encuesta_inicial(file_path)
+            df = limpiar_encuesta_inicial(file)
+            print("sali")
         elif type == "cuatrimestral":
-            df = limpiar_encuesta_cuatrimestral(file_path)
+            df = limpiar_encuesta_cuatrimestral(file, db)
+        elif type == "notas":
+            df = limpiar_notas(file, db)
         else:
-            df = pd.read_csv(file_path)
+            df = read_csv_from_file(file)
 
-            # 1. Normalizar campos numéricos
-            # numeric_columns = df.select_dtypes(include=["float64", "int64"]).columns
-
-            # 2. Eliminar duplicados por DNI (mantener el primero)
+            # Eliminar duplicados por DNI (mantener el primero)
             if "dni" in df.columns:
                 df = df.drop_duplicates(subset=["dni"], keep="first")
             else:
                 print("Columna 'DNI' no encontrada. No se eliminaron duplicados")
 
-        # 3. Crear carpeta procesed_data si no existe
-        back_end_path = os.path.dirname(ROOT_PATH)  # Sube una carpeta desde Services
-        procesed_data_path = os.path.join(back_end_path, "procesed_data")
-
-        os.makedirs(procesed_data_path, exist_ok=True)
-
-        # 4. Guardar CSV limpio
-        output_file = os.path.join(procesed_data_path, f"{type}_clean.csv")
-        df.to_csv(output_file, index=False, encoding="utf-8")
-
-        return output_file
+        return df
 
     except Exception as e:
         print(f"❌ Error al limpiar CSV: {e}")
-        return "null"
+        return pd.DataFrame()
 
 
-def To_object_list(procesed_path: str) -> list[SimpleNamespace]:
+def To_object_list_from_df(df: pd.DataFrame) -> list[SimpleNamespace]:
     """
-    Convierte un CSV procesado en una lista de objetos (registros)
-    Genérico para cualquier tipo de CSV: alumnos, notas, encuestas, etc.
-
-    Proceso:
-    1. Lee el CSV con pandas
-    2. Convierte a diccionario (orient='records')
-    3. Transforma cada diccionario en un objeto SimpleNamespace
+    Convierte un DataFrame en una lista de objetos SimpleNamespace.
+    Trabaja directamente con el DataFrame en memoria sin necesidad de leer desde disco.
 
     Args:
-        procesed_path (str): Ruta del archivo CSV procesado
+        df (pd.DataFrame): DataFrame con los datos a convertir
 
     Returns:
-        list: Lista de objetos SimpleNamespace, uno por cada fila del CSV
-              Cada objeto tiene atributos dinámicos según las columnas del CSV
+        list[SimpleNamespace]: Lista de objetos, uno por cada fila del DataFrame
     """
     try:
-        # Paso 1: Leer CSV
-        df = pd.read_csv(procesed_path)
-
-        # Paso 2: Convertir a diccionarios (lista de dicts, uno por fila)
         diccionarios = df.to_dict(orient="records")
 
-        # Paso 3: Convertir cada diccionario a objeto SimpleNamespace
         objetos = []
         for i, registro_dict in enumerate(diccionarios, 1):
-            # SimpleNamespace convierte dict a objeto con atributos
             registro_obj = SimpleNamespace(**registro_dict)
             objetos.append(registro_obj)
         print("lista final: ", objetos)
         return objetos
 
     except Exception as e:
+        print(f"❌ Error al convertir DataFrame a objetos: {e}")
+        return []
+
+
+# Mantener compatibilidad: To_object_list con path por si algún módulo lo usa
+def To_object_list(procesed_path: str) -> list[SimpleNamespace]:
+    """
+    Convierte un CSV procesado en una lista de objetos (registros).
+    DEPRECADO: Usar To_object_list_from_df() con un DataFrame en su lugar.
+
+    Args:
+        procesed_path (str): Ruta del archivo CSV procesado
+
+    Returns:
+        list[SimpleNamespace]: Lista de objetos SimpleNamespace
+    """
+    try:
+        df = pd.read_csv(procesed_path)
+        return To_object_list_from_df(df)
+    except Exception as e:
         print(f"❌ Error al convertir CSV a objetos: {e}")
         return []
 
 
-# PROXIMA FUNCION --> FUNCION QUE PASE EL RESULTADO DE LAS ENCUESTAS SUBIDAS AL FORMATO ESPERADO POR LAS FUNCIONES DE CALCULO
-
-
-def limpiar_encuesta_inicial(path: str) -> pd.DataFrame:
-
-    df = pd.read_csv(path)
+def limpiar_encuesta_inicial(file: BinaryIO) -> pd.DataFrame:
+    """
+    Limpia y normaliza una encuesta inicial desde un file-like object.
+    """
+    df = read_csv_from_file(file)
     df_final = pd.DataFrame(
         columns=[
             "dni",
-            "soc",
-            "interrupciones",
-            "met",
-            "trb_base",
-            "cap_fam",
-            "loc",
-            "dependientes",
+            "nombre",
+            "apellido",
+            "mail",
+            "fecha_inicio",
+            "materias_aprobadas",
+            "plan de estudios",
+            "PSE",
+            "IC",
+            "PEP",
+            "CL",
+            "CV",
+            "LOC",
         ]
     )
-    # (dni, soc, interrupciones, met, trb_base, cap_fam, loc, dependientes) campos finales
-    df_final["dni"] = df["dni"]
-    df_final["soc"] = df[df.columns.__contains__("soc")].mean()
-    df_final["interrupciones"] = df[df.columns.__contains__("interrupciones")].mean()
-    df_final["met"] = df[df.columns.__contains__("met")].mean()
-    df_final["trb_base"] = df[df.columns.__contains__("trb_base")].mean()
-    df_final["cap_fam"] = df[df.columns.__contains__("cap_fam")].mean()
-    df_final["loc"] = df[df.columns.__contains__("loc")].mean()
-    df_final["dependientes"] = df[df.columns.__contains__("dependientes")].mean()
+    print(df["Nombre"])
+    df_final["nombre"] = df["Nombre"]
+    df_final["apellido"] = df["Apellido"]
+    df_final["dni"] = df["DNI"]
+    df_final["mail"] = df["Direccion de mail"]
+    df_final["fecha_inicio"] = df["Año que ingreso a la facultad"]
+    df_final["materias_aprobadas"] = df[
+        "¿Cuantas materias aprobadas tenes hasta ahora?"
+    ]
+    df_final["plan de estudios"] = df["Plan de estudio actual"]
+    # df_final["carrera"] = df["Carrera"]
+    # Definir grupos
+    grupo_PSE = df.iloc[:, 11:15]
+    grupo_IC = df.iloc[:, 15:18]
+    grupo_PEP = df.iloc[:, 18:22]
+    grupo_CL = df.iloc[:, 22:25]
+    grupo_CV = df.iloc[:, 25:29]
+    grupo_LOC = df.iloc[:, 29:32]
+
+    grupos = {
+        "PSE": grupo_PSE,
+        "IC": grupo_IC,
+        "PEP": grupo_PEP,
+        "CL": grupo_CL,
+        "CV": grupo_CV,
+        "LOC": grupo_LOC,
+    }
+
+    # Procesar cada grupo
+    for nombre_grupo, grupo in grupos.items():
+        # Extraer número (ej: "1 - texto" → 1)
+        # numeros = grupo.str.extract(r"(\d+)")[0].astype(int)
+        numeros = grupo.astype(str).apply(
+            lambda col: col.str.extract(r"(\d+)")[0].astype(int)
+        )
+
+        # Promedio POR FILA (cada estudiante)
+        promedio_por_fila = numeros.mean(axis=1)
+
+        # Normalizar: (dato - 1) / 4
+        normalizado = (promedio_por_fila - 1) / 4
+        print(
+            f"promedio_por_fila: {promedio_por_fila.head()}",
+            f"normalizado: {normalizado.head()}",
+        )
+        # Guardar en columna nueva
+        df_final[nombre_grupo] = normalizado
+
+    # Ver resultado
+    """print(
+        df_final[
+            [
+                "nombre",
+                "PSE",
+                "IC",
+                "PEP",
+                "CL",
+                "CV",
+                "LOC",
+            ]
+        ].head(10)
+    )
+    """
+    print(df_final.head(10))
+    return df_final
+
+
+def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
+    """
+    Limpia y normaliza una encuesta cuatrimestral desde un file-like object.
+    """
+    df = read_csv_from_file(file)
+    df_final = pd.DataFrame(columns=["dni", "EA", "R", "PDE", "EL", "DT", "MOT", "SEG"])
+
+    df_final["dni"] = df["ingrese su DNI"]
+    df_final["EA"] = (
+        df["¿Cuantas de las materias que cursaste, aprobaste su cursada?"]
+        / df["¿Cuantas materias cursaste este cuatrimestre?"]
+    )
+
+    # para calcular la regularidad tengo que traerme todas las materias aprobadas de todos los alumnos
+    alumnos = AlumnoController.Get_alumnos(db)
+    for alumno in alumnos:
+        df_final[df_final["dni"] == alumno.dni]["R"] = (
+            df[df["Ingrese su DNI"] == alumno.dni][
+                "¿Cuantas de las materias que cursaste, aprobaste su cursada?"
+            ]
+            + alumno.materias_aprobadas
+            - df[df["Ingrese su DNI"] == alumno.dni][
+                "¿Cuántos finales pendientes tenes?"
+            ]
+        ) / df[df["Ingrese su DNI"] == alumno.dni][
+            "¿Cuantas materias cursaste este cuatrimestre?"
+        ]
+
+    df_final["PDE"] = (
+        1
+        - abs(
+            df[
+                "¿Cuantas materias adelantaste respecto del plan de estudio este cuatrimestre?"
+            ]
+            - df["¿Cuantas materias estas atrasado respecto del plan de estudio?"]
+        )
+    ) / 36
+
+    df_final["EL"] = (
+        df[
+            "¿Dispones del tiempo semanal necesario fuera del horario de clases para dedicarle al estudio y las entregas este cuatrimestre?"
+        ]
+        .str.extract(r"(\d+)")[0]
+        .astype(int)
+    )
+
+    df_final["DT"] = (
+        df[
+            "¿Como evaluas tu motivacion para continuar la carrera este cuatrimestre comparado con el anterior?"
+        ]
+        .str.extract(r"(\d+)")[0]
+        .astype(int)
+    )
+
+    df_final["MOT"] = (
+        df[
+            "¿Que tan seguro te sentis de poder aprobar las materias que te inscribiste?"
+        ]
+        .str.extract(r"(\d+)")[0]
+        .astype(int)
+    )
+
+    df_final["SEG"] = (
+        df["¿En que estado se encuentra tu trabajo final?"]
+        .str.extract(r"(\d+)")[0]
+        .astype(int)
+    )
 
     return df_final
 
 
-def limpiar_encuesta_cuatrimestral(path: str) -> pd.DataFrame:
+def limpiar_notas(file: BinaryIO, db) -> pd.DataFrame:
+    """
+    Limpia un CSV de notas desde un file-like object.
+    """
 
-    # - dni, pre_score, trb_base_norm, anios_cursados, ma_c, apr_c, cur_c, fp_c, ca_c, trb_delta, disp_c, mot_c, conf_c, tf_score
+    def nombreToid(nombre: str) -> int:
+        for materia in materias:
+            if materia.nombre == nombre:
+                return materia.id
+        return -1
 
-    df = pd.read_csv(path)
-    df_final = pd.DataFrame(
-        columns=[
-            "dni",
-            "pre_score",
-            "trb_base_norm",
-            "anios_cursados",
-            "ma_c",
-            "apr_c",
-            "cur_c",
-            "fp_c",
-            "ca_c",
-            "trb_delta",
-            "disp_c",
-            "mot_c",
-            "conf_c",
-            "tf_score",
-        ]
-    )
-    for alumno in df.iterrows():
-        dni = alumno[1]["dni"]
-        df_final["dni"] = dni
-        for campo in df.columns:
-            if campo != "dni":
-                datos = df.filter(like=campo)
-                df_final[campo] = datos.mean(axis=1)
+    df = read_csv_from_file(file)
+    materias = MateriasController.get_materias(db)
 
-    return df_final
+    df["id_materia"] = df["materia"].apply(nombreToid)
+    return df

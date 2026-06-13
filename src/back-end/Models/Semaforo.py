@@ -1,6 +1,7 @@
-from sqlalchemy import text
 from dataclasses import dataclass
-from datetime import datetime, date
+from datetime import date, datetime
+
+from sqlalchemy import text
 
 
 @dataclass
@@ -8,7 +9,7 @@ class semaforoDTO:
     dni_alumno: str
     color: str
     score: float
-    created_at: datetime
+
 
 def Post_Semaforo(semaforo: semaforoDTO, db):
     query = text(
@@ -24,3 +25,11 @@ def Post_Semaforo(semaforo: semaforoDTO, db):
         },
     )
     db.commit()
+
+
+def get_score_actual(dni: str, db):
+    query = text(
+        """SELECT score FROM "Semaforo" WHERE dni_alumno = :dni_alumno ORDER BY created_at DESC LIMIT 1"""
+    )
+    result = db.execute(query, {"dni_alumno": dni})
+    return result.fetchone()

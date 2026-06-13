@@ -1,45 +1,84 @@
+from io import IOBase
+from typing import BinaryIO
+
 from Controllers import AlumnoController, NotasController
+from Models import Encuestas, Semaforo
+from pandas.core.strings.accessor import AlignJoin
 from Services import Data_transformer, SemaforoCalculator
 
 
-def Handle_alumnos(file_path: str, db):
+def Handle_alumnos(file: BinaryIO, db):
+    """
+    Procesa un archivo CSV de alumnos directamente desde un file-like object en memoria.
+    """
+    # 1) Limpia los datos: elimina duplicados, campos nulos, etc.
+    #    Devuelve un DataFrame limpio en lugar de un path
+    df_clean = Data_transformer.Limpiar_csv(file, "alumnos", db)
 
-    # 1) limpia los dato, eliminando duplicados, campos nulos, etc y los guarda en la seccion de procesed_data
-    final_path = Data_transformer.Limpiar_csv(file_path, "alumnos")
-    # 2)Una vez limpios los datos paso los datos a un arreglo objetos con los atributos del alumno
-    Alumnos = Data_transformer.To_object_list(final_path)
-    # 3)handleo los datos del alumno al modelo de alumnos para que los guarde en la base de datos
+    # 2) Convierte el DataFrame limpio a una lista de objetos
+    Alumnos = Data_transformer.To_object_list_from_df(df_clean)
+
+    # 3) Persiste los alumnos en la base de datos
     try:
         AlumnoController.Post_alumnos(Alumnos, db)
     except Exception as e:
         print(e)
 
 
-def Handle_encuesta_cuatrimestral(file_path: str, db):
+def Handle_encuesta_cuatrimestral(file: BinaryIO, db):
+    """
+    Procesa un archivo CSV de encuestas cuatrimestrales desde un file-like object en memoria.
+    """
+    # 1) Limpia y normaliza los datos de la encuesta. Devuelve un DataFrame limpio.
+    df_clean = Data_transformer.Limpiar_csv(file, "cuatrimestral", db)
 
-    # 1) Limpia los datos de las encuestas pasandolos a un archivo normalizado cuantitativo de con resultados de las encuestas y los guarda en la seccion de procesed_data
-    final_path = Data_transformer.Limpiar_csv(
-        file_path, "encuestas"
-    )  # en este caso la informacion se guarda en un csv con un formato listo para hacer calculos
+    # 2) Para las respuestas, necesitamos los datos originales del archivo.
+    #    Rebobinamos el file y leemos de nuevo para obtener los objetos de respuesta.
+    file.seek(0)
+    df_raw = Data_transformer.read_csv_from_file(file)
+    respuestas = Data_transformer.To_object_list_from_df(df_raw)
+    print(respuestas)
+    Encuestas.Handle_respuestas(respuestas, db)
 
-    # 2)opcional: Una vez los datos estan limpios genero el arreglo de objetos tipo encuesta con los resultados de las encustas si es que decidimos persistirlas
-    # Encuestas = Data_transformer.To_object_List(final_path)
+    # 3) Calcula el estado del semáforo desde el DataFrame limpio
+    resultados = SemaforoCalculator.calculo_cuatrimestral_from_df(df_clean, db)
 
-    # 3)paso el data set de encuestas limpias y normalizadas al modulo de calculo de semaforos, devuelve tuplas de (estado_semaforo,dni_alumno)
-    estado = SemaforoCalculator.calculo_cuatrimestral(final_path)
-    # 4)paso las tuplas al modelo para que modifiquen el estado en la base de datos
-    AlumnoController.Actualizar_estado(estado, db)
+    # 4) Persiste los estados del semáforo
+    for estado in resultados:
+        Semaforo.Post_Semaforo(Semaforo.semaforoDTO(**estado), db)
 
 
-def Handle_notas(file_path: str, db):
+def Handle_notas(file: BinaryIO, db):
+    """
+    Procesa un archivo CSV de notas desde un file-like object en memoria.
+    """
+    # 1) Limpia y normaliza las notas. Devuelve un DataFrame limpio.
+    df_clean = Data_transformer.Limpiar_csv(file, "notas", db)
 
-    # 1) leo el archivo de notas crudas y los paso por la seccion de calculo de datos para limpiarlos y normalizarlos
-    final_path = Data_transformer.Limpiar_csv(file_path, "notas")
-    # 2) Una vez limpios los datos paso los datos a un arreglo objetos con los atributos de las notas y los paso al modelo de notas para que los persista
-    notas = Data_transformer.To_object_list(final_path)
+    # 2) Convierte el DataFrame limpio a lista de objetos y persiste
+    notas = Data_transformer.To_object_list_from_df(df_clean)
     NotasController.post_notas(db, notas)
-    # 3) paso el data set de notas limpias y normalizadas al modulo de calculo de semaforo que me devuelve tuplas de (promedio,alumno)
-    resultados = SemaforoCalculator.get_states_From_notas(final_path, db)
-    # print(resultados)
-    # 4) paso las tuplas al modelo de alumnos para que genere el estado del alumno dentro de la base de datos     AlumnosController.Actualizar_estado(update)
-    AlumnoController.Actualizar_estado(resultados, db)
+    print("pase las notas")
+
+    # 3) Calcula el estado del semáforo desde el DataFrame limpio
+    resultados = SemaforoCalculator.get_states_From_notas_from_df(df_clean, db)
+    for estado in resultados:
+        Semaforo.Post_Semaforo(Semaforo.semaforoDTO(**estado), db)
+
+
+def Handle_encuesta_inicial(file: BinaryIO, db):
+    """
+    Procesa un archivo CSV de encuesta inicial desde un file-like object en memoria.
+    """
+    # 1) Limpia la encuesta y la transforma a indicadores cuantitativos
+    df_clean = Data_transformer.Limpiar_csv(file, "inicial", db)
+
+    # 2) Calcula el PRE y devuelve los resultados como lista de objetos
+    resultados = SemaforoCalculator.calculo_inicial_from_df(df_clean)
+
+    # 3) Persiste cada alumno con su PRE calculado
+    for resultado in resultados:
+        AlumnoController.Post_alumnos_FromEncuesta(
+            resultado,
+            db,
+        )

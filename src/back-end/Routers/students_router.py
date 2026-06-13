@@ -35,6 +35,7 @@ async def get_students(db: Session = Depends(server.get_db)):
     except Exception as e:
         print(e)
 
+
 @router.get("/all-stats", status_code=200)
 async def get_students_with_stats(db: Session = Depends(server.get_db)):
     try:

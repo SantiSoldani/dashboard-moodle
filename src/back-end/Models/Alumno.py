@@ -1,7 +1,10 @@
 from dataclasses import dataclass
+from pydoc import plain
+from types import SimpleNamespace
 
 from pydantic.networks import EmailStr
 from sqlalchemy import text
+from sqlalchemy.sql.sqltypes import SmallInteger
 
 
 @dataclass
@@ -11,17 +14,15 @@ class AlumnoDto:
     email: EmailStr
     carrera: str
     dni: str
-    fecha_inicio: str
-    color: str
-    score: float
-    legajo: str
+    fecha_inicio: int
+    materias_aprobadas: int
+    pre: float
+    plan_de_estudios: int
 
 
-def Post_Alumno(alumno: AlumnoDto, db):
-
-    # SQL QUERY INSERT INTO alumnos VALUES ()
+def Post_alumno_FromEncuesta(alumno: AlumnoDto, db):
     query = text(
-        """INSERT INTO "Alumnos" (dni, nombre, apellido, email, fecha_inicio) VALUES (:dni, :nombre, :apellido, :email, :fecha_inicio) ON CONFLICT (dni) DO NOTHING"""
+        """INSERT INTO "Alumnos" (dni, nombre, apellido, email, fecha_inicio, carrera, materias_aprobadas, "PRE", plan_de_estudios) VALUES (:dni, :nombre, :apellido, :email, :fecha_inicio, :carrera, :materias_aprobadas, :pre, :plan_de_estudios) ON CONFLICT (dni) DO UPDATE SET materias_aprobadas = :materias_aprobadas, "PRE" = :pre, plan_de_estudios = :plan_de_estudios"""
     )
     db.execute(
         query,
@@ -31,10 +32,34 @@ def Post_Alumno(alumno: AlumnoDto, db):
             "email": alumno.email,
             "dni": alumno.dni,
             "fecha_inicio": alumno.fecha_inicio,
+            "carrera": "industrial",
+            "materias_aprobadas": alumno.materias_aprobadas,
+            "pre": alumno.pre,
+            "plan_de_estudios": alumno.plan_de_estudios,
+        },
+    )
+    return db.commit()
+
+
+def Post_Alumno(alumno: AlumnoDto, db):
+
+    # SQL QUERY INSERT INTO alumnos VALUES ()
+    query = text(
+        """INSERT INTO "Alumnos" (dni, nombre, apellido, email, fecha_inicio, carrera) VALUES (:dni, :nombre, :apellido, :email, :fecha_inicio, :carrera) ON CONFLICT (dni) DO NOTHING"""
+    )
+    db.execute(
+        query,
+        {
+            "nombre": alumno.nombre,
+            "apellido": alumno.apellido,
+            "email": alumno.email,
+            "dni": alumno.dni,
+            "fecha_inicio": alumno.fecha_inicio,
+            "carrera": "Industrial",
         },
     )
 
-    return  # db.commit()
+    return db.commit()
 
 
 def Get_alumno(dni: str, db) -> AlumnoDto:
@@ -53,24 +78,24 @@ def Get_alumnos(db) -> list[AlumnoDto]:
         alumnos.append(AlumnoDto(**row))
     return alumnos
 
+
 def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
-    '''
+    """
     Trae a todos los alumnos pero agregar la informacion de la nueva tabla 'Semaforo'
-    '''
+    """
     alumnos = []
     query = text("""
-        SELECT 
-            "Alumnos".nombre, 
-            "Alumnos".apellido, 
-            "Alumnos".email, 
-            "Alumnos".carrera, 
-            "Alumnos".dni, 
-            "Alumnos".fecha_inicio, 
-            "Alumnos".legajo, 
-            "Semaforo".color, 
-            "Semaforo".score 
-        FROM "Alumnos" 
-        LEFT JOIN "Semaforo" ON "Alumnos".dni = "Semaforo".dni_alumno 
+        SELECT
+            "Alumnos".nombre,
+            "Alumnos".apellido,
+            "Alumnos".email,
+            "Alumnos".carrera,
+            "Alumnos".dni,
+            "Alumnos".fecha_inicio,
+            "Semaforo".color,
+            "Semaforo".score
+        FROM "Alumnos"
+        LEFT JOIN "Semaforo" ON "Alumnos".dni = "Semaforo".dni_alumno
         ORDER BY "Alumnos".nombre
     """)
     fetched = (db.execute(query)).mappings().fetchall()
@@ -80,7 +105,7 @@ def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
             data["color"] = "gris"
         if data.get("score") is None:
             data["score"] = 0
-        alumnos.append(AlumnoDto(**data))
+        alumnos.append(SimpleNamespace(**data))
     return alumnos
 
 

@@ -2,6 +2,26 @@ from types import SimpleNamespace
 
 from Models import Alumno
 from Models.Alumno import AlumnoDto
+from sqlalchemy.sql.expression import Null
+
+
+def Post_alumnos_FromEncuesta(alumno: SimpleNamespace, db):
+    print("alumno: ", alumno)
+    Alumno.Post_alumno_FromEncuesta(
+        Alumno.AlumnoDto(
+            nombre=str(alumno.nombre),
+            apellido=str(alumno.apellido),
+            email=str(alumno.mail),
+            dni=str(alumno.dni),
+            fecha_inicio=alumno.fecha_inicio,
+            carrera=alumno.plan_de_estudios,
+            materias_aprobadas=alumno.materias_aprobadas,
+            plan_de_estudios=alumno.plan_de_estudios,
+            pre=alumno.pre,
+        ),
+        db,
+    )
+    print("termine el commit")
 
 
 def Post_alumnos(Alumnos: list[SimpleNamespace], db):
@@ -12,11 +32,11 @@ def Post_alumnos(Alumnos: list[SimpleNamespace], db):
                 apellido=str(alumno.apellido),
                 email=str(alumno.email),
                 dni=str(alumno.dni),
-                fecha_inicio=alumno.fecha_inicio,
+                fecha_inicio=-1,
                 carrera=alumno.carrera,
-                score=-1,
-                estado="",
-                legajo="",
+                materias_aprobadas=-1,
+                pre=-1,
+                plan_de_estudios=-1,
             ),
             db,
         )
@@ -36,9 +56,10 @@ def Get_alumnos(db) -> list[AlumnoDto]:
     alumnos = Alumno.Get_alumnos(db)
     return alumnos
 
+
 def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
     alumnos = Alumno.Get_alumnos_with_stats(db)
-    return alumnos    
+    return alumnos
 
 
 def Get_alumno_Bydni(dni: str, db) -> SimpleNamespace:
