@@ -9,7 +9,6 @@
 
 import { HandleGet_alumnos } from "../models/Alumno.js";
 
-
 export async function initAlumnoStats(dniParam) {
   try {
     let alumno_dni = dniParam;
@@ -18,20 +17,25 @@ export async function initAlumnoStats(dniParam) {
       alumno_dni = params.get("alumno");
     }
     if (!alumno_dni) {
-      console.warn("No se especificó un DNI de alumno. Mostrando datos hardcodeados.");
+      console.warn(
+        "No se especificó un DNI de alumno. Mostrando datos hardcodeados.",
+      );
       return;
     }
 
-    let alumno = await HandleGet_alumnos(alumno_dni);
+    let alumno = await HandleGet_alumnos(alumno_dni, "byDNI");
     if (alumno) {
-      alumno = typeof alumno === 'string' ? JSON.parse(alumno) : alumno;
-      console.log(alumno);
+      alumno = typeof alumno === "string" ? JSON.parse(alumno) : alumno;
+      console.log("alumno de dni", alumno_dni, "es", alumno);
       set_state_panel(alumno);
       set_info_panel(alumno);
       set_dashboard(alumno);
     }
   } catch (error) {
-    console.error("Error al cargar datos del alumno (posiblemente endpoint no implementado). Mostrando datos hardcodeados:", error);
+    console.error(
+      "Error al cargar datos del alumno (posiblemente endpoint no implementado). Mostrando datos hardcodeados:",
+      error,
+    );
   }
 }
 
@@ -87,7 +91,8 @@ function set_dashboard(alumno) {
   if (kpiPromedio && alumno.score) {
     let scoreDisplay = parseFloat(alumno.score);
     // Si el score viene de 0 a 1, escalarlo a 10
-    if (scoreDisplay <= 1.0 && scoreDisplay > 0) scoreDisplay = scoreDisplay * 10;
+    if (scoreDisplay <= 1.0 && scoreDisplay > 0)
+      scoreDisplay = scoreDisplay * 10;
     kpiPromedio.textContent = scoreDisplay.toFixed(1);
   }
 }

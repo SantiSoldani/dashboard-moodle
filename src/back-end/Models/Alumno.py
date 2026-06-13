@@ -25,7 +25,8 @@ class AlumnoDto:
 
 def Post_alumno_FromEncuesta(alumno: AlumnoDto, db):
     query = text(
-        """INSERT INTO "Alumnos" (dni, nombre, apellido, email, fecha_inicio, carrera, materias_aprobadas, "PRE", plan_de_estudios) VALUES (:dni, :nombre, :apellido, :email, :fecha_inicio, :carrera, :materias_aprobadas, :pre, :plan_de_estudios) ON CONFLICT (dni) DO UPDATE SET materias_aprobadas = :materias_aprobadas, "PRE" = :pre, plan_de_estudios = :plan_de_estudios"""
+        """INSERT INTO "Alumnos" (dni, nombre, apellido, email, fecha_inicio, carrera, materias_aprobadas, "PRE", plan_de_estudios) VALUES (:dni, :nombre, :apellido, :email, :fecha_inicio, :carrera, :materias_aprobadas, :pre, :plan_de_estudios)
+        ON CONFLICT (dni) DO UPDATE SET materias_aprobadas = :materias_aprobadas, "PRE" = :pre, plan_de_estudios = :plan_de_estudios"""
     )
     db.execute(
         query,
@@ -124,10 +125,15 @@ def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
             "Alumnos".dni,
             "Alumnos".fecha_inicio,
             "Semaforo".color,
-            "Semaforo".score
+            "Semaforo".score,
+            "Semaforo".created_at
         FROM "Alumnos"
-        LEFT JOIN "Semaforo" ON "Alumnos".dni = "Semaforo".dni_alumno
-        ORDER BY "Semaforo".score ASC, "Alumnos".dni ASC
+        LEFT JOIN (
+            SELECT *,
+                   ROW_NUMBER() OVER (PARTITION BY dni_alumno ORDER BY created_at DESC) as rn
+            FROM "Semaforo"
+        ) "Semaforo" ON "Alumnos".dni = "Semaforo".dni_alumno AND "Semaforo".rn = 1
+        ORDER BY "Alumnos".dni ASC
     """)
 
     fetched = (db.execute(query)).mappings().fetchall()

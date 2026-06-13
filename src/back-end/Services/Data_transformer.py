@@ -4,7 +4,9 @@ from typing import BinaryIO, Union
 
 import pandas as pd
 from Controllers import AlumnoController, MateriasController
+from fastapi.openapi.models import SchemaOrBool
 from numpy._core import int64
+from sqlalchemy.pool.base import reset_commit
 
 
 def read_csv_from_file(file: Union[BinaryIO, io.BytesIO]) -> pd.DataFrame:
@@ -79,7 +81,7 @@ def To_object_list_from_df(df: pd.DataFrame) -> list[SimpleNamespace]:
         for i, registro_dict in enumerate(diccionarios, 1):
             registro_obj = SimpleNamespace(**registro_dict)
             objetos.append(registro_obj)
-        print("lista final: ", objetos)
+        # print("lista final: ", objetos)
         return objetos
 
     except Exception as e:

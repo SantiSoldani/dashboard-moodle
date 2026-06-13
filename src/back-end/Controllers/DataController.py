@@ -1,8 +1,15 @@
 from io import IOBase
 from typing import BinaryIO
 
-from Controllers import AlumnoController, NotasController
+import pandas as pd
+from Controllers import (
+    AlumnoController,
+    EncuestaController,
+    IndicadoresController,
+    NotasController,
+)
 from Models import Encuestas, Semaforo
+from Models.Indicadores import IndicadorDTO
 from pandas.core.strings.accessor import AlignJoin
 from Services import Data_transformer, SemaforoCalculator
 
@@ -37,7 +44,7 @@ def Handle_encuesta_cuatrimestral(file: BinaryIO, db):
     #
     #   # 3) Calcula el estado del semáforo desde el DataFrame limpio
     resultados = SemaforoCalculator.calculo_cuatrimestral_from_df(df_clean, db)
-    print(resultados)
+    # print(resultados)
     # 4) Persiste los estados del semáforo
     for estado in resultados:
         Semaforo.Post_Semaforo(
@@ -48,9 +55,9 @@ def Handle_encuesta_cuatrimestral(file: BinaryIO, db):
             ),
             db,
         )
-    # df_raw = Data_transformer.read_csv_from_file(file)
-    # respuestas = Data_transformer.To_object_list_from_df(df_raw)
-    # Encuestas.Handle_respuestas(respuestas, db)
+
+    respuestas = Data_transformer.To_object_list_from_df(pd.read_csv(file))
+    EncuestaController.Handle_respuestas(respuestas, db)
 
 
 def Handle_notas(file: BinaryIO, db):
@@ -78,11 +85,25 @@ def Handle_encuesta_inicial(file: BinaryIO, db):
     df_clean = Data_transformer.Limpiar_csv(file, "inicial", db)
 
     # 2) Calcula el PRE y devuelve los resultados como lista de objetos
-    resultados = SemaforoCalculator.calculo_inicial_from_df(df_clean)
-
-    # 3) Persiste cada alumno con su PRE calculado
-    for resultado in resultados:
-        AlumnoController.Post_alumnos_FromEncuesta(
-            resultado,
-            db,
+    # resultados = SemaforoCalculator.calculo_inicial_from_df(df_clean)
+    indicadores = Data_transformer.To_object_list_from_df(df_clean)
+    persistibles = []
+    for objeto in indicadores:
+        persistibles.append(
+            IndicadorDTO(
+                dni=objeto.dni,
+                ic=objeto.IC,
+                pse=objeto.PSE,
+                pep=objeto.PEP,
+                cl=objeto.CL,
+                cv=objeto.CV,
+                loc=objeto.LOC,
+            )
         )
+    # 3) Persiste cada alumno con su PRE calculado
+    # for resultado in resultados:
+    #   AlumnoController.Post_alumnos_FromEncuesta(
+    #      resultado,
+    #    db,
+    # )
+    IndicadoresController.post_Indicadores(persistibles, db)

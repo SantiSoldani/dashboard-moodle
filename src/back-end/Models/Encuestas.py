@@ -14,15 +14,19 @@ class encuestasDTO:
 def Handle_respuestas(encuestas: list, db):
 
     query = text(
-        "INSERT INTO encuestas (dni_alumno, pregunta, respuesta) VALUES (:dni_alumno, :pregunta, :respuesta)"
+        """INSERT INTO "Respuestas" (dni_alumno, pregunta, respuesta) VALUES (:dni_alumno, :pregunta, :respuesta)"""
     )
-    for encuesta in encuestas:
-        db.execute(
-            query,
-            {
-                "dni_alumno": encuesta.dni_alumno,
-                "pregunta": encuesta.pregunta,
-                "respuesta": encuesta.respuesta,
-            },
-        )
-    db.commit()
+    try:
+        for encuesta in encuestas:
+            print(encuesta)
+            db.execute(
+                query,
+                {
+                    "dni_alumno": encuesta.dni_alumno,
+                    "pregunta": encuesta.pregunta,
+                    "respuesta": encuesta.respuesta,
+                },
+            )
+    except Exception as e:
+        db.rollback()
+        print(e)
