@@ -1,49 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <link
+            rel="icon"
+            href="src/front-end/public/icon.png"
+            type="image/png"
+        />
+        <title>Dashboard</title>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="src/front-end/public/icon.png" type="image/png">
-    <title>Dashboard</title>
+        <!-- Material Symbols -->
+        <link
+            href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined"
+            rel="stylesheet"
+        />
 
-    <!-- Material Symbols -->
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+        <!-- CSS Global -->
+        <link rel="stylesheet" href="src/front-end/styles/home_style.css" />
+        <link
+            rel="stylesheet"
+            href="src/front-end/styles/modalAlumnoStats.css"
+        />
+        <link
+            rel="stylesheet"
+            href="src/front-end/styles/data_entry_style.css"
+        />
+        <link
+            rel="stylesheet"
+            href="src/front-end/styles/Alumno_stats_style.css"
+        />
+        <link rel="stylesheet" href="src/front-end/styles/tutores_style.css" />
 
-    <!-- CSS Global -->
-    <link rel="stylesheet" href="src/front-end/styles/home_style.css">
-    <link rel="stylesheet" href="src/front-end/styles/modalAlumnoStats.css">
-    <link rel="stylesheet" href="src/front-end/styles/data_entry_style.css">
-    <link rel="stylesheet" href="src/front-end/styles/Alumno_stats_style.css">
-    <link rel="stylesheet" href="src/front-end/styles/tutores_style.css">
+        <!-- Web Components -->
+        <script type="module" src="src/front-end/components/navbar.js"></script>
+        <script
+            type="module"
+            src="src/front-end/components/alumnoStats.js"
+        ></script>
 
-    <!-- Web Components -->
-    <script type="module" src="src/front-end/components/navbar.js"></script>
-    <script type="module" src="src/front-end/components/alumnoStats.js"></script>
+        <!-- Enrutador Principal -->
+        <script type="module" src="src/front-end/router.js"></script>
+        <script
+            type="module"
+            src="src/front-end/controllers/data_entry_controller.js"
+        ></script>
+        <script
+            type="module"
+            src="src/front-end/controllers/Alumno_stats_controller.js"
+        ></script>
+        <script
+            type="module"
+            src="src/front-end/controllers/tutores_controller.js"
+        ></script>
 
-    <!-- Enrutador Principal -->
-    <script type="module" src="src/front-end/router.js"></script>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+            body {
+                background: #f4f6f9;
+                color: #333;
+                font-family:
+                    "Inter",
+                    -apple-system,
+                    BlinkMacSystemFont,
+                    Arial,
+                    sans-serif;
+                min-height: 100vh;
+            }
+        </style>
+    </head>
 
-        body {
-            background: #f4f6f9;
-            color: #333;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, Arial, sans-serif;
-            min-height: 100vh;
-        }
-    </style>
-</head>
-
-<body>
-    <main id="root">
-        <!-- El router inyectará aquí el contenido dinámicamente -->
-    </main>
-</body>
-
+    <body>
+        <main id="root">
+            <!-- El router inyectará aquí el contenido dinámicamente -->
+        </main>
+    </body>
 </html>

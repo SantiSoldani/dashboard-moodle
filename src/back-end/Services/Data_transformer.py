@@ -4,6 +4,7 @@ from typing import BinaryIO, Union
 
 import pandas as pd
 from Controllers import AlumnoController, MateriasController
+from numpy._core import int64
 
 
 def read_csv_from_file(file: Union[BinaryIO, io.BytesIO]) -> pd.DataFrame:
@@ -140,12 +141,12 @@ def limpiar_encuesta_inicial(file: BinaryIO) -> pd.DataFrame:
     df_final["plan de estudios"] = df["Plan de estudio actual"]
     # df_final["carrera"] = df["Carrera"]
     # Definir grupos
-    grupo_PSE = df.iloc[:, 11:15]
-    grupo_IC = df.iloc[:, 15:18]
-    grupo_PEP = df.iloc[:, 18:22]
-    grupo_CL = df.iloc[:, 22:25]
-    grupo_CV = df.iloc[:, 25:29]
-    grupo_LOC = df.iloc[:, 29:32]
+    grupo_PSE = df.iloc[:, 10:14]
+    grupo_IC = df.iloc[:, 14:17]
+    grupo_PEP = df.iloc[:, 17:21]
+    grupo_CL = df.iloc[:, 21:24]
+    grupo_CV = df.iloc[:, 24:28]
+    grupo_LOC = df.iloc[:, 28:31]
 
     grupos = {
         "PSE": grupo_PSE,
@@ -202,66 +203,86 @@ def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
     df = read_csv_from_file(file)
     df_final = pd.DataFrame(columns=["dni", "EA", "R", "PDE", "EL", "DT", "MOT", "SEG"])
 
-    df_final["dni"] = df["ingrese su DNI"]
+    df_final["dni"] = df["ingrese su DNI"].astype(str)
     df_final["EA"] = (
-        df["¿Cuantas de las materias que cursaste, aprobaste su cursada?"]
+        df["¿Cuantas de las materias que cursaste aprobaste su cursada?"]
         / df["¿Cuantas materias cursaste este cuatrimestre?"]
     )
 
     # para calcular la regularidad tengo que traerme todas las materias aprobadas de todos los alumnos
     alumnos = AlumnoController.Get_alumnos(db)
     for alumno in alumnos:
-        df_final[df_final["dni"] == alumno.dni]["R"] = (
-            df[df["Ingrese su DNI"] == alumno.dni][
-                "¿Cuantas de las materias que cursaste, aprobaste su cursada?"
-            ]
+        rowdf = df[df["ingrese su DNI"].astype(str) == alumno.dni]
+        print("compruebpo la flag", rowdf.empty)
+        if rowdf.empty:
+            continue
+
+        rowdf = rowdf.iloc[0]
+        print(rowdf)
+        mask = df_final["dni"].astype(str) == alumno.dni
+
+        numerador = (
+            int(rowdf["¿Cuantas de las materias que cursaste aprobaste su cursada?"])
             + alumno.materias_aprobadas
-            - df[df["Ingrese su DNI"] == alumno.dni][
-                "¿Cuántos finales pendientes tenes?"
-            ]
-        ) / df[df["Ingrese su DNI"] == alumno.dni][
-            "¿Cuantas materias cursaste este cuatrimestre?"
-        ]
+            - int(rowdf["¿Cuántos finales pendientes tenes?"])
+        )
+        print("numerador", numerador)
+        denominador = (
+            int(rowdf["¿Cuantas de las materias que cursaste aprobaste su cursada?"])
+            + alumno.materias_aprobadas
+        )
+
+        print("denominador", denominador)
+        if denominador != 0:
+            df_final.loc[mask, "R"] = numerador / denominador
+        else:
+            df_final.loc[mask, "R"] = 0  # o np.nan si prefieres
+        print("TEXTO PARA DARME CUENTA", df_final.loc[mask, "R"])
 
     df_final["PDE"] = (
         1
         - abs(
             df[
-                "¿Cuantas materias adelantaste respecto del plan de estudio este cuatrimestre?"
+                "¿Cuantas materias adelantaste respecto del plan de estudios este cuatrimestre?"
             ]
-            - df["¿Cuantas materias estas atrasado respecto del plan de estudio?"]
+            - df["¿Cuantas materias estas atrasado respecto del plan de estudios?"]
         )
     ) / 36
-
+    print(df_final["EL"])
     df_final["EL"] = (
+        df[
+            "¿Como evaluas el impacto de tu situacion laboral actual sobre el rendimiento de este cuatrimestre?"
+        ]
+        .str.extract(r"(\d+)")
+        .astype(int)
+    )
+    print(df_final["EL"])
+    df_final["DT"] = (
         df[
             "¿Dispones del tiempo semanal necesario fuera del horario de clases para dedicarle al estudio y las entregas este cuatrimestre?"
         ]
-        .str.extract(r"(\d+)")[0]
+        .str.extract(r"(\d+)")
         .astype(int)
     )
-
-    df_final["DT"] = (
-        df[
-            "¿Como evaluas tu motivacion para continuar la carrera este cuatrimestre comparado con el anterior?"
-        ]
-        .str.extract(r"(\d+)")[0]
-        .astype(int)
-    )
+    print(df_final["DT"])
 
     df_final["MOT"] = (
         df[
-            "¿Que tan seguro te sentis de poder aprobar las materias que te inscribiste?"
+            "¿Como evaluas tu motivacion para continuar la carrera este cuatrimestre comparado con el anterior?"
         ]
-        .str.extract(r"(\d+)")[0]
+        .str.extract(r"(\d+)")
         .astype(int)
     )
+    print(df_final["MOT"])
 
     df_final["SEG"] = (
-        df["¿En que estado se encuentra tu trabajo final?"]
-        .str.extract(r"(\d+)")[0]
+        df[
+            "¿Que tan seguro te sentis de poder aprobar las materias que te inscribiste?"
+        ]
+        .str.extract(r"(\d+)")
         .astype(int)
     )
+    print(df_final["SEG"])
 
     return df_final
 

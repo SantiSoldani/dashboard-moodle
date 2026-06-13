@@ -21,7 +21,6 @@ def Post_alumnos_FromEncuesta(alumno: SimpleNamespace, db):
         ),
         db,
     )
-    print("termine el commit")
 
 
 def Post_alumnos(Alumnos: list[SimpleNamespace], db):
@@ -62,9 +61,10 @@ def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
     return alumnos
 
 
-def Get_alumno_Bydni(dni: str, db):
+def Get_alumno_Bydni(dni: str, db) -> SimpleNamespace:
     alumno = Alumno.Get_alumno_by_dni(dni, db)
-    return alumno
+    return SimpleNamespace(**alumno.__dict__)
+
 
 def toState(aprobacion: float) -> str:
 

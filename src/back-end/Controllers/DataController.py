@@ -31,21 +31,26 @@ def Handle_encuesta_cuatrimestral(file: BinaryIO, db):
     """
     # 1) Limpia y normaliza los datos de la encuesta. Devuelve un DataFrame limpio.
     df_clean = Data_transformer.Limpiar_csv(file, "cuatrimestral", db)
-
+    file.seek(0)
     # 2) Para las respuestas, necesitamos los datos originales del archivo.
     #    Rebobinamos el file y leemos de nuevo para obtener los objetos de respuesta.
-    file.seek(0)
-    df_raw = Data_transformer.read_csv_from_file(file)
-    respuestas = Data_transformer.To_object_list_from_df(df_raw)
-    print(respuestas)
-    Encuestas.Handle_respuestas(respuestas, db)
-
-    # 3) Calcula el estado del semáforo desde el DataFrame limpio
+    #
+    #   # 3) Calcula el estado del semáforo desde el DataFrame limpio
     resultados = SemaforoCalculator.calculo_cuatrimestral_from_df(df_clean, db)
-
+    print(resultados)
     # 4) Persiste los estados del semáforo
     for estado in resultados:
-        Semaforo.Post_Semaforo(Semaforo.semaforoDTO(**estado), db)
+        Semaforo.Post_Semaforo(
+            Semaforo.semaforoDTO(
+                dni_alumno=estado["dni_alumno"],
+                color=estado["color"],
+                score=estado["score"],
+            ),
+            db,
+        )
+    # df_raw = Data_transformer.read_csv_from_file(file)
+    # respuestas = Data_transformer.To_object_list_from_df(df_raw)
+    # Encuestas.Handle_respuestas(respuestas, db)
 
 
 def Handle_notas(file: BinaryIO, db):
@@ -58,7 +63,6 @@ def Handle_notas(file: BinaryIO, db):
     # 2) Convierte el DataFrame limpio a lista de objetos y persiste
     notas = Data_transformer.To_object_list_from_df(df_clean)
     NotasController.post_notas(db, notas)
-    print("pase las notas")
 
     # 3) Calcula el estado del semáforo desde el DataFrame limpio
     resultados = SemaforoCalculator.get_states_From_notas_from_df(df_clean, db)

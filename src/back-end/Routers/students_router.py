@@ -1,4 +1,5 @@
 import json
+
 import server
 from Controllers import AlumnoController
 from fastapi import APIRouter, Depends, HTTPException
@@ -9,8 +10,7 @@ router = APIRouter(
     tags=["alumnos"],
 )
 
-
-<<<<<<< HEAD
+"""
 @router.get("/Bydni/{student_dni}")
 async def get_student(student_dni: str, db: Session = Depends(server.get_db)):
 
@@ -23,10 +23,9 @@ async def get_student(student_dni: str, db: Session = Depends(server.get_db)):
 
 @router.get("/all", status_code=200)
 async def get_students(db: Session = Depends(server.get_db)):
-    """
+
     la idea es dependiendo del url param del front obtener un estudiante particualar o traer todos los estudiantes
     para reciclar codigo. Tal vez vamos a necesitar una clase que tenga una coleccion de alumnos por ejemplo.
-    """
     try:
         alumnos = AlumnoController.Get_alumnos(db)
         json_alumnos = json.dumps([a.__dict__ for a in alumnos], indent=4)
@@ -34,12 +33,11 @@ async def get_students(db: Session = Depends(server.get_db)):
         return json_alumnos
     except Exception as e:
         print(e)
+"""
 
 
 @router.get("/all-stats", status_code=200)
-=======
 @router.get("/get/stats", status_code=200)
->>>>>>> fb2d52edf94134dd126ae34c17a9cd699003391a
 async def get_students_with_stats(db: Session = Depends(server.get_db)):
     try:
         alumnos = AlumnoController.Get_alumnos_with_stats(db)
@@ -47,8 +45,7 @@ async def get_students_with_stats(db: Session = Depends(server.get_db)):
     except Exception as e:
         print(f"Error en get_students_with_stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
-<<<<<<< HEAD
-=======
+
 
 @router.get("/get/byDNI/{student_dni}")
 async def get_student(student_dni: str, db: Session = Depends(server.get_db)):
@@ -56,6 +53,7 @@ async def get_student(student_dni: str, db: Session = Depends(server.get_db)):
     if not alumno:
         raise HTTPException(status_code=404, detail="Alumno no encontrado")
     return alumno.__dict__
+
 
 @router.get("/get", status_code=200)
 async def get_students(db: Session = Depends(server.get_db)):
@@ -65,4 +63,3 @@ async def get_students(db: Session = Depends(server.get_db)):
     except Exception as e:
         print(f"Error en get_students: {e}")
         raise HTTPException(status_code=500, detail=str(e))
->>>>>>> fb2d52edf94134dd126ae34c17a9cd699003391a

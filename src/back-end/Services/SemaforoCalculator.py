@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import pandas as pd
 from Controllers import AlumnoController, MateriasController
 from Models import Semaforo
+from numpy._core import astype, float128
 
 # ARCHIVO DE CALCULOS DE SEMAFORO DONDE SE ALMACENA LA LOGICA DE NEGOCIO
 #
@@ -33,9 +34,10 @@ def get_states_From_notas_from_df(df: pd.DataFrame, db):
 
     for dni, grupo in df.groupby("dni_alumno"):
         indicador = 0.0
-
+        cursadas = 0
         for id_materia, subgrupo in grupo.groupby("id_materia"):
             coeficiente = get_coeficiente(hash(id_materia), materias_db)
+            cursadas += 1
             nota = subgrupo["nota"].values[0]
             if (
                 nota is not None
@@ -45,7 +47,7 @@ def get_states_From_notas_from_df(df: pd.DataFrame, db):
             else:
                 indicador += 0
 
-        score_final = indicador
+        score_final = indicador / cursadas
         score_inicial = Semaforo.get_score_actual(str(dni), db)
         score_final = (
             ((score_final + score_inicial) / 2)
@@ -55,7 +57,6 @@ def get_states_From_notas_from_df(df: pd.DataFrame, db):
         resultados.append(
             {"color": get_color(score_final), "dni_alumno": dni, "score": score_final}
         )
-    print(resultados)
     return resultados
 
 
@@ -144,29 +145,46 @@ def calculo_cuatrimestral_from_df(df: pd.DataFrame, db):
             return "verde"
 
     resultados = []
+    print(df)
+    print(df.columns)
+    columnas_numericas = ["EA", "R", "PDE", "EL", "DT", "MOT", "SEG"]
+    for col in columnas_numericas:
+        df[col] = pd.to_numeric(df[col], errors="coerce")
 
+    df["RAC"] = 0.4 * df["EA"] + 0.3 * df["R"] + 0.3 * df["PDE"]
+    df["RAP"] = (
+        (df["EL"] - 1) / 4
+        + (df["DT"] - 1) / 4
+        + (df["MOT"] - 1) / 4
+        + (df["SEG"] - 1) / 4
+    ) / 4
+    df["RAF"] = (df["RAC"] + df["RAP"]) / 2
+
+    # Luego iterar solo para obtener datos del alumno
+    resultados = []
     for index, row in df.iterrows():
-        dni = row["dni"]
-        alumno = AlumnoController.Get_alumno_Bydni(str(dni), db)
-        pre = alumno.pre
+        try:
+            dni = row["dni"]
+            alumno = AlumnoController.Get_alumno_Bydni(str(dni), db)
+            pre = float(alumno.pre) if alumno.pre else 0
 
-        rac = 0.4 * row["EA"] + 0.3 * row["R"] + 0.3 * row["PDE"]
-        rap = (row["EL"] + row["DT"] + row["MOT"] + row["SEG"]) / 4
+            score = (row["RAF"] + pre) / 2
 
-        raf = (rac + rap) / 2
+            if pd.isna(score):
+                continue
 
-        score = (raf + pre) / 2
+            color = get_color(score)
+            resultados.append(
+                {
+                    "dni_alumno": dni,
+                    "color": color,
+                    "score": float(score),
+                }
+            )
 
-        color = get_color(score)
-
-        resultados.append(
-            {
-                "dni_alumno": dni,
-                "color": color,
-                "score": score,
-            }
-        )
-
+        except Exception as e:
+            print(f"❌ Error en DNI {row['dni']}: {e}")
+            continue
     return resultados
 
 

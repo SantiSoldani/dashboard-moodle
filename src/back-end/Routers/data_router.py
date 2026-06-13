@@ -1,5 +1,4 @@
 import server
-
 from Controllers import DataController
 from fastapi import APIRouter, Depends, File, UploadFile, status
 from sqlalchemy.orm import Session
@@ -99,7 +98,7 @@ async def upload_generic(
                 DataController.Handle_notas(file.file, db)
             case "alumnos":
                 DataController.Handle_alumnos(file.file, db)
-            case "encuestaCuatrimestral":
+            case "encuestaPeriodica":
                 DataController.Handle_encuesta_cuatrimestral(file.file, db)
             case "encuestaInicial":
                 DataController.Handle_encuesta_inicial(file.file, db)
