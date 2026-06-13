@@ -9,24 +9,32 @@ let allStudents = [];
 let filteredStudents = [];
 
 // Elementos del DOM
-const searchInput = document.getElementById("searchAlumno");
-const filterEstado = document.getElementById("filterEstado");
-const studentsTableBody = document
-    .getElementById("studentsTable")
-    .querySelector("tbody");
-const totalCountElement = document.getElementById("totalAlumnosCount");
-const avgScoreElement = document.getElementById("avgScore1erAnio");
-const criticalCountElement = document.getElementById("criticalAlumnosCount");
-const criticalListElement = document.getElementById("criticalList");
-const currentDateElement = document.getElementById("currentDate");
-const btnCargarDatos = document.getElementById("btnCargarDatos");
+let searchInput;
+let filterEstado;
+let studentsTableBody;
+let totalCountElement;
+let avgScoreElement;
+let criticalCountElement;
+let criticalListElement;
+let currentDateElement;
+let btnCargarDatos;
 
-// Carga inicial al cargar la página
-window.addEventListener("load", async () => {
+export async function initHome() {
+    searchInput = document.getElementById("searchAlumno");
+    filterEstado = document.getElementById("filterEstado");
+    const table = document.getElementById("studentsTable");
+    if (table) studentsTableBody = table.querySelector("tbody");
+    totalCountElement = document.getElementById("totalAlumnosCount");
+    avgScoreElement = document.getElementById("avgScore1erAnio");
+    criticalCountElement = document.getElementById("criticalAlumnosCount");
+    criticalListElement = document.getElementById("criticalList");
+    currentDateElement = document.getElementById("currentDate");
+    btnCargarDatos = document.getElementById("btnCargarDatos");
+
     setupCurrentDate();
     setupNavigation();
     await cargarDatosDashboard();
-});
+}
 
 
 // Configurar la fecha actual de forma elegante en español
@@ -80,10 +88,9 @@ function setupNavigation() {
 // Cargar y procesar los alumnos de la API
 async function cargarDatosDashboard() {
     try {
-        let response = await HandleGet_alumnos("all-stats");
+        let response = await HandleGet_alumnos(null, "stats");
         if (response) {
-            allStudents =
-                typeof response === "string" ? JSON.parse(response) : response;
+            allStudents = response;
         } else {
             allStudents = [];
         }
@@ -93,6 +100,7 @@ async function cargarDatosDashboard() {
     }
 
     filteredStudents = [...allStudents];
+
     calcularYMostrarMetricas();
     mostrarAlumnosCriticos();
     mostrarListadoGeneral();
@@ -278,33 +286,33 @@ function mostrarListadoGeneral() {
 // MODAL DE ESTADÍSTICAS DEL ALUMNO - CONTROLADORES GLOBALES
 // ==========================================================================
 
-window.abrirModalAlumnoStats = function(dni) {
+window.abrirModalAlumnoStats = function (dni) {
     const modal = document.getElementById("modalAlumnoStats");
     if (!modal) return;
-    
+
     const statsComponent = modal.querySelector("modal-alumnostats");
     if (statsComponent) {
         statsComponent.setAttribute("alumno-dni", dni);
     }
-    
+
     // Show the modal
     modal.style.display = "flex";
     // Force browser reflow to enable transition
     modal.offsetHeight;
     modal.classList.add("active");
-    
+
     // Disable body scrolling
     document.body.style.overflow = "hidden";
-    
+
     console.log(`Abriendo ficha del alumno con DNI: ${dni}`);
 };
 
-window.cerrarModalAlumnoStats = function() {
+window.cerrarModalAlumnoStats = function () {
     const modal = document.getElementById("modalAlumnoStats");
     if (!modal) return;
-    
+
     modal.classList.remove("active");
-    
+
     // Wait for transition to complete
     setTimeout(() => {
         if (!modal.classList.contains("active")) {
@@ -317,7 +325,7 @@ window.cerrarModalAlumnoStats = function() {
             document.body.style.overflow = "";
         }
     }, 350);
-    
+
     console.log("Cerrando ficha del alumno");
 };
 

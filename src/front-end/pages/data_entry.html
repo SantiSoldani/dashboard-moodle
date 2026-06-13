@@ -7,8 +7,8 @@
     <link rel="icon" href="../public/icon.png" type="image/x-icon">
     <link rel="stylesheet" href="../styles/msj.css" />
     <link rel="stylesheet" href="../styles/data_entry_style.css" />
-    <script type="module" src="../components/navbar.js"></script>
-    <script type="module" src="../components/header.js"></script>
+    <script type="module" src="../components/navbar.js?v=1.1"></script>
+    <script type="module" src="../components/header.js?v=1.1"></script>
     <title>Seguimiento</title>
 </head>
 
@@ -40,6 +40,16 @@
                     <option value="encuestaInicial">Encuesta Inicial</option>
                     <option value="encuestaPeriodica">Encuesta Cuatrimestral</option>
                     <option value="entrevista">Entrevista</option>
+                </select>
+                <select id="selectSubject" class="select-file-type hidden">
+                    <option disabled selected value="">Seleccionar Materia</option>
+                    <option value="Análisis Matemático 1">Análisis Matemático 1</option>
+                    <option value="Análisis Matemático 2">Análisis Matemático 2</option>
+                    <option value="Álgebra 1">Álgebra 1</option>
+                    <option value="Álgebra 2">Álgebra 2</option>
+                    <option value="Fundamentos de Química">Fundamentos de Química</option>
+                    <option value="Física A">Física A</option>
+                    <option value="Fundamentos de la Programación">Fundamentos de la Programación</option>
                 </select>
                 <button id="btnClearFile" class="btn-limpiar hidden"
                     style="position: static; transform: none; display: flex; margin-right: 8px;">✕</button>
@@ -94,7 +104,7 @@
             </div>
         </section>
     </div>
-    <script type="module" src="../controllers/data_entry_controller.js"></script>
+    <script type="module" src="../controllers/data_entry_controller.js?v=1.1"></script>
 </body>
 
 </html>

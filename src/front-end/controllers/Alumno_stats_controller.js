@@ -10,20 +10,21 @@
 import { HandleGet_alumnos } from "../models/Alumno.js";
 
 
-window.addEventListener("load", async () => {
+export async function initAlumnoStats(dniParam) {
   try {
-    const params = new URLSearchParams(window.location.search); //parametros esperados -> alumno && modo
-
-    const modo = params.get("modo");
-    const alumno_dni = params.get("alumno");
+    let alumno_dni = dniParam;
+    if (!alumno_dni) {
+      const params = new URLSearchParams(window.location.search);
+      alumno_dni = params.get("alumno");
+    }
     if (!alumno_dni) {
       console.warn("No se especificó un DNI de alumno. Mostrando datos hardcodeados.");
       return;
     }
-    
+
     let alumno = await HandleGet_alumnos(alumno_dni);
     if (alumno) {
-      alumno = JSON.parse(alumno);
+      alumno = typeof alumno === 'string' ? JSON.parse(alumno) : alumno;
       console.log(alumno);
       set_state_panel(alumno);
       set_info_panel(alumno);
@@ -32,66 +33,46 @@ window.addEventListener("load", async () => {
   } catch (error) {
     console.error("Error al cargar datos del alumno (posiblemente endpoint no implementado). Mostrando datos hardcodeados:", error);
   }
-});
-
-const goBackBtn = document.getElementById("go_back_Btn");
-if (goBackBtn) {
-  goBackBtn.addEventListener("click", () => {
-    window.location.href = "../iframes/home.html"
-  });
 }
 
 function set_state_panel(alumno) {
-  const stats = document.getElementById("status-section");
-  const estados = document.querySelectorAll(".estado-verde");
-  estados.forEach((estado) => {
-    console.log(alumno.estado);
-    estado.classList.replace("estado-verde", `estado-${alumno.estado}`);
-
-    if (estado.querySelector("strong")) {
-      estado.querySelector("strong").textContent = estado
-        .querySelector("strong")
-        .textContent.replace("Verde", alumno.estado);
-    } else if (estado.querySelector(".status-card-state")) {
-      estado.querySelector(".status-card-state").textContent = estado
-        .querySelector(".status-card-state")
-        .textContent.replace("Verde", alumno.estado);
-    }
-    //const texto = estado.querySelector("strong") || estado.querySelector("p .status-card-state")
-    //texto.textContent.replace("Verde", alumno.estado);
-  });
-
-  let nombre = stats.querySelector("h1");
-  nombre.textContent = alumno.nombre + " " + alumno.apellido;
+  const headerName = document.getElementById("stats-header-name");
+  if (headerName) {
+    headerName.textContent = `Hola, ${alumno.nombre} ${alumno.apellido}`;
+  }
 }
+
 function set_info_panel(alumno) {
-  const info_panel = document.querySelectorAll("#info-panel .info-item");
+  const info_panel = document.querySelectorAll("#info-panel .info-item-new");
 
   info_panel.forEach((panel) => {
-    switch (panel.querySelector("span").textContent) {
-      case "Nombre":
-        panel.querySelector("strong").textContent =
-          alumno.nombre + " " + alumno.apellido;
+    const label = panel.querySelector(".info-label-new");
+    const val = panel.querySelector(".info-val-new");
+    if (!label || !val) return;
+
+    switch (label.textContent) {
+      case "NOMBRE COMPLETO":
+        val.textContent = alumno.nombre + " " + alumno.apellido;
         break;
 
-      case "Documento":
-        panel.querySelector("strong").textContent = alumno.dni;
+      case "DOCUMENTO":
+        val.textContent = alumno.dni;
         break;
 
-      case "Carrera":
-        panel.querySelector("strong").textContent = alumno.carrera;
+      case "CARRERA":
+        val.textContent = alumno.carrera;
         break;
 
-      case "Curso":
-        panel.querySelector("strong").textContent = alumno.fecha_inicio;
+      case "CURSO ACTUAL":
+        val.textContent = alumno.fecha_inicio;
         break;
 
-      case "Email":
-        panel.querySelector("strong").textContent = alumno.email;
+      case "CORREO ELECTRÓNICO INSTITUCIONAL":
+        val.textContent = alumno.email;
         break;
 
-      case "Telefono":
-        panel.querySelector("strong").textContent = alumno.telefono;
+      case "TELÉFONO DE CONTACTO":
+        val.textContent = alumno.telefono || "+54 11 5555 1234"; // Fake si no existe
         break;
 
       default:
@@ -102,7 +83,11 @@ function set_info_panel(alumno) {
 
 function set_dashboard(alumno) {
   console.log("set dashboard");
-
-  //Carga de la informacion estadistica del alumno
-  //carga del dashboard desde looker studio o podriamos pedirle a la ia un modulo de dashboards dinamicos que recbia al alumno como parametro y que se adapte a su informacion estadistica, por ejemplo si el alumno tiene un estado rojo entonces el dashboard podria mostrarle graficos de su rendimiento historico para que pueda entender mejor su situacion academica y como mejorarla, mientras que si el alumno tiene un estado verde el dashboard podria mostrarle graficos de su rendimiento actual para que pueda seguir manteniendo ese buen rendimiento
+  const kpiPromedio = document.getElementById("kpi-promedio");
+  if (kpiPromedio && alumno.score) {
+    let scoreDisplay = parseFloat(alumno.score);
+    // Si el score viene de 0 a 1, escalarlo a 10
+    if (scoreDisplay <= 1.0 && scoreDisplay > 0) scoreDisplay = scoreDisplay * 10;
+    kpiPromedio.textContent = scoreDisplay.toFixed(1);
+  }
 }

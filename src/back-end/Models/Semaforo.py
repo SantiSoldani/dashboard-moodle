@@ -9,7 +9,11 @@ class semaforoDTO:
     dni_alumno: str
     color: str
     score: float
+<<<<<<< HEAD
 
+=======
+    created_at: str
+>>>>>>> fb2d52edf94134dd126ae34c17a9cd699003391a
 
 def Post_Semaforo(semaforo: semaforoDTO, db):
     query = text(
@@ -21,7 +25,7 @@ def Post_Semaforo(semaforo: semaforoDTO, db):
             "dni_alumno": semaforo.dni_alumno,
             "color": semaforo.color,
             "score": semaforo.score,
-            "created_at": datetime.now(),
+            "created_at": str(datetime.now()),
         },
     )
     db.commit()
