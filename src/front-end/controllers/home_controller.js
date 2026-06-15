@@ -19,6 +19,12 @@ let criticalListElement;
 let currentDateElement;
 let btnCargarDatos;
 
+let currentPage = 1;
+const itemsPerPage = 20;
+let btnPrevPage;
+let btnNextPage;
+let pageIndicator;
+
 export async function initHome() {
   searchInput = document.getElementById("searchAlumno");
   filterEstado = document.getElementById("filterEstado");
@@ -30,6 +36,10 @@ export async function initHome() {
   criticalListElement = document.getElementById("criticalList");
   currentDateElement = document.getElementById("currentDate");
   btnCargarDatos = document.getElementById("btnCargarDatos");
+
+  btnPrevPage = document.getElementById("btnPrevPage");
+  btnNextPage = document.getElementById("btnNextPage");
+  pageIndicator = document.getElementById("pageIndicator");
 
   setupCurrentDate();
   setupNavigation();
@@ -68,6 +78,25 @@ function setupNavigation() {
   }
   if (filterEstado) {
     filterEstado.addEventListener("change", aplicarFiltros);
+  }
+
+  if (btnPrevPage) {
+    btnPrevPage.addEventListener("click", () => {
+      if (currentPage > 1) {
+        currentPage--;
+        mostrarListadoGeneral();
+      }
+    });
+  }
+
+  if (btnNextPage) {
+    btnNextPage.addEventListener("click", () => {
+      const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+      if (currentPage < totalPages) {
+        currentPage++;
+        mostrarListadoGeneral();
+      }
+    });
   }
 
   // Agregar evento a la tabla para abrir ficha del alumno en el modal
@@ -232,6 +261,7 @@ function aplicarFiltros() {
     return matchesSearch && matchesEstado;
   });
 
+  currentPage = 1;
   mostrarListadoGeneral();
 }
 
@@ -246,10 +276,27 @@ function mostrarListadoGeneral() {
     row.className = "placeholder-row";
     row.innerHTML = `<td colspan="7">No se encontraron alumnos para la búsqueda o filtro aplicado.</td>`;
     studentsTableBody.appendChild(row);
+    
+    if (pageIndicator) pageIndicator.textContent = `Página 1 de 1`;
+    if (btnPrevPage) btnPrevPage.disabled = true;
+    if (btnNextPage) btnNextPage.disabled = true;
     return;
   }
 
-  filteredStudents.forEach((alumno) => {
+  const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
+  
+  if (currentPage > totalPages) currentPage = totalPages;
+  if (currentPage < 1) currentPage = 1;
+
+  if (pageIndicator) pageIndicator.textContent = `Página ${currentPage} de ${totalPages}`;
+  if (btnPrevPage) btnPrevPage.disabled = currentPage === 1;
+  if (btnNextPage) btnNextPage.disabled = currentPage === totalPages;
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const studentsToDisplay = filteredStudents.slice(startIndex, endIndex);
+
+  studentsToDisplay.forEach((alumno) => {
     const row = document.createElement("tr");
     row.dataset.dni = alumno.dni;
 

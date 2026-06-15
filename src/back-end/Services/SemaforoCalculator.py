@@ -3,7 +3,18 @@ from types import SimpleNamespace
 import pandas as pd
 from Controllers import AlumnoController, MateriasController
 from Models import Semaforo
-from numpy._core import astype, float128
+import numpy as np
+#from numpy._core import astype, float128
+
+# Habia una incompatibilidad en el import entre Windows y Linux. Esto lo soluciona
+try:
+    # Intenta importar como lo hizo tu compañero (funciona en su Linux)
+    from numpy._core import astype, float128
+except ImportError:
+    # Si falla (como en tu Windows), hace el fallback
+    from numpy._core import astype
+    float128 = np.float64  # Usamos la máxima precisión disponible en Windows
+
 
 # ARCHIVO DE CALCULOS DE SEMAFORO DONDE SE ALMACENA LA LOGICA DE NEGOCIO
 #
