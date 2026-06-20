@@ -25,3 +25,7 @@ def Handle_respuestas(respuestas_list: list[SimpleNamespace], db):
     print(resultados)
     Encuestas.Handle_respuestas(resultados, db)
     db.commit()
+
+
+def get_encuesta(db, dni):
+    return Encuestas.get_encuesta(db, dni)

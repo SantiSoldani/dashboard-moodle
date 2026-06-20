@@ -1,10 +1,11 @@
 from types import SimpleNamespace
 
-import pandas as pd
-from Controllers import AlumnoController, MateriasController
-from Models import Semaforo
 import numpy as np
-#from numpy._core import astype, float128
+import pandas as pd
+from Controllers import AlumnoController, IndicadoresController, MateriasController
+from Models import Semaforo
+
+# from numpy._core import astype, float128
 
 # Habia una incompatibilidad en el import entre Windows y Linux. Esto lo soluciona
 try:
@@ -13,6 +14,7 @@ try:
 except ImportError:
     # Si falla (como en tu Windows), hace el fallback
     from numpy._core import astype
+
     float128 = np.float64  # Usamos la máxima precisión disponible en Windows
 
 
@@ -173,14 +175,26 @@ def calculo_cuatrimestral_from_df(df: pd.DataFrame, db):
 
     # Luego iterar solo para obtener datos del alumno
     resultados = []
+    indicadores_persistibles = []
     for index, row in df.iterrows():
         try:
             dni = row["dni"]
             alumno = AlumnoController.Get_alumno_Bydni(str(dni), db)
+            cantidad_acumulada = MateriasController.get_cant_materias_acumulada(
+                db, alumno.cuatrimestre, alumno.plan_de_estudios
+            )
             pre = float(alumno.pre) if alumno.pre else 0
-
+            ac = (
+                row["MATERIAS_APROBADAS"] + alumno.materias_aprobadas
+            ) / cantidad_acumulada
             score = (row["RAF"] + pre) / 2
-
+            objeto = {
+                "dni": dni,
+                "rac": row["RAC"],
+                "rap": row["RAP"],
+                "raf": row["RAF"],
+                "ac": ac,
+            }
             if pd.isna(score):
                 continue
 
@@ -192,10 +206,11 @@ def calculo_cuatrimestral_from_df(df: pd.DataFrame, db):
                     "score": float(score),
                 }
             )
-
+            indicadores_persistibles.append(SimpleNamespace(**objeto))
         except Exception as e:
             print(f"❌ Error en DNI {row['dni']}: {e}")
             continue
+    IndicadoresController.post_indicadores_cuatrimestrales(db, indicadores_persistibles)
     return resultados
 
 

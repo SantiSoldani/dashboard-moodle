@@ -9,6 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from Routers import (
     data_router,
+    encuestas_router,
     moodle_router,
     notasRouter,
     students_router,
@@ -40,6 +41,7 @@ app.include_router(data_router.router)
 app.include_router(students_router.router)
 app.include_router(moodle_router.router)
 app.include_router(tutores_router.router)
+app.include_router(encuestas_router.router)
 
 load_dotenv()
 

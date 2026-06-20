@@ -203,14 +203,28 @@ def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
     Limpia y normaliza una encuesta cuatrimestral desde un file-like object.
     """
     df = read_csv_from_file(file)
-    df_final = pd.DataFrame(columns=["dni", "EA", "R", "PDE", "EL", "DT", "MOT", "SEG"])
+    df_final = pd.DataFrame(
+        columns=[
+            "dni",
+            "EA",
+            "R",
+            "PDE",
+            "EL",
+            "DT",
+            "MOT",
+            "SEG",
+            "MATERIAS_APROBADAS",
+        ]
+    )
 
     df_final["dni"] = df["ingrese su DNI"].astype(str)
     df_final["EA"] = (
         df["¿Cuantas de las materias que cursaste aprobaste su cursada?"]
         / df["¿Cuantas materias cursaste este cuatrimestre?"]
     )
-
+    df_final["MATERIAS_APROBADAS"] = df[
+        "¿Cuantas materias cursaste este cuatrimestre?"
+    ]  # cantidad de materias aprobadas / cantidad de materias que deberia haber aprobado
     # para calcular la regularidad tengo que traerme todas las materias aprobadas de todos los alumnos
     alumnos = AlumnoController.Get_alumnos(db)
     for alumno in alumnos:

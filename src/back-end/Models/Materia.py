@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from types import SimpleNamespace
 
 from sqlalchemy import text
 
@@ -20,3 +21,19 @@ def get_materias(db) -> list[MateriaDto]:
     devuelve = [MateriaDto(**row) for row in rows]
     # print("devuelve", devuelve)
     return devuelve
+
+
+def get_materias_del_cuatrimestre(db, cuatrimestre, plan):
+
+    query = text(
+        """SELECT cantidad_acumulada FROM "materiasXcuatrimestre" WHERE numero = :cuatrimestre AND plan = :plan"""
+    )
+    try:
+        return SimpleNamespace ** (
+            db.execute(query, {"cuatrimestre": cuatrimestre, "plan": plan})
+            .mappings()
+            .fetchone()
+        )
+    except Exception as e:
+        print(e)
+        return None

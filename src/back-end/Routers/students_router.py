@@ -63,3 +63,23 @@ async def get_students(db: Session = Depends(server.get_db)):
     except Exception as e:
         print(f"Error en get_students: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/get/evolucion_semaforos/{dni}", status_code=200)
+async def get_evolucion_semaforo(dni: str, db: Session = Depends(server.get_db)):
+
+    try:
+        return AlumnoController.fetch_semaforos(db, dni)
+    except Exception as e:
+        print(e)
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/get/indicadores/{cohorte}", status_code=200)
+async def get_indicadores(cohorte: int, db: Session = Depends(server.get_db)):
+
+    try:
+        indicadores = AlumnoController.indicadoresXcohorte(db, cohorte)
+        return indicadores
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

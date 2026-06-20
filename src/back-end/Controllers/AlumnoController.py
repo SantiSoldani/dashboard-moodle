@@ -33,9 +33,9 @@ def Post_alumnos(Alumnos: list[SimpleNamespace], db):
                 dni=str(alumno.dni),
                 fecha_inicio=-1,
                 carrera=alumno.carrera,
-                materias_aprobadas=-1,
-                pre=-1,
-                plan_de_estudios=-1,
+                materias_aprobadas=0,
+                pre=0,
+                plan_de_estudios=2024,
             ),
             db,
         )
@@ -78,3 +78,19 @@ def toState(aprobacion: float) -> str:
 
 def get_score(dni: str, db) -> float:
     return Alumno.get_score(dni, db)
+
+
+def actualizar_Cuatrimestre(db):
+
+    Alumno.aumentar_cuatrimestre(db)
+    return db.commit()
+
+
+def fetch_semaforos(db, dni):
+
+    return Alumno.fetch_semaforos(db, dni)
+
+
+def indicadoresXcohorte(cohorte, db):
+
+    return Alumno.fetch_indicadoresXcohorte(cohorte, db)

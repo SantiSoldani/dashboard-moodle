@@ -93,8 +93,8 @@ def Get_alumnos(db) -> list[AlumnoDto]:
     query = text("""SELECT *  FROM "Alumnos" ORDER BY dni""")
     fetched_alumnos = (db.execute(query)).mappings().fetchall()
     for alumno in fetched_alumnos:
-        print(alumno["PRE"] is not nan)
-        print(alumno["PRE"])
+        # print(alumno["PRE"] is not nan)
+        # print(alumno["PRE"])
         alumnos_list.append(
             AlumnoDto(
                 nombre=alumno["nombre"],
@@ -161,3 +161,49 @@ def get_score(dni: str, db) -> float:
     result = db.execute(query, {"dni": dni}).fetchone()
     print("score", result)
     return result[0]
+
+
+def aumentar_cuatrimestre(db):
+
+    query = text(
+        """ UPDATE "Alumnos" SET cuatrimestre = cuatrimestre + 1 WHERE cuatrimestre <> 10"""
+    )
+
+    db.execute(query)
+    return
+
+
+def fetch_semaforos(db, dni):
+    query = text(
+        """SELECT color, score, created_at as fecha FROM "Semaforo" WHERE dni_alumno = :dni ORDER BY created_at"""
+    )
+
+    try:
+        return [
+            SimpleNamespace(**row)
+            for row in db.execute(query, {"dni": dni}).mappings().fetchall()
+        ]
+    except Exception as e:
+        raise Exception(e)
+
+
+def fetch_indicadoresXcohorte(db, cohorte):
+    query = text(""" SELECT AVG(pse) as pse, AVG(pse) as pse_prom,
+                            AVG(ic) as ic_prom,
+                            AVG(pep) as pep_prom,
+                            AVG(cl) as cl_prom,
+                            AVG(cv) as cv_prom,
+                            AVG(loc) as loc_prom
+                     FROM "Indicadores" i
+                     JOIN "Alumnos" a
+                     ON a.dni = i.dni
+                     WHERE a.fecha_inicio = :cohorte;
+                """)
+
+    try:
+        return SimpleNamespace(
+            **db.execute(query, {"cohorte": cohorte}).mappings().fetchone()
+        )
+
+    except Exception as e:
+        raise Exception(e)
