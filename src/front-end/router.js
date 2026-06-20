@@ -3,11 +3,15 @@ import {
   VISTA_DATA_ENTRY,
   VISTA_ALUMNO_STATS,
   VISTA_TUTORES,
+  VISTA_ADMIN_DASHBOARD,
+  VISTA_ADMIN_TOOLS,
 } from "./Vistas.js";
 import { initHome } from "./controllers/home_controller.js";
 import { initDataEntry } from "./controllers/data_entry_controller.js";
 import { initAlumnoStats } from "./controllers/Alumno_stats_controller.js";
 import { initTutores } from "./controllers/tutores_controller.js";
+import { initAdminDashboard } from "./controllers/admin_dashboard_controller.js";
+import { initAdminTools } from "./controllers/admin_tools_controller.js";
 
 window.addEventListener("load", () => {
   // Determine current route from hash or default to home
@@ -43,8 +47,18 @@ export function navegar(nombreVista) {
     let dni = params.get("alumno") || localStorage.getItem("estudianteDNI");
     initAlumnoStats(dni);
   } else if (nombreVista === "tutores") {
+    if (rol !== "Administrador") {
+      window.location.hash = "#home";
+      return;
+    }
     root.innerHTML = VISTA_TUTORES;
     initTutores();
+  } else if (nombreVista === "admin_dashboard") {
+    root.innerHTML = VISTA_ADMIN_DASHBOARD;
+    initAdminDashboard();
+  } else if (nombreVista === "admin_tools") {
+    root.innerHTML = VISTA_ADMIN_TOOLS;
+    initAdminTools();
   } else {
     // Fallback
     root.innerHTML = "<h2>Vista no encontrada</h2>";

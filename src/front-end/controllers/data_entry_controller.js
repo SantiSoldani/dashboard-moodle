@@ -5,7 +5,6 @@ export function initDataEntry() {
   const mainFileInput = document.getElementById("mainFileInput");
   const uploadZoneText = document.getElementById("uploadZoneText");
   const selectFileType = document.getElementById("selectFileType");
-  const selectSubject = document.getElementById("selectSubject");
   const btnClearFile = document.getElementById("btnClearFile");
   const btnUpload = document.getElementById("x");
   const emptyMessage = document.getElementById("emptyMessage");
@@ -36,16 +35,7 @@ export function initDataEntry() {
     }
   });
 
-  // Mostrar/ocultar select de materias al seleccionar Notas
-  selectFileType.addEventListener("change", () => {
-    if (selectFileType.value === "notas") {
-      selectSubject.classList.remove("hidden");
-    } else {
-      selectSubject.classList.add("hidden");
-      selectSubject.value = "";
-    }
-  });
-
+  // Event listener no longer needed for selectSubject
   // Procesar archivo seleccionado
   function handleFileSelect(file) {
     selectedFile = file;
@@ -174,8 +164,6 @@ export function initDataEntry() {
 
     // Restablecer selectores
     selectFileType.selectedIndex = 0;
-    selectSubject.classList.add("hidden");
-    selectSubject.selectedIndex = 0;
 
     // Ocultar tabla y mostrar vacío
     tbody.innerHTML = "";
@@ -210,23 +198,11 @@ export function initDataEntry() {
       return;
     }
 
-    let subject = null;
-    if (type === "notas") {
-      subject = selectSubject.value;
-      if (!subject) {
-        showMessage(
-          "Por favor, selecciona una materia antes de subir.",
-          "error",
-        );
-        return;
-      }
-    }
-
     btnUpload.disabled = true;
     btnUpload.innerHTML = `<span class="material-symbols-outlined" style="font-size: 20px;">sync</span> Subiendo...`;
 
     try {
-      const success = await Post_csv(selectedFile, backendType, subject);
+      const success = await Post_csv(selectedFile, backendType, null);
       if (success) {
         showMessage("¡Archivo cargado y procesado exitosamente!", "success");
         resetUploadState();

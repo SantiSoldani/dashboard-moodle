@@ -174,16 +174,6 @@ export const VISTA_DATA_ENTRY = `
                     <option value="encuestaPeriodica">Encuesta Cuatrimestral</option>
                     <option value="entrevista">Entrevista</option>
                 </select>
-                <select id="selectSubject" class="select-file-type hidden">
-                    <option disabled selected value="">Seleccionar Materia</option>
-                    <option value="Análisis Matemático 1">Análisis Matemático 1</option>
-                    <option value="Análisis Matemático 2">Análisis Matemático 2</option>
-                    <option value="Álgebra 1">Álgebra 1</option>
-                    <option value="Álgebra 2">Álgebra 2</option>
-                    <option value="Fundamentos de Química">Fundamentos de Química</option>
-                    <option value="Física A">Física A</option>
-                    <option value="Fundamentos de la Programación">Fundamentos de la Programación</option>
-                </select>
                 <button id="btnClearFile" class="btn-limpiar hidden"
                     style="position: static; transform: none; display: flex; margin-right: 8px;">✕</button>
                 <button id="x" class="btn-upload-compact" style="background: var(--primary);">
@@ -518,6 +508,141 @@ export const VISTA_TUTORES = `
                     <button id="btnCancelarAsignacion" class="btn-secondary-t">Cancelar</button>
                     <button class="btn-primary-large-t"><span class="material-symbols-outlined">assignment_ind</span> Confirmar Asignación</button>
                 </div>
+            </div>
+        </div>
+    </div>
+`;
+
+export const VISTA_ADMIN_DASHBOARD = `
+    <div class="container new-design admin-page">
+        <component-navbar></component-navbar>
+
+        <!-- CABECERA PRINCIPAL -->
+        <header class="page-header" style="margin-bottom: 24px;">
+            <h1>Dashboard General</h1>
+            <p class="subtitle">Visión general e indicadores a nivel institucional.</p>
+        </header>
+
+        <!-- KPIS Institucionales -->
+        <div class="admin-kpi-row">
+            <div class="kpi-card-admin blue-kpi">
+                <div class="kpi-icon-container"><span class="material-symbols-outlined">domain</span></div>
+                <div class="kpi-info">
+                    <span class="kpi-title">Alumnos Totales</span>
+                    <strong class="kpi-value" id="admin_total_alumnos">--</strong>
+                </div>
+            </div>
+            <div class="kpi-card-admin green-kpi">
+                <div class="kpi-icon-container"><span class="material-symbols-outlined">how_to_reg</span></div>
+                <div class="kpi-info">
+                    <span class="kpi-title">Promedio Institucional</span>
+                    <strong class="kpi-value" id="admin_promedio_general">--</strong>
+                </div>
+            </div>
+            <div class="kpi-card-admin red-kpi">
+                <div class="kpi-icon-container"><span class="material-symbols-outlined">warning</span></div>
+                <div class="kpi-info">
+                    <span class="kpi-title">En Riesgo Crítico</span>
+                    <strong class="kpi-value" id="admin_riesgo_critico">--</strong>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHARTS GRID -->
+        <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="chart-panel card-panel">
+                <div class="panel-header-flex">
+                    <div class="panel-header-t">
+                        <span class="material-symbols-outlined icon-blue">timeline</span>
+                        <h2>Evolución de Alumnos en Riesgo</h2>
+                    </div>
+                </div>
+                <div id="chartRiesgoLine" style="width: 100%; height: 350px;"></div>
+            </div>
+            <div class="chart-panel card-panel">
+                <div class="panel-header-flex">
+                    <div class="panel-header-t">
+                        <span class="material-symbols-outlined icon-blue">radar</span>
+                        <h2>Distribución de Riesgo por Área</h2>
+                    </div>
+                </div>
+                <div id="chartRiesgoRadar" style="width: 100%; height: 350px;"></div>
+            </div>
+        </div>
+    </div>
+`;
+
+export const VISTA_ADMIN_TOOLS = `
+    <div class="container new-design admin-page">
+        <component-navbar></component-navbar>
+
+        <!-- CABECERA PRINCIPAL -->
+        <header class="page-header" style="margin-bottom: 24px;">
+            <h1>Herramientas del Administrador</h1>
+            <p class="subtitle">Gestión de usuarios y configuración de parámetros del sistema.</p>
+        </header>
+
+        <div class="tools-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <!-- FORMULARIO ALTA ADMIN -->
+            <div class="tool-panel card-panel">
+                <div class="panel-header-flex">
+                    <div class="panel-header-t">
+                        <span class="material-symbols-outlined icon-blue">admin_panel_settings</span>
+                        <h2>Alta de Administradores</h2>
+                    </div>
+                </div>
+                <form id="formAltaAdmin" class="admin-form">
+                    <div class="form-group">
+                        <label>DNI del Administrador</label>
+                        <input type="text" id="adminDni" placeholder="Ej. 25654321" required>
+                    </div>
+                    <button type="submit" class="btn-primary-large-t" style="width: 100%; margin-top: 16px;">
+                        <span class="material-symbols-outlined">save</span> Registrar Administrador
+                    </button>
+                    <div id="msgAdmin" class="msg-feedback hidden" style="margin-top: 10px; padding: 10px; border-radius: 4px;"></div>
+                </form>
+            </div>
+            
+            <!-- CONFIGURACION COEFICIENTES -->
+            <div class="tool-panel card-panel">
+                <div class="panel-header-flex">
+                    <div class="panel-header-t">
+                        <span class="material-symbols-outlined icon-blue">settings</span>
+                        <h2>Configuración de Coeficientes de Riesgo</h2>
+                    </div>
+                </div>
+                <p style="color: #64748b; margin-bottom: 16px; font-size: 0.9rem;">
+                    Ajuste los pesos relativos de cada variable para el cálculo del índice de riesgo de los estudiantes. El valor base es 1.0. Si aumenta un coeficiente, los demás disminuirán para mantener el balance.
+                </p>
+                <form id="formCoeficientes" class="admin-form">
+                    <div class="coeficientes-grid" style="display: flex; flex-direction: column; gap: 24px;">
+                        <div class="form-group">
+                            <label style="display: flex; justify-content: space-between;">
+                                <span>Coeficiente Asistencia</span>
+                                <span id="valAsistencia" style="color: #3b82f6; font-weight: bold;">1.0</span>
+                            </label>
+                            <input type="range" class="coef-slider" id="coefAsistencia" min="0" max="3" step="0.1" value="1.0" style="width: 100%; cursor: pointer;">
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; justify-content: space-between;">
+                                <span>Coeficiente Tareas</span>
+                                <span id="valTareas" style="color: #3b82f6; font-weight: bold;">1.0</span>
+                            </label>
+                            <input type="range" class="coef-slider" id="coefTareas" min="0" max="3" step="0.1" value="1.0" style="width: 100%; cursor: pointer;">
+                        </div>
+                        <div class="form-group">
+                            <label style="display: flex; justify-content: space-between;">
+                                <span>Coeficiente Exámenes</span>
+                                <span id="valExamenes" style="color: #3b82f6; font-weight: bold;">1.0</span>
+                            </label>
+                            <input type="range" class="coef-slider" id="coefExamenes" min="0" max="3" step="0.1" value="1.0" style="width: 100%; cursor: pointer;">
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary-large-t" style="margin-top: 16px;">
+                        <span class="material-symbols-outlined">tune</span> Guardar Configuración
+                    </button>
+                    <div id="msgCoef" class="msg-feedback hidden" style="margin-top: 10px; padding: 10px; border-radius: 4px;"></div>
+                </form>
             </div>
         </div>
     </div>

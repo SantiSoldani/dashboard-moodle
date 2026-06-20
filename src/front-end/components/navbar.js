@@ -13,11 +13,20 @@ class navBar extends HTMLElement {
         const nombre = localStorage.getItem('nombreUsuario') || '';
 
         let navLinks = '';
-        if (rol !== 'Estudiante') {
+        if (rol === 'Administrador') {
+            const isAdminDashboard = hash === 'admin_dashboard';
+            const isAdminTools = hash === 'admin_tools';
+            navLinks = `
+                <li class="${isAdminDashboard ? 'active' : ''}"><a href="#admin_dashboard">📈 Dashboard General</a></li>
+                <li class="${isAdminTools ? 'active' : ''}"><a href="#admin_tools">⚙️ Herramientas</a></li>
+                <li class="${hash === 'tutores' ? 'active' : ''}"><a href="#tutores">👨‍🏫 Tutores</a></li>
+                <li style="border-left: 1px solid #ccc; margin-left: 8px; padding-left: 8px;" class="${isHome ? 'active' : ''}"><a href="#home">📊 Panel Docente</a></li>
+                <li class="${isDataEntry ? 'active' : ''}"><a href="#data_entry">📁 Cargar Datos</a></li>
+            `;
+        } else if (rol !== 'Estudiante') {
             navLinks = `
                 <li class="${isHome ? 'active' : ''}"><a href="#home">📊 Inicio</a></li>
                 <li class="${isDataEntry ? 'active' : ''}"><a href="#data_entry">📁 Cargar Datos</a></li>
-                <li class="${hash === 'tutores' ? 'active' : ''}"><a href="#tutores">👨‍🏫 Tutores</a></li>
             `;
         } else {
             navLinks = `
@@ -37,7 +46,7 @@ class navBar extends HTMLElement {
                     </svg>
                 </button>
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <div class="teacher-avatar">${rol === 'Estudiante' ? 'ES' : 'DO'}</div>
+                    <div class="teacher-avatar">${rol === 'Administrador' ? 'AD' : (rol === 'Estudiante' ? 'ES' : 'DO')}</div>
                     <div class="teacher-info">
                         <span>Hola ${nombre}!</span>
                     </div>
