@@ -7,6 +7,9 @@ from sqlalchemy import text
 @dataclass
 class UsuarioDTO:
     dni: str | None
+    nombre: str | None
+    apellido: str | None
+    email: str | None
     rol: str | None
     ult_coneccion: str | None
     created_at: str | None

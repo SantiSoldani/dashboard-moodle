@@ -1,7 +1,7 @@
 -- WARNING: This schema is for context only and is not meant to be run.
 -- Table order and constraints may not be valid for execution.
 
-CREATE TABLE public.Alumnos (
+CREATE TABLE IF NOT EXISTS public.Alumnos (
   dni character varying NOT NULL,
   nombre character varying,
   apellido character varying,
@@ -13,7 +13,7 @@ CREATE TABLE public.Alumnos (
   IR real,
   CONSTRAINT Alumnos_pkey PRIMARY KEY (dni)
 );
-CREATE TABLE public.Examen (
+CREATE TABLE IF NOT EXISTS public.Examen (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   dni_alumno character varying NOT NULL,
   id_materia bigint,
@@ -22,7 +22,7 @@ CREATE TABLE public.Examen (
   CONSTRAINT Examen_id_materia_fkey FOREIGN KEY (id_materia) REFERENCES public.Materia(id),
   CONSTRAINT Examen_dni_alumno_fkey FOREIGN KEY (dni_alumno) REFERENCES public.Alumnos(dni)
 );
-CREATE TABLE public.Materia (
+CREATE TABLE IF NOT EXISTS  public.Materia (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   nombre character varying NOT NULL,
   cuatrimestre smallint,
@@ -30,7 +30,7 @@ CREATE TABLE public.Materia (
   notaMinima real,
   CONSTRAINT Materia_pkey PRIMARY KEY (id)
 );
-CREATE TABLE public.Semaforo (
+CREATE TABLE IF NOT EXISTS  public.Semaforo (
   dni_alumno character varying NOT NULL,
   color character varying,
   score real NOT NULL,
@@ -38,7 +38,7 @@ CREATE TABLE public.Semaforo (
   CONSTRAINT Semaforo_pkey PRIMARY KEY (dni_alumno),
   CONSTRAINT Semaforo_dni_alumno_fkey FOREIGN KEY (dni_alumno) REFERENCES public.Alumnos(dni)
 );
-CREATE TABLE public.Encuestas (
+CREATE TABLE IF NOT EXISTS  public.Encuestas (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   dni_alumno character varying,
   score real,
@@ -48,7 +48,7 @@ CREATE TABLE public.Encuestas (
   CONSTRAINT Encuestas_pkey PRIMARY KEY (id),
   CONSTRAINT Encuestas_dni_alumno_fkey FOREIGN KEY (dni_alumno) REFERENCES public.Alumnos(dni)
 );
-CREATE TABLE public.Respuestas (
+CREATE TABLE IF NOT EXISTS  public.Respuestas (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   dni_alumno character varying,
   id_encuesta bigint,
@@ -58,7 +58,7 @@ CREATE TABLE public.Respuestas (
   CONSTRAINT Respuestas_id_encuesta_fkey FOREIGN KEY (id_encuesta) REFERENCES public.Encuestas(id),
   CONSTRAINT Respuestas_dni_alumno_fkey FOREIGN KEY (dni_alumno) REFERENCES public.Alumnos(dni)
 );
-CREATE TABLE public.Log (
+CREATE TABLE IF NOT EXISTS  public.Log (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   dni_usuario bigint,
   tipo_accion text,
@@ -66,27 +66,23 @@ CREATE TABLE public.Log (
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT Log_pkey PRIMARY KEY (id)
 );
-CREATE TABLE public.Usuarios (
+CREATE TABLE IF NOT EXISTS  public.Usuarios (
   dni character varying NOT NULL,
+  nombre text,
+  apellido text,
+  email text,
   rol text,
   ult_coneccion timestamp with time zone,
   created_at timestamp with time zone NOT NULL DEFAULT now(),
   CONSTRAINT Usuarios_pkey PRIMARY KEY (dni)
 );
-CREATE TABLE public.Tutores (
-  dni character varying NOT NULL,
-  nombre text,
-  apellido text,
-  email text,
-  CONSTRAINT Tutores_pkey PRIMARY KEY (dni),
-  CONSTRAINT Tutores_dni_fkey FOREIGN KEY (dni) REFERENCES public.Usuarios(dni)
-);
-CREATE TABLE public.Tutor-Alumno (
+
+CREATE TABLE IF NOT EXISTS  public.Tutor-Alumno (
   id bigint GENERATED ALWAYS AS IDENTITY NOT NULL,
   dni_tutor character varying,
   dni_alumno character varying,
   created_at timestamp with time zone,
   CONSTRAINT Tutor-Alumno_pkey PRIMARY KEY (id),
-  CONSTRAINT Tutor-Alumno_dni_tutor_fkey FOREIGN KEY (dni_tutor) REFERENCES public.Tutores(dni),
+  CONSTRAINT Tutor-Alumno_dni_tutor_fkey FOREIGN KEY (dni_tutor) REFERENCES public.Usuarios(dni),
   CONSTRAINT Tutor-Alumno_dni_alumno_fkey FOREIGN KEY (dni_alumno) REFERENCES public.Alumnos(dni)
 );

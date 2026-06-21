@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+
 from Routers import (
     data_router,
     encuestas_router,
@@ -44,10 +45,6 @@ app.include_router(tutores_router.router)
 app.include_router(encuestas_router.router)
 
 load_dotenv()
-
-TOKEN = os.getenv("MOODLE_TOKEN")
-BASE_URL = os.getenv("MOODLE_BASE_URL")
-
 
 @app.get("/")
 def root():
