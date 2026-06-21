@@ -1,12 +1,14 @@
+import { getBackendURL } from '../config.js';
+
 export function initAdminTools() {
-    setupForm('formAltaAdmin', 'msgAdmin', 'Administrador registrado exitosamente.');
+    setupAltaAdminForm();
     setupForm('formCoeficientes', 'msgCoef', 'Coeficientes actualizados correctamente.');
 
     // Logic for auto-balancing sliders
     const coefAsistencia = document.getElementById('coefAsistencia');
     const coefTareas = document.getElementById('coefTareas');
     const coefExamenes = document.getElementById('coefExamenes');
-    
+
     if (coefAsistencia && coefTareas && coefExamenes) {
         const sliders = [coefAsistencia, coefTareas, coefExamenes];
         const valDisplays = [
@@ -27,12 +29,12 @@ export function initAdminTools() {
             slider.addEventListener('input', (e) => {
                 let newVal = parseFloat(e.target.value);
                 let others = sliders.filter((_, i) => i !== index);
-                
+
                 let targetSum = 3.0 - newVal;
-                
+
                 let val1 = parseFloat(others[0].value);
                 let val2 = parseFloat(others[1].value);
-                
+
                 let currentSum = val1 + val2;
                 if (currentSum === 0) {
                     val1 = targetSum / 2;
@@ -43,10 +45,10 @@ export function initAdminTools() {
                     val1 = targetSum * ratio1;
                     val2 = targetSum * ratio2;
                 }
-                
+
                 others[0].value = val1.toFixed(1);
                 others[1].value = val2.toFixed(1);
-                
+
                 updateDisplays();
             });
         });
@@ -80,7 +82,7 @@ function setupForm(formId, msgId, successText) {
 
     form.addEventListener('submit', (e) => {
         e.preventDefault();
-        
+
         // Simular guardado
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
@@ -115,3 +117,39 @@ style.textContent = `
     @keyframes spin { 100% { transform: rotate(360deg); } }
 `;
 document.head.appendChild(style);
+
+function setupAltaAdminForm() {
+    const form = document.getElementById('formAltaAdmin');
+    if (!form) return;
+
+    form.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const submitBtn = form.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        const dniInput = document.getElementById('adminDni').value;
+
+        submitBtn.innerHTML = '<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Procesando...';
+        submitBtn.disabled = true;
+
+        try {
+            const baseUrl = getBackendURL();
+            const response = await fetch(`${baseUrl}/usuarios/${dniInput}/rol`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ rol: 'Admin' })
+            });
+
+            if (!response.ok) throw new Error('Error al actualizar rol');
+
+            form.reset();
+            mostrarMensaje('msgAdmin', 'Administrador registrado exitosamente.', 'success');
+        } catch (error) {
+            console.error(error);
+            mostrarMensaje('msgAdmin', 'Error al registrar administrador.', 'error');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    });
+}

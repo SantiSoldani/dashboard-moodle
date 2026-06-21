@@ -410,50 +410,15 @@ export const VISTA_TUTORES = `
                 <table class="table-t">
                     <thead>
                         <tr>
-                            <th>APELLIDO</th>
-                            <th>NOMBRE</th>
+                            <th>NOMBRE COMPLETO</th>
+                            <th>DNI</th>
                             <th>EMAIL</th>
                             <th>ALUMNOS</th>
                             <th>ACCIONES</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>Alvarez</td>
-                            <td>Roberto</td>
-                            <td>roberto@ejemplo.com</td>
-                            <td><span class="badge-alumnos">12</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon btn-asignar" data-tutor="Roberto Alvarez"><span class="material-symbols-outlined">group_add</span> Asignar</button>
-                                    <button class="btn-icon btn-eliminar"><span class="material-symbols-outlined">delete</span> Eliminar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Domínguez</td>
-                            <td>María Florencia</td>
-                            <td>mariaflorencia@ejemplo.com</td>
-                            <td><span class="badge-alumnos">8</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon btn-asignar" data-tutor="María Florencia Domínguez"><span class="material-symbols-outlined">group_add</span> Asignar</button>
-                                    <button class="btn-icon btn-eliminar"><span class="material-symbols-outlined">delete</span> Eliminar</button>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>Gómez</td>
-                            <td>Esteban</td>
-                            <td>estebang@ejemplo.com</td>
-                            <td><span class="badge-alumnos zero">0</span></td>
-                            <td>
-                                <div class="action-buttons">
-                                    <button class="btn-icon btn-asignar" data-tutor="Esteban Gómez"><span class="material-symbols-outlined">group_add</span> Asignar</button>
-                                    <button class="btn-icon btn-eliminar"><span class="material-symbols-outlined">delete</span> Eliminar</button>
-                                </div>
-                            </td>
-                        </tr>
+                        
                     </tbody>
                 </table>
             </div>

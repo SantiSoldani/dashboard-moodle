@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Request
 from sqlalchemy.orm import Session
 import server
 from Controllers import UsuarioController
@@ -10,7 +10,6 @@ router = APIRouter(
 
 @router.post("/")
 async def add_usuario(usuario_data: dict, db: Session = Depends(server.get_db)):
-
     usuario = UsuarioController.add_usuario(usuario_data, db)
     return usuario
 
@@ -21,8 +20,12 @@ async def delete_usuario(dni: str, db: Session = Depends(server.get_db)):
     return {"message": f"Usuario {dni} eliminado correctamente"}
 
 @router.put("/{dni}/rol")
-async def update_rol(dni: str, nuevo_rol: str, db: Session = Depends(server.get_db)):
-
+async def update_rol(request: Request, dni: str, db: Session = Depends(server.get_db)):
+    try:
+        body = await request.json()
+    except:
+        return {"message": "Error al procesar la solicitud"}
+    nuevo_rol = body.get("rol")
     UsuarioController.update_rol(dni, nuevo_rol, db)
     return {"message": f"Rol del usuario {dni} actualizado a {nuevo_rol}"}
 

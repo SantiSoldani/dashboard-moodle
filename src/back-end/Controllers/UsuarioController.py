@@ -19,7 +19,7 @@ def add_usuario(usuario_data: dict, db):
     Usuario.post_Usuario(nuevo_usuario, db)
 
     # Si el usuario nuevo es Estudiante, se le crea un semaforo
-    if rol_aux == "Estudiante":
+    if rol_aux == "Learner":
         semaforo = Semaforo.semaforoDTO(
             dni_alumno=usuario_data.get("dni"),
             color="gris",
@@ -47,3 +47,4 @@ def get_usuario_by_dni(dni: str, db):
 def get_usuarios_by_rol(rol: str, db):
 
     return Usuario.get_usuarios_by_rol(rol, db)
+

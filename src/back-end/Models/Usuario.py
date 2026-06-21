@@ -57,8 +57,11 @@ def get_usuarios_by_rol(rol: str, db):
     query = text("""SELECT * FROM "Usuarios" WHERE rol = :rol""")
     result = db.execute(query, {"rol": rol}).fetchall()
     usuarios = []
+    print(result)
     for row in result:
         usuarios.append(
-            UsuarioDTO(dni=row[0], rol=row[1], ult_coneccion=row[2], created_at=row[3])
+            {"dni": row.dni, "nombre": row.nombre, "apellido": row.apellido, "email": row.email}
         )
+    
     return usuarios
+

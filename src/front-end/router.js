@@ -25,11 +25,11 @@ window.addEventListener("hashchange", () => {
 });
 
 export function navegar(nombreVista) {
-  const rol = localStorage.getItem("rol") || "Docente"; // Por defecto Docente para la demo
+  const rol = localStorage.getItem("rol") || "Instructor"; // Por defecto Docente para la demo
   const root = document.getElementById("root");
 
   // Control de Acceso Estudiante
-  if (rol === "Estudiante" && nombreVista !== "alumno_stats") {
+  if (rol === "Learner" && nombreVista !== "alumno_stats") {
     window.location.hash = "#alumno_stats";
     return;
   }
