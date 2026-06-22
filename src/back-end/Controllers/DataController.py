@@ -44,6 +44,7 @@ def Handle_encuesta_cuatrimestral(file: BinaryIO, db):
     #
     #   # 3) Calcula el estado del semáforo desde el DataFrame limpio
     resultados = SemaforoCalculator.calculo_cuatrimestral_from_df(df_clean, db)
+
     # print(resultados)
     # 4) Persiste los estados del semáforo
     for estado in resultados:
@@ -58,6 +59,7 @@ def Handle_encuesta_cuatrimestral(file: BinaryIO, db):
 
     respuestas = Data_transformer.To_object_list_from_df(pd.read_csv(file))
     EncuestaController.Handle_respuestas(respuestas, db)
+    AlumnoController.actualizar_Cuatrimestre(db)
 
 
 def Handle_notas(file: BinaryIO, db):

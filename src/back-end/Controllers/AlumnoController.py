@@ -1,6 +1,7 @@
+from collections import defaultdict
 from types import SimpleNamespace
 
-from Models import Alumno
+from Models import Alumno, Semaforo
 from Models.Alumno import AlumnoDto
 from sqlalchemy.sql.expression import Null
 
@@ -94,3 +95,24 @@ def fetch_semaforos(db, dni):
 def indicadoresXcohorte(cohorte, db):
 
     return Alumno.fetch_indicadoresXcohorte(cohorte, db)
+
+
+def cuatrimestrales_filtrados(db, filtro, valor):
+
+    raw = Alumno.get_cuatrimestrales_filtrados(db, filtro, valor)
+
+    return raw
+
+
+def iniciales_filtrados(db, filtro, valor):
+
+    raw = Alumno.get_iniciales_filtrados(db, filtro, valor)
+
+    return raw
+
+
+def get_evolucion_semaforos(db, filtro, valor, piso, techo):
+
+    raw = Semaforo.get_evolucion(db, filtro, valor, piso, techo)
+
+    return raw

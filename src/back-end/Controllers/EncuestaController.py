@@ -1,3 +1,4 @@
+from collections import defaultdict
 from types import SimpleNamespace
 
 from Models import Encuestas
@@ -29,3 +30,15 @@ def Handle_respuestas(respuestas_list: list[SimpleNamespace], db):
 
 def get_encuesta(db, dni):
     return Encuestas.get_encuesta(db, dni)
+
+
+def get_encuesta_filtrada(db, filtro, valor):
+    raw = Encuestas.get_encuesta_filtrada(db, filtro, valor)
+
+    agrupado = defaultdict(list)
+    for item in raw:
+        agrupado[item.dni].append(item)
+        delattr(item, "dni")
+
+    # {"Sistemas": [{...}, {...}], "Civil": [{...}]}
+    return agrupado

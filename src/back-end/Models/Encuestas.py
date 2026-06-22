@@ -58,3 +58,29 @@ def get_encuesta(db, dni: str) -> list[SimpleNamespace]:
     except Exception as e:
         print(e)
         return []
+
+
+def get_encuesta_filtrada(db, filtro, valor):
+
+    COLUMNAS_PERMITIDAS = [
+        "plan_de_estudios",
+        "materias_aprobadas",
+        "cuatrimestre",
+        "fecha_inicio",
+    ]
+    try:
+        if filtro in COLUMNAS_PERMITIDAS:
+            query = text(f"""SELECT dni, pregunta, respuesta, {filtro} FROM "Respuestas" r
+                            JOIN "Alumnos" a
+                            ON a.dni = a.dni
+                            WHERE a.{filtro} = :valor
+                        """)
+
+            rows = (db.execute(query, {"valor": int(valor)})).mappings().all()
+            respuestas = [SimpleNamespace(**row) for row in rows]
+            return respuestas
+        else:
+            raise ValueError("filtro seleccionado inexistente")
+    except Exception as e:
+        print(e)
+        return []

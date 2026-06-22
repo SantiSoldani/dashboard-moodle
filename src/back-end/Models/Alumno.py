@@ -207,3 +207,69 @@ def fetch_indicadoresXcohorte(db, cohorte):
 
     except Exception as e:
         raise Exception(e)
+
+
+def get_cuatrimestrales_filtrados(db, filtro, valor):
+
+    COLUMNAS_PERMITIDAS = [
+        "plan_de_estudios",
+        "materias_aprobadas",
+        "cuatrimestre",
+        "fecha_inicio",
+    ]
+    try:
+        if filtro in COLUMNAS_PERMITIDAS:
+            query = text(f"""
+                            SELECT dni, {filtro},
+                            AVG(rac) AS "rendimiento cuantitativo",
+                            AVG(rap) AS "rendimiento percibido",
+                            AVG(raf) AS "rendimiento final",
+                            AVG(ac) AS "atraso de la carrera"
+                            FROM "indicadores_cuatrimestrales" ic
+                            JOIN "Alumnos" a
+                            ON a.dni = ic.dni
+                            WHERE (:valor = -1 OR a.{filtro} = :valor)
+                            GROUP BY {filtro}
+                            ORDER BY {filtro}
+                        """)
+            rows = db.execute(query, {"valor": valor}).mappings().all()
+            return [SimpleNamespace(**row) for row in rows]
+
+        else:
+            raise ValueError("la columna seleccionada no existe")
+    except Exception as e:
+        raise Exception(e)
+
+
+def get_iniciales_filtrados(db, filtro, valor):
+
+    COLUMNAS_PERMITIDAS = [
+        "plan_de_estudios",
+        "materias_aprobadas",
+        "cuatrimestre",
+        "fecha_inicio",
+    ]
+    try:
+        if filtro in COLUMNAS_PERMITIDAS:
+            query = text(f"""
+                            SELECT {filtro},
+                            AVG(pse) AS "perfil socio-economico",
+                            AVG(ic) AS "interrupcion de la carrera",
+                            AVG(pep) AS "perfil educativo de los padres/tutores",
+                            AVG(cl) AS "carga laboral",
+                            AVG(cv) AS "carga vital",
+                            AVG(loc) AS "localidad"
+                            FROM "Indicadores" i
+                            JOIN "Alumnos" a
+                            ON a.dni = i.dni
+                            WHERE (:valor = -1 OR a.{filtro} = :valor)
+                            GROUP BY a.{filtro}
+                            ORDER BY a.{filtro}
+                        """)
+            rows = db.execute(query, {"valor": valor}).mappings().all()
+            return [SimpleNamespace(**row) for row in rows]
+
+        else:
+            raise ValueError("la columna seleccionada no existe")
+    except Exception as e:
+        raise Exception(e)

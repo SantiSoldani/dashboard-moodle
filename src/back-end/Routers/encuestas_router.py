@@ -16,3 +16,13 @@ async def get_ultima_encuesta(dni: str, db: Session = Depends(server.get_db)):
     except Exception as e:
         print(e)
         raise HTTPException(status_code=500)
+
+
+@router.get("/All/{filtro}/{valor}", status_code=200)
+def get_respuestas_filtradas(filtro, valor, db: Session = Depends(server.get_db)):
+
+    try:
+        respuestas = EncuestaController.get_encuesta_filtrada(db, filtro, valor)
+        return respuestas
+    except Exception as e:
+        raise HTTPException(status_code=500)
