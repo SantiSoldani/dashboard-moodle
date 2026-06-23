@@ -32,12 +32,24 @@ def post_notas(notas, db):
     return db.commit()
 
 def get_notas(db):
-    query = """SELECT * FROM "Notas" """
+    query = """SELECT * FROM "Examen" """
     rows = db.execute(query).mappings().fetchall()
     return [NotasDto(**row) for row in rows]
 
 
 def get_nota_by_dni(dni: str, db):
-    query = """SELECT * FROM "Notas" WHERE dni = :dni"""
-    rows = db.execute(query, {"dni": dni}).mappings().fetchone()
+    query = """SELECT * FROM "Examen" WHERE dni_alumno = :dni"""
+    rows = db.execute(query, {"dni_alumno": dni}).mappings().fetchone()
     return [NotasDto(**row) for row in rows]
+
+def get_promedio_general(db):
+    query = text("""
+        SELECT AVG(promedio_alumno) FROM (
+            SELECT AVG(nota) as promedio_alumno
+            FROM "Examen"
+            GROUP BY dni_alumno
+        ) AS subquery
+    """)
+    row = db.execute(query).fetchone()
+    return float(round(row[0], 2)) if row and row[0] is not None else 0.0
+    

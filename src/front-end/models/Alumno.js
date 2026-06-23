@@ -23,8 +23,8 @@ export async function HandleGet_alumnos(dni = null, which = "get") {
       response = await fetch(`${alumnosAPI}/get`, { headers }); // Trae todos los alumnos
     else if (which == "byDNI")
       response = await fetch(`${alumnosAPI}/get/byDNI/${dni}`, { headers });
-    else if (which == "stats")
-      // Trae los alumnos + Datos de su Semaforo.
+    else if (which == "stats" || which == "criticos")
+      // Trae los alumnos + Datos de su Semaforo o los criticos
       response = await fetch(`${alumnosAPI}/get/${which}`, { headers });
     if (!response.ok) {
       throw new Error("Error en el fetch de los alumnos");

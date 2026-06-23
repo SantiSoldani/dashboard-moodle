@@ -89,3 +89,16 @@ def get_evolucion(db, filtro, valor, piso, techo):
     except Exception as e:
         print(e)
         return []
+
+def get_criticos(db):
+    query = text(
+        """
+        SELECT dni_alumno, color, score FROM (
+            SELECT dni_alumno, color, score, ROW_NUMBER() OVER(PARTITION BY dni_alumno ORDER BY created_at DESC) as rn
+            FROM "Semaforo"
+        ) AS subquery
+        WHERE rn = 1 AND color = 'rojo'
+        """
+    )
+    rows = db.execute(query).mappings().all()
+    return [semaforoDTO(**row) for row in rows]

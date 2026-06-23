@@ -116,3 +116,6 @@ def get_evolucion_semaforos(db, filtro, valor, piso, techo):
     raw = Semaforo.get_evolucion(db, filtro, valor, piso, techo)
 
     return raw
+
+def get_criticos(db):
+    return Semaforo.get_criticos(db)

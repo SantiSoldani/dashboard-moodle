@@ -97,3 +97,12 @@ async def get_evolucion_semaforos(
         return semaforos
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/get/criticos", status_code=200)
+async def get_criticos(db: Session = Depends(server.get_db)):
+    try:
+        criticos = AlumnoController.get_criticos(db)
+        return [c.__dict__ for c in criticos]
+    except Exception as e:
+        print(f"Error en get_criticos: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

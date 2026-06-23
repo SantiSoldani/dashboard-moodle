@@ -423,7 +423,7 @@ export const VISTA_ADMIN_DASHBOARD = `
                 </div>
                 <div class="kpi-value" style="display: flex; align-items: baseline; gap: 8px;">
                     <strong id="admin_riesgo_critico" style="font-size: 2rem; color: #141b2b;">--%</strong>
-                    <span style="color: #EF4444; font-size: 0.9rem; font-weight: 600;">↑ 0.5%</span>
+                    
                 </div>
             </div>
             <div class="kpi-card-new border-primary" style="background: white; border-radius: 12px; padding: 16px; border-left: 4px solid #2563EB; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">

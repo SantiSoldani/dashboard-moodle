@@ -34,6 +34,14 @@ async def get_notas_alumno(dni: str, db: Session = Depends(server.get_db)):
 
     return notas
 
+@router.get('/promedio')
+async def get_promedio_general(db: Session = Depends(server.get_db)):
+    try:
+        promedio = NotasController.get_promedio_general(db)
+    except Exception as e:
+        return {"error": str(e)}
+    return promedio
+
 
 @router.get("/stats/{indicador}/{dni}")
 async def get_stats(indicador: str, dni: str, db: Session = Depends(server.get_db)):

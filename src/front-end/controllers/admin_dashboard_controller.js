@@ -1,7 +1,10 @@
 import { HandleGet_alumnos } from "../models/Alumno.js";
+import { Handle_get_promedio_general } from "../models/Notas.js";
 
 let allStudents = [];
 let chartInstances = [];
+let promedioGeneral = 0;
+let totalCriticos = 0;
 
 export async function initAdminDashboard() {
     await cargarDatos();
@@ -23,9 +26,22 @@ async function cargarDatos() {
         } else {
             allStudents = [];
         }
+
+        let promResponse = await Handle_get_promedio_general();
+        if (promResponse !== undefined && promResponse !== null) {
+            promedioGeneral = typeof promResponse === 'string' ? parseFloat(promResponse) : promResponse;
+        }
+
+        let criticosResponse = await HandleGet_alumnos(null, "criticos");
+        if (criticosResponse && Array.isArray(criticosResponse)) {
+            totalCriticos = criticosResponse.length;
+        } else {
+            totalCriticos = 0;
+        }
     } catch (error) {
         console.error("Error cargando alumnos para el dashboard administrador:", error);
         allStudents = [];
+        totalCriticos = 0;
     }
 }
 
@@ -33,40 +49,19 @@ function calcularYMostrarMetricas() {
     const totalAlumnos = allStudents.length;
     document.getElementById("admin_total_alumnos").textContent = totalAlumnos || 312;
 
-    let sumScore = 0;
-    let countScore = 0;
-    let criticosCount = 0;
-
-    allStudents.forEach(alumno => {
-        const estado = String(alumno.color).trim().toLowerCase();
-        if (estado === "rojo") {
-            criticosCount++;
-        }
-
-        if (alumno.score !== undefined && alumno.score !== null) {
-            sumScore += parseFloat(alumno.score);
-            countScore++;
-        }
-    });
-
     // Tasa de respuesta
     document.getElementById("admin_tasa_respuesta").textContent = "78%";
 
     // Riesgo critico
-    const riskPercentage = totalAlumnos > 0 ? ((criticosCount / totalAlumnos) * 100).toFixed(0) : "14";
+    const riskPercentage = totalAlumnos > 0 ? ((totalCriticos / totalAlumnos) * 100).toFixed(0) : "14";
     document.getElementById("admin_riesgo_critico").textContent = `${riskPercentage}%`;
 
     // Promedio General
-    let promedioInstitucional = 0;
-    if (countScore > 0) {
-        promedioInstitucional = sumScore / countScore;
-        if (promedioInstitucional <= 1.0) {
-            promedioInstitucional = promedioInstitucional * 10;
-        }
+    if (promedioGeneral > 0) {
+        document.getElementById("admin_promedio_general").textContent = promedioGeneral.toFixed(1);
     } else {
-        promedioInstitucional = 6.1; // Default
+        document.getElementById("admin_promedio_general").textContent = "--";
     }
-    document.getElementById("admin_promedio_general").textContent = promedioInstitucional.toFixed(1);
 }
 
 function renderizarGraficos() {

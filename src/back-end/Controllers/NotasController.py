@@ -12,6 +12,10 @@ def fetch_notas_alumno(db, dni):
     return Notas.get_nota_by_dni(db, dni)
 
 
+def get_promedio_general(db):
+    return Notas.get_promedio_general(db)
+
+
 def post_notas(db, notas: list[SimpleNamespace]):
     try:
         Notas.post_notas(
@@ -26,7 +30,7 @@ def post_notas(db, notas: list[SimpleNamespace]):
             ],
             db,
         )
-        print("volvi de la funcion")
+       # print("volvi de la funcion")
         return
     except Exception as e:
         db.rollback()
