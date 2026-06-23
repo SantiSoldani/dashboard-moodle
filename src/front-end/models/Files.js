@@ -13,7 +13,7 @@ export async function Post_csv(file, which_file, subject = null) {
     formData.append("materia", subject);
   }
   try {
-    // Hará un fetch a rutas similares a:
+    // Hará un fetch POST a rutas similares a:
     // data/upload/notas;
     // data/upload/alumnos;
     // data/upload/encuestaInicial;

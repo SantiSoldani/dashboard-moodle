@@ -9,7 +9,7 @@ class navBar extends HTMLElement {
         const isHome = hash === 'home';
         const isDataEntry = hash === 'data_entry';
         const isAlumnoStats = hash === 'alumno_stats';
-        const rol = localStorage.getItem('rol') || 'Docente';
+        const rol = localStorage.getItem('rol') || 'Instructor';
         const nombre = localStorage.getItem('nombreUsuario') || '';
 
         let navLinks = '';
@@ -20,10 +20,10 @@ class navBar extends HTMLElement {
                 <li class="${isAdminDashboard ? 'active' : ''}"><a href="#admin_dashboard">📈 Dashboard General</a></li>
                 <li class="${isAdminTools ? 'active' : ''}"><a href="#admin_tools">⚙️ Herramientas</a></li>
                 <li class="${hash === 'tutores' ? 'active' : ''}"><a href="#tutores">👨‍🏫 Tutores</a></li>
-                <li style="border-left: 1px solid #ccc; margin-left: 8px; padding-left: 8px;" class="${isHome ? 'active' : ''}"><a href="#home">📊 Panel Docente</a></li>
+                <li style="border-left: 1px solid #ccc; margin-left: 8px; padding-left: 8px;" class="${isHome ? 'active' : ''}"><a href="#home">📊 Panel Instructor</a></li>
                 <li class="${isDataEntry ? 'active' : ''}"><a href="#data_entry">📁 Cargar Datos</a></li>
             `;
-        } else if (rol !== 'Estudiante') {
+        } else if (rol !== 'Learner') {
             navLinks = `
                 <li class="${isHome ? 'active' : ''}"><a href="#home">📊 Inicio</a></li>
                 <li class="${isDataEntry ? 'active' : ''}"><a href="#data_entry">📁 Cargar Datos</a></li>
@@ -46,7 +46,7 @@ class navBar extends HTMLElement {
                     </svg>
                 </button>
                 <div style="display: flex; align-items: center; gap: 12px;">
-                    <div class="teacher-avatar">${rol === 'Administrador' ? 'AD' : (rol === 'Estudiante' ? 'ES' : 'DO')}</div>
+                    <div class="teacher-avatar">${rol === 'Administrador' ? 'AD' : (rol === 'Learner' ? 'LN' : (rol === 'Tutor' ? 'TU' : 'IN'))}</div>
                     <div class="teacher-info">
                         <span>Hola ${nombre}!</span>
                     </div>

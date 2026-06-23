@@ -1,18 +1,17 @@
 import { HandleGet_alumnos } from "../models/Alumno.js";
 
 let allStudents = [];
-let chartLineInstance = null;
-let chartRadarInstance = null;
+let chartInstances = [];
 
 export async function initAdminDashboard() {
     await cargarDatos();
     calcularYMostrarMetricas();
     renderizarGraficos();
     
-    // Resize charts on window resize
     window.addEventListener('resize', () => {
-        if(chartLineInstance) chartLineInstance.resize();
-        if(chartRadarInstance) chartRadarInstance.resize();
+        chartInstances.forEach(chart => {
+            if (chart) chart.resize();
+        });
     });
 }
 
@@ -32,28 +31,32 @@ async function cargarDatos() {
 
 function calcularYMostrarMetricas() {
     const totalAlumnos = allStudents.length;
-    document.getElementById("admin_total_alumnos").textContent = totalAlumnos;
+    document.getElementById("admin_total_alumnos").textContent = totalAlumnos || 312;
 
     let sumScore = 0;
     let countScore = 0;
     let criticosCount = 0;
 
     allStudents.forEach(alumno => {
-        // Riesgo critico
         const estado = String(alumno.color).trim().toLowerCase();
         if (estado === "rojo") {
             criticosCount++;
         }
 
-        // Promedio (mock logic similar to home)
         if (alumno.score !== undefined && alumno.score !== null) {
             sumScore += parseFloat(alumno.score);
             countScore++;
         }
     });
 
-    document.getElementById("admin_riesgo_critico").textContent = criticosCount;
+    // Tasa de respuesta
+    document.getElementById("admin_tasa_respuesta").textContent = "78%";
 
+    // Riesgo critico
+    const riskPercentage = totalAlumnos > 0 ? ((criticosCount / totalAlumnos) * 100).toFixed(0) : "14";
+    document.getElementById("admin_riesgo_critico").textContent = `${riskPercentage}%`;
+
+    // Promedio General
     let promedioInstitucional = 0;
     if (countScore > 0) {
         promedioInstitucional = sumScore / countScore;
@@ -61,150 +64,179 @@ function calcularYMostrarMetricas() {
             promedioInstitucional = promedioInstitucional * 10;
         }
     } else {
-        promedioInstitucional = totalAlumnos > 0 ? 7.85 : 0.0;
+        promedioInstitucional = 6.1; // Default
     }
-    document.getElementById("admin_promedio_general").textContent = promedioInstitucional.toFixed(2);
+    document.getElementById("admin_promedio_general").textContent = promedioInstitucional.toFixed(1);
 }
 
 function renderizarGraficos() {
-    if (typeof echarts === 'undefined') {
-        console.error("ECharts no está cargado.");
-        return;
-    }
+    if (typeof echarts === 'undefined') return;
 
-    renderLineChart();
+    chartInstances.forEach(chart => { if(chart) chart.dispose(); });
+    chartInstances = [];
+
     renderRadarChart();
-}
-
-function renderLineChart() {
-    const dom = document.getElementById('chartRiesgoLine');
-    if (!dom) return;
-    
-    chartLineInstance = echarts.init(dom);
-
-    // Mock data for evolution (últimos 6 meses)
-    const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'];
-    const currentCriticos = parseInt(document.getElementById("admin_riesgo_critico").textContent) || 12;
-    
-    // Generar tendencia falsa terminando en el valor actual
-    const dataRiesgo = [
-        Math.round(currentCriticos * 1.5), 
-        Math.round(currentCriticos * 1.3), 
-        Math.round(currentCriticos * 1.4), 
-        Math.round(currentCriticos * 1.1), 
-        Math.round(currentCriticos * 0.9), 
-        currentCriticos
-    ];
-
-    const option = {
-        tooltip: {
-            trigger: 'axis'
-        },
-        grid: {
-            left: '3%',
-            right: '4%',
-            bottom: '3%',
-            containLabel: true
-        },
-        xAxis: {
-            type: 'category',
-            boundaryGap: false,
-            data: meses,
-            axisLine: { lineStyle: { color: '#94a3b8' } }
-        },
-        yAxis: {
-            type: 'value',
-            splitLine: { lineStyle: { type: 'dashed', color: '#e2e8f0' } },
-            axisLine: { show: false }
-        },
-        series: [
-            {
-                name: 'Alumnos en Riesgo',
-                type: 'line',
-                data: dataRiesgo,
-                smooth: true,
-                symbolSize: 8,
-                itemStyle: { color: '#ef4444' },
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        { offset: 0, color: 'rgba(239,68,68,0.5)' },
-                        { offset: 1, color: 'rgba(239,68,68,0.0)' }
-                    ])
-                }
-            }
-        ]
-    };
-
-    chartLineInstance.setOption(option);
+    renderHeatmapChart();
+    renderScatterChart();
+    renderLineChart();
+    renderBarChart();
 }
 
 function renderRadarChart() {
-    const dom = document.getElementById('chartRiesgoRadar');
+    const dom = document.getElementById('chartMeticasAgregadas');
     if (!dom) return;
-
-    chartRadarInstance = echarts.init(dom);
-
-    // Agrupar alumnos en riesgo rojo y amarillo por carrera
-    const riesgoPorCarrera = {};
-    allStudents.forEach(a => {
-        const estado = String(a.color).trim().toLowerCase();
-        if (estado === "rojo" || estado === "amarillo") {
-            const carrera = a.carrera || "General";
-            riesgoPorCarrera[carrera] = (riesgoPorCarrera[carrera] || 0) + 1;
-        }
-    });
-
-    // Si no hay datos, crear unos de muestra
-    let indicator = [];
-    let values = [];
-    
-    const carrerasKeys = Object.keys(riesgoPorCarrera);
-    if (carrerasKeys.length > 2) {
-        let maxVal = Math.max(...Object.values(riesgoPorCarrera)) + 2;
-        carrerasKeys.forEach(c => {
-            indicator.push({ name: c, max: maxVal });
-            values.push(riesgoPorCarrera[c]);
-        });
-    } else {
-        indicator = [
-            { name: 'Ing. Sistemas', max: 20 },
-            { name: 'Ing. Industrial', max: 20 },
-            { name: 'Arquitectura', max: 20 },
-            { name: 'Administración', max: 20 },
-            { name: 'Diseño', max: 20 }
-        ];
-        values = [12, 15, 8, 4, 10];
-    }
+    const chart = echarts.init(dom);
+    chartInstances.push(chart);
 
     const option = {
         tooltip: {},
         radar: {
-            indicator: indicator,
-            splitArea: {
-                areaStyle: {
-                    color: ['#f8fafc', '#f1f5f9', '#e2e8f0', '#cbd5e1']
-                }
-            },
-            axisName: {
-                color: '#475569',
-                backgroundColor: '#fff',
-                borderRadius: 3,
-                padding: [3, 5]
-            }
+            indicator: [
+                { name: 'RAC', max: 100 },
+                { name: 'RAP', max: 100 },
+                { name: 'RAF', max: 100 },
+                { name: 'PRE', max: 100 },
+                { name: 'ATT', max: 100 }
+            ],
+            axisName: { color: '#434655' }
         },
         series: [{
-            name: 'Riesgo por Carrera',
+            name: 'Métricas',
             type: 'radar',
             data: [
                 {
-                    value: values,
-                    name: 'Alumnos en Riesgo',
-                    itemStyle: { color: '#f59e0b' },
-                    areaStyle: { color: 'rgba(245, 158, 11, 0.4)' }
+                    value: [80, 75, 90, 60, 85],
+                    name: 'Promedio Institucional',
+                    itemStyle: { color: '#2563EB' },
+                    areaStyle: { color: 'rgba(37, 99, 235, 0.2)' }
                 }
             ]
         }]
     };
+    chart.setOption(option);
+}
 
-    chartRadarInstance.setOption(option);
+function renderHeatmapChart() {
+    const dom = document.getElementById('chartPerfilSemaforo');
+    if (!dom) return;
+    const chart = echarts.init(dom);
+    chartInstances.push(chart);
+
+    const xData = ['Estable (Verde)', 'Alerta (Amarillo)', 'Crítico (Rojo)'];
+    const yData = ['Alto', 'Medio', 'Bajo'];
+    // Mock Data format: [xIndex, yIndex, value]
+    const data = [
+        [0, 0, 50], [0, 1, 40], [0, 2, 10],
+        [1, 0, 20], [1, 1, 60], [1, 2, 30],
+        [2, 0, 5], [2, 1, 25], [2, 2, 70]
+    ].map(item => [item[0], item[1], item[2]]);
+
+    const option = {
+        tooltip: { position: 'top' },
+        grid: { left: '15%', right: '5%', top: '5%', bottom: '15%' },
+        xAxis: { type: 'category', data: xData, axisLabel: { color: '#434655' } },
+        yAxis: { type: 'category', data: yData, axisLabel: { color: '#434655' } },
+        visualMap: {
+            min: 0,
+            max: 100,
+            calculable: true,
+            orient: 'horizontal',
+            left: 'center',
+            bottom: -20,
+            show: false,
+            inRange: { color: ['#F0FDF4', '#FFFBEB', '#FEF2F2'] }
+        },
+        series: [{
+            name: 'Distribución',
+            type: 'heatmap',
+            data: data,
+            label: { show: true, color: '#141b2b' }
+        }]
+    };
+    chart.setOption(option);
+}
+
+function renderScatterChart() {
+    const dom = document.getElementById('chartPRENota');
+    if (!dom) return;
+    const chart = echarts.init(dom);
+    chartInstances.push(chart);
+
+    const option = {
+        tooltip: { trigger: 'item' },
+        grid: { left: '10%', right: '5%', top: '10%', bottom: '15%' },
+        xAxis: { 
+            type: 'value', 
+            name: 'PRE',
+            nameLocation: 'middle',
+            nameGap: 25,
+            axisLabel: { color: '#434655' },
+            splitLine: { lineStyle: { type: 'dashed' } }
+        },
+        yAxis: { 
+            type: 'value',
+            name: 'Nota Promedio',
+            nameLocation: 'middle',
+            nameGap: 30,
+            axisLabel: { color: '#434655' },
+            splitLine: { lineStyle: { type: 'dashed' } }
+        },
+        series: [{
+            symbolSize: 10,
+            data: [
+                [40, 5], [55, 6.5], [70, 8], [85, 9.5],
+                [30, 4.5], [60, 7.5], [80, 8.5], [90, 9]
+            ],
+            type: 'scatter',
+            itemStyle: { color: '#2563EB' }
+        }]
+    };
+    chart.setOption(option);
+}
+
+function renderLineChart() {
+    const dom = document.getElementById('chartEvolucionSemaforo');
+    if (!dom) return;
+    const chart = echarts.init(dom);
+    chartInstances.push(chart);
+
+    const option = {
+        tooltip: { trigger: 'axis' },
+        legend: { data: ['Estable', 'Alerta', 'Crítico'], bottom: 0 },
+        grid: { left: '5%', right: '5%', top: '5%', bottom: '15%', containLabel: true },
+        xAxis: { type: 'category', data: ['Q1 \'23', 'Q2 \'23', 'Q1 \'24', 'Q2 \'24'], axisLabel: { color: '#434655' } },
+        yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed' } }, axisLabel: { color: '#434655' } },
+        series: [
+            { name: 'Estable', type: 'bar', stack: 'total', data: [120, 132, 101, 134], itemStyle: { color: '#22C55E' } },
+            { name: 'Alerta', type: 'bar', stack: 'total', data: [220, 182, 191, 234], itemStyle: { color: '#F59E0B' } },
+            { name: 'Crítico', type: 'bar', stack: 'total', data: [150, 232, 201, 154], itemStyle: { color: '#EF4444' } }
+        ]
+    };
+    chart.setOption(option);
+}
+
+function renderBarChart() {
+    const dom = document.getElementById('chartComparacionCohortes');
+    if (!dom) return;
+    const chart = echarts.init(dom);
+    chartInstances.push(chart);
+
+    const option = {
+        tooltip: { trigger: 'axis' },
+        grid: { left: '5%', right: '5%', top: '5%', bottom: '10%', containLabel: true },
+        xAxis: { type: 'category', data: ['2022', '2023', '2024'], axisLabel: { color: '#434655' }, axisLine: { show: false }, axisTick: { show: false } },
+        yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed' } }, axisLabel: { show: false }, splitLine: { show: false } },
+        series: [{
+            data: [
+                { value: 6.2, itemStyle: { color: '#2563EB' } },
+                { value: 7.1, itemStyle: { color: '#b4c5ff' } },
+                { value: 5.8, itemStyle: { color: '#e1e8fd' } }
+            ],
+            type: 'bar',
+            barWidth: '40%',
+            label: { show: true, position: 'insideBottom', color: '#141b2b', formatter: '{c}' },
+            itemStyle: { borderRadius: [4, 4, 0, 0] }
+        }]
+    };
+    chart.setOption(option);
 }

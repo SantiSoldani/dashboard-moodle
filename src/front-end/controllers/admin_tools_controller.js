@@ -137,7 +137,7 @@ function setupAltaAdminForm() {
             const response = await fetch(`${baseUrl}/usuarios/${dniInput}/rol`, {
                 method: 'PUT',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ rol: 'Admin' })
+                body: JSON.stringify({ rol: 'Administrador' })
             });
 
             if (!response.ok) throw new Error('Error al actualizar rol');

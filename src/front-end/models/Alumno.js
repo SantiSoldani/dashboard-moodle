@@ -11,8 +11,14 @@ const alumnosAPI = `${getConfig()}/alumnos`;
 
 export async function HandleGet_alumnos(dni = null, which = "get") {
   try {
+    const rol = localStorage.getItem("rol") || "Instructor";
+    const headers = { 
+      "ngrok-skip-browser-warning": "69420",
+      "X-Role": rol 
+    };
+    
     let response;
-    const headers = { "ngrok-skip-browser-warning": "69420" };
+    
     if (which == "get")
       response = await fetch(`${alumnosAPI}/get`, { headers }); // Trae todos los alumnos
     else if (which == "byDNI")

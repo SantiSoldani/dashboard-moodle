@@ -4,7 +4,7 @@ export const VISTA_HOME = `
         <!-- CABECERA PRINCIPAL -->
         <header class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 24px;">
             <div>
-                <h1>Panel del Docente</h1>
+                <h1>Panel del Instructor</h1>
                 <p class="subtitle">Visualizador de Datos de Alumnos</p>
                 <p id="currentDate" style="font-weight: 600; color: #3b82f6; margin-top: 6px; font-size: 0.92rem;"></p>
             </div>
@@ -228,130 +228,47 @@ export const VISTA_DATA_ENTRY = `
 `;
 
 export const VISTA_ALUMNO_STATS = `
-    <div class="stats-page new-design">
-        <header class="new-header">
+    <div class="container new-design stats-page">
+
+        <header class="page-header" style="margin-bottom: 24px;">
             <h1 id="stats-header-name">Hola, ...</h1>
-            <p class="subtitle">Bienvenido a tu portal de alumno. Aquí encontrarás el resumen de tu rendimiento, asistencia y las tareas que requieren tu atención.</p>
+            <p class="subtitle" id="stats-header-subtitle">Ing. Industrial · Cohorte 2022 · última encuesta: 2do cuatrimestre 2024</p>
         </header>
 
-        <section class="kpi-section">
-            <div class="kpi-card-new border-blue">
-                <div class="kpi-top">
-                    <span class="kpi-label">PROMEDIO GENERAL</span>
-                    <div class="kpi-icon-badge"><span class="material-symbols-outlined">school</span></div>
-                </div>
-                <div class="kpi-value">
-                    <strong id="kpi-promedio">8.9</strong>
-                </div>
+        <section class="kpi-section" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;" id="student-kpi-grid">
+            <!-- Loaded dynamically -->
+        </section>
+
+        <section id="student-alert-box" class="alert-panel" style="margin-top: 24px; background-color: #f1f3ff; border: 1px solid #dce2f7; border-radius: 12px; padding: 24px; display: flex; gap: 16px;">
+            <div style="background-color: #2563eb; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                <span class="material-symbols-outlined">emoji_objects</span>
             </div>
-            <div class="kpi-card-new border-blue">
-                <div class="kpi-top">
-                    <span class="kpi-label">ASISTENCIA TOTAL</span>
-                    <div class="kpi-icon-badge"><span class="material-symbols-outlined">calendar_today</span></div>
-                </div>
-                <div class="kpi-value">
-                    <strong id="kpi-asistencia">92 <span class="kpi-unit">%</span></strong>
-                </div>
-            </div>
-            <div class="kpi-card-new border-blue">
-                <div class="kpi-top">
-                    <span class="kpi-label">TAREAS ENTREGADAS</span>
-                    <div class="kpi-icon-badge"><span class="material-symbols-outlined">check_circle</span></div>
-                </div>
-                <div class="kpi-value">
-                    <strong id="kpi-tareas">17 <span class="kpi-unit">/18</span></strong>
-                </div>
+            <div>
+                <h3 id="alert-title" style="color: #003ea8; margin: 0 0 8px 0; font-size: 1.1rem;">Tu confianza para aprobar viene bajando hace dos cuatrimestres</h3>
+                <p id="alert-desc" style="color: #434655; margin: 0 0 12px 0;">No es una alarma, es una señal para actuar. Hay tutorías de Análisis Matemático los martes y jueves, y no hace falta estar en crisis para ir.</p>
+                <a href="#" id="alert-link" style="color: #2563eb; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px;">Ver horarios de tutorías <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span></a>
             </div>
         </section>
 
-        <section class="info-section">
-            <div class="section-header-new">
-                <div class="title-with-icon">
-                    <span class="material-symbols-outlined">person</span>
-                    <h2>Información Personal</h2>
+        <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; margin-top: 24px;">
+            <div class="metrics-list-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div style="margin-bottom: 24px;">
+                    <h2 id="metric-list-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;">Cómo te sentís este cuatrimestre</h2>
+                    <p class="subtitle" id="metric-list-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;">Tus respuestas en la última encuesta</p>
                 </div>
-                <span class="section-subtitle-right">Datos básicos de matriculación</span>
-            </div>
-            <div id="info-panel" class="info-grid-new">
-                <div class="info-item-new">
-                    <span class="info-label-new">NOMBRE COMPLETO</span>
-                    <strong class="info-val-new">...</strong>
-                </div>
-                <div class="info-item-new">
-                    <span class="info-label-new">DOCUMENTO</span>
-                    <strong class="info-val-new">...</strong>
-                </div>
-                <div class="info-item-new">
-                    <span class="info-label-new">CARRERA</span>
-                    <strong class="info-val-new">...</strong>
-                </div>
-                <div class="info-item-new">
-                    <span class="info-label-new">CURSO ACTUAL</span>
-                    <strong class="info-val-new">...</strong>
-                </div>
-                <div class="info-item-new full-width-sm">
-                    <span class="info-label-new">CORREO ELECTRÓNICO INSTITUCIONAL</span>
-                    <strong class="info-val-new">...</strong>
-                </div>
-                <div class="info-item-new full-width-sm">
-                    <span class="info-label-new">TELÉFONO DE CONTACTO</span>
-                    <strong class="info-val-new">...</strong>
+                <div id="metrics-list-container" style="display: flex; flex-direction: column; gap: 20px;">
+                    <!-- Loaded dynamically -->
                 </div>
             </div>
-        </section>
-
-        <section class="activities-section">
-            <div class="section-header-new">
-                <div class="title-with-icon">
-                    <span class="material-symbols-outlined">assignment</span>
-                    <h2>Actividades Pendientes</h2>
+            
+            <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div style="margin-bottom: 24px;">
+                    <h2 id="chart-percepcion-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;">Cómo cambió tu percepción a lo largo del tiempo</h2>
+                    <p class="subtitle" id="chart-percepcion-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;">Solo te mostramos tu propio recorrido — no hay ningún otro alumno en este gráfico</p>
                 </div>
-                <a href="#" class="link-right">Ver todas</a>
+                <div id="chartPercepcionLine" style="width: 100%; height: 350px;"></div>
             </div>
-            <div class="activities-table-wrapper">
-                <table class="activities-table">
-                    <thead>
-                        <tr>
-                            <th>ACTIVIDAD</th>
-                            <th>ESTADO</th>
-                            <th>FECHA LÍMITE</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>
-                                <div class="activity-cell">
-                                    <span class="material-symbols-outlined icon-gray">dns</span>
-                                    <span>Completar Encuesta de Clima Académico</span>
-                                </div>
-                            </td>
-                            <td><span class="badge-new badge-pendiente">Pendiente</span></td>
-                            <td class="date-cell">15 Oct 2023</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="activity-cell">
-                                    <span class="material-symbols-outlined icon-gray">upload_file</span>
-                                    <span>Subir Documentación de Identidad Actualizada</span>
-                                </div>
-                            </td>
-                            <td><span class="badge-new badge-accion">Requiere Acción</span></td>
-                            <td class="date-cell">20 Oct 2023</td>
-                        </tr>
-                        <tr>
-                            <td>
-                                <div class="activity-cell">
-                                    <span class="material-symbols-outlined icon-gray">book</span>
-                                    <span>Matrícula Materias Segundo Semestre</span>
-                                </div>
-                            </td>
-                            <td><span class="badge-new badge-noiniciado">No Iniciado</span></td>
-                            <td class="date-cell">01 Nov 2023</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </section>
+        </div>
     </div>
 `;
 
@@ -482,56 +399,102 @@ export const VISTA_ADMIN_DASHBOARD = `
     <div class="container new-design admin-page">
         <component-navbar></component-navbar>
 
-        <!-- CABECERA PRINCIPAL -->
         <header class="page-header" style="margin-bottom: 24px;">
-            <h1>Dashboard General</h1>
-            <p class="subtitle">Visión general e indicadores a nivel institucional.</p>
+            <h1>Dashboard Institucional - Vista Global</h1>
+            <p class="subtitle">Análisis de indicadores clave, cohortes y métricas de rendimiento académico (RAC, RAP, RAF, PRE).</p>
         </header>
 
         <!-- KPIS Institucionales -->
-        <div class="admin-kpi-row">
-            <div class="kpi-card-admin blue-kpi">
-                <div class="kpi-icon-container"><span class="material-symbols-outlined">domain</span></div>
-                <div class="kpi-info">
-                    <span class="kpi-title">Alumnos Totales</span>
-                    <strong class="kpi-value" id="admin_total_alumnos">--</strong>
+        <div class="admin-kpi-row" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 24px;">
+            <div class="kpi-card-new border-success" style="background: white; border-radius: 12px; padding: 16px; border-left: 4px solid #22C55E; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div class="kpi-top" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span class="kpi-label" style="font-size: 0.75rem; font-weight: 700; color: #434655;">TASA DE RESPUESTA</span>
+                    <div class="kpi-icon-badge" style="color: #22C55E; background: #F0FDF4; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;"><span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span></div>
+                </div>
+                <div class="kpi-value" style="display: flex; align-items: baseline; gap: 8px;">
+                    <strong id="admin_tasa_respuesta" style="font-size: 2rem; color: #141b2b;">--%</strong>
+                    <span style="color: #22C55E; font-size: 0.9rem; font-weight: 600;">+2.1%</span>
                 </div>
             </div>
-            <div class="kpi-card-admin green-kpi">
-                <div class="kpi-icon-container"><span class="material-symbols-outlined">how_to_reg</span></div>
-                <div class="kpi-info">
-                    <span class="kpi-title">Promedio Institucional</span>
-                    <strong class="kpi-value" id="admin_promedio_general">--</strong>
+            <div class="kpi-card-new border-critical" style="background: white; border-radius: 12px; padding: 16px; border-left: 4px solid #EF4444; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div class="kpi-top" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span class="kpi-label" style="font-size: 0.75rem; font-weight: 700; color: #434655;">ALUMNOS EN RIESGO CRÍTICO</span>
+                    <div class="kpi-icon-badge" style="color: #EF4444; background: #FEF2F2; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;"><span class="material-symbols-outlined" style="font-size: 16px;">warning</span></div>
+                </div>
+                <div class="kpi-value" style="display: flex; align-items: baseline; gap: 8px;">
+                    <strong id="admin_riesgo_critico" style="font-size: 2rem; color: #141b2b;">--%</strong>
+                    <span style="color: #EF4444; font-size: 0.9rem; font-weight: 600;">↑ 0.5%</span>
                 </div>
             </div>
-            <div class="kpi-card-admin red-kpi">
-                <div class="kpi-icon-container"><span class="material-symbols-outlined">warning</span></div>
-                <div class="kpi-info">
-                    <span class="kpi-title">En Riesgo Crítico</span>
-                    <strong class="kpi-value" id="admin_riesgo_critico">--</strong>
+            <div class="kpi-card-new border-primary" style="background: white; border-radius: 12px; padding: 16px; border-left: 4px solid #2563EB; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div class="kpi-top" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span class="kpi-label" style="font-size: 0.75rem; font-weight: 700; color: #434655;">PROMEDIO GENERAL 1ER AÑO</span>
+                    <div class="kpi-icon-badge" style="color: #2563EB; background: #EFF6FF; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;"><span class="material-symbols-outlined" style="font-size: 16px;">functions</span></div>
+                </div>
+                <div class="kpi-value" style="display: flex; align-items: baseline; gap: 4px;">
+                    <strong id="admin_promedio_general" style="font-size: 2rem; color: #141b2b;">--</strong> <span class="kpi-unit" style="color: #434655;">/ 10</span>
+                </div>
+            </div>
+            <div class="kpi-card-new border-gray" style="background: white; border-radius: 12px; padding: 16px; border-left: 4px solid #475569; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div class="kpi-top" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
+                    <span class="kpi-label" style="font-size: 0.75rem; font-weight: 700; color: #434655;">TOTAL ALUMNOS ACTIVOS</span>
+                    <div class="kpi-icon-badge" style="color: #475569; background: #F1F5F9; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;"><span class="material-symbols-outlined" style="font-size: 16px;">group</span></div>
+                </div>
+                <div class="kpi-value">
+                    <strong id="admin_total_alumnos" style="font-size: 2rem; color: #141b2b;">--</strong>
                 </div>
             </div>
         </div>
 
         <!-- CHARTS GRID -->
-        <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
-            <div class="chart-panel card-panel">
-                <div class="panel-header-flex">
-                    <div class="panel-header-t">
-                        <span class="material-symbols-outlined icon-blue">timeline</span>
-                        <h2>Evolución de Alumnos en Riesgo</h2>
+        <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div class="panel-header-flex" style="margin-bottom: 16px;">
+                    <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined icon-blue" style="color: #434655;">pentagon</span>
+                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Métricas Agregadas RAC/RAP/RAF/PRE</h2>
                     </div>
                 </div>
-                <div id="chartRiesgoLine" style="width: 100%; height: 350px;"></div>
+                <div id="chartMeticasAgregadas" style="width: 100%; height: 250px;"></div>
             </div>
-            <div class="chart-panel card-panel">
-                <div class="panel-header-flex">
-                    <div class="panel-header-t">
-                        <span class="material-symbols-outlined icon-blue">radar</span>
-                        <h2>Distribución de Riesgo por Área</h2>
+            <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div class="panel-header-flex" style="margin-bottom: 16px;">
+                    <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined icon-blue" style="color: #434655;">grid_view</span>
+                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Perfil Económico vs Semáforo</h2>
                     </div>
                 </div>
-                <div id="chartRiesgoRadar" style="width: 100%; height: 350px;"></div>
+                <div id="chartPerfilSemaforo" style="width: 100%; height: 250px;"></div>
+            </div>
+            <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div class="panel-header-flex" style="margin-bottom: 16px;">
+                    <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined icon-blue" style="color: #434655;">scatter_plot</span>
+                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">PRE vs Nota Promedio 1er Año</h2>
+                    </div>
+                </div>
+                <div id="chartPRENota" style="width: 100%; height: 250px;"></div>
+            </div>
+        </div>
+        
+        <div class="charts-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
+            <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div class="panel-header-flex" style="margin-bottom: 16px;">
+                    <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined icon-blue" style="color: #434655;">bar_chart</span>
+                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Evolución del Semáforo por Cuatrimestre</h2>
+                    </div>
+                </div>
+                <div id="chartEvolucionSemaforo" style="width: 100%; height: 250px;"></div>
+            </div>
+            <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                <div class="panel-header-flex" style="margin-bottom: 16px;">
+                    <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
+                        <span class="material-symbols-outlined icon-blue" style="color: #434655;">compare_arrows</span>
+                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Comparación de Cohortes</h2>
+                    </div>
+                </div>
+                <div id="chartComparacionCohortes" style="width: 100%; height: 250px;"></div>
             </div>
         </div>
     </div>
