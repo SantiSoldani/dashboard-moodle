@@ -52,4 +52,14 @@ def get_promedio_general(db):
     """)
     row = db.execute(query).fetchone()
     return float(round(row[0], 2)) if row and row[0] is not None else 0.0
+
+def get_promedio_materias(db):
+    query = text("""
+        SELECT nombre, AVG(nota) as promedio
+        FROM "Examen"
+        JOIN "Materia" ON "Examen".id_materia = "Materia".id
+        GROUP BY nombre
+    """)
+    rows = db.execute(query).mappings().fetchall()
+    return [{"nombre": row["nombre"], "promedio": float(round(row["promedio"], 2))} for row in rows]
     

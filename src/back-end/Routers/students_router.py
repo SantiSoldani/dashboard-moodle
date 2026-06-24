@@ -106,3 +106,12 @@ async def get_criticos(db: Session = Depends(server.get_db)):
     except Exception as e:
         print(f"Error en get_criticos: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/get/color/{dni}", status_code=200)
+async def get_color(dni: str, db: Session = Depends(server.get_db)):
+    try:
+        color = AlumnoController.get_color(dni, db)
+        return color
+    except Exception as e:
+        print(f"Error en get_color: {e}")
+        raise HTTPException(status_code=500, detail=str(e))

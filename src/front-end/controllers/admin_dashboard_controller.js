@@ -1,5 +1,5 @@
 import { HandleGet_alumnos } from "../models/Alumno.js";
-import { Handle_get_promedio_general } from "../models/Notas.js";
+import { Handle_get_promedio_general, Handle_get_promedio_materias } from "../models/Notas.js";
 
 let allStudents = [];
 let chartInstances = [];
@@ -49,9 +49,6 @@ function calcularYMostrarMetricas() {
     const totalAlumnos = allStudents.length;
     document.getElementById("admin_total_alumnos").textContent = totalAlumnos || 312;
 
-    // Tasa de respuesta
-    document.getElementById("admin_tasa_respuesta").textContent = "78%";
-
     // Riesgo critico
     const riskPercentage = totalAlumnos > 0 ? ((totalCriticos / totalAlumnos) * 100).toFixed(0) : "14";
     document.getElementById("admin_riesgo_critico").textContent = `${riskPercentage}%`;
@@ -72,7 +69,7 @@ function renderizarGraficos() {
 
     renderRadarChart();
     renderHeatmapChart();
-    renderScatterChart();
+    renderPromedioMateriasList();
     renderLineChart();
     renderBarChart();
 }
@@ -87,11 +84,11 @@ function renderRadarChart() {
         tooltip: {},
         radar: {
             indicator: [
-                { name: 'RAC', max: 100 },
-                { name: 'RAP', max: 100 },
-                { name: 'RAF', max: 100 },
-                { name: 'PRE', max: 100 },
-                { name: 'ATT', max: 100 }
+                { name: 'PSE', max: 100 },
+                { name: 'IC', max: 100 },
+                { name: 'CL', max: 100 },
+                { name: 'CV', max: 100 },
+                { name: 'LOC', max: 100 }
             ],
             axisName: { color: '#434655' }
         },
@@ -117,20 +114,21 @@ function renderHeatmapChart() {
     const chart = echarts.init(dom);
     chartInstances.push(chart);
 
-    const xData = ['Estable (Verde)', 'Alerta (Amarillo)', 'Crítico (Rojo)'];
-    const yData = ['Alto', 'Medio', 'Bajo'];
+    const xData = ['Desafiante', 'Medio-Bajo', 'Medio-Alto', 'Favorable'];
+    const yData = ['Crítico', 'Alerta', 'Estable', 'Alto'];
     // Mock Data format: [xIndex, yIndex, value]
     const data = [
-        [0, 0, 50], [0, 1, 40], [0, 2, 10],
-        [1, 0, 20], [1, 1, 60], [1, 2, 30],
-        [2, 0, 5], [2, 1, 25], [2, 2, 70]
-    ].map(item => [item[0], item[1], item[2]]);
+        [0, 0, 45], [0, 1, 30], [0, 2, 10], [0, 3, 5],
+        [1, 0, 25], [1, 1, 40], [1, 2, 20], [1, 3, 10],
+        [2, 0, 15], [2, 1, 25], [2, 2, 45], [2, 3, 20],
+        [3, 0, 5],  [3, 1, 15], [3, 2, 30], [3, 3, 60]
+    ];
 
     const option = {
         tooltip: { position: 'top' },
         grid: { left: '15%', right: '5%', top: '5%', bottom: '15%' },
-        xAxis: { type: 'category', data: xData, axisLabel: { color: '#434655' } },
-        yAxis: { type: 'category', data: yData, axisLabel: { color: '#434655' } },
+        xAxis: { type: 'category', data: xData, axisLabel: { color: '#434655' }, name: 'PRE', nameLocation: 'middle', nameGap: 25 },
+        yAxis: { type: 'category', data: yData, axisLabel: { color: '#434655' }, name: 'RAF', nameLocation: 'end' },
         visualMap: {
             min: 0,
             max: 100,
@@ -139,7 +137,7 @@ function renderHeatmapChart() {
             left: 'center',
             bottom: -20,
             show: false,
-            inRange: { color: ['#F0FDF4', '#FFFBEB', '#FEF2F2'] }
+            inRange: { color: ['#86efac', '#fcd34d', '#fca5a5'] }
         },
         series: [{
             name: 'Distribución',
@@ -151,42 +149,60 @@ function renderHeatmapChart() {
     chart.setOption(option);
 }
 
-function renderScatterChart() {
-    const dom = document.getElementById('chartPRENota');
+async function renderPromedioMateriasList() {
+    const dom = document.getElementById('listPromedioMaterias');
     if (!dom) return;
-    const chart = echarts.init(dom);
-    chartInstances.push(chart);
 
-    const option = {
-        tooltip: { trigger: 'item' },
-        grid: { left: '10%', right: '5%', top: '10%', bottom: '15%' },
-        xAxis: { 
-            type: 'value', 
-            name: 'PRE',
-            nameLocation: 'middle',
-            nameGap: 25,
-            axisLabel: { color: '#434655' },
-            splitLine: { lineStyle: { type: 'dashed' } }
-        },
-        yAxis: { 
-            type: 'value',
-            name: 'Nota Promedio',
-            nameLocation: 'middle',
-            nameGap: 30,
-            axisLabel: { color: '#434655' },
-            splitLine: { lineStyle: { type: 'dashed' } }
-        },
-        series: [{
-            symbolSize: 10,
-            data: [
-                [40, 5], [55, 6.5], [70, 8], [85, 9.5],
-                [30, 4.5], [60, 7.5], [80, 8.5], [90, 9]
-            ],
-            type: 'scatter',
-            itemStyle: { color: '#2563EB' }
-        }]
-    };
-    chart.setOption(option);
+    dom.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%;"><span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span></div>';
+
+    try {
+        const materias = await Handle_get_promedio_materias();
+        if (!materias || !Array.isArray(materias)) {
+            dom.innerHTML = '<p style="color: #64748b; text-align: center; margin-top: 20px;">No hay datos disponibles.</p>';
+            return;
+        }
+
+        // Sort ascending (lowest averages first)
+        materias.sort((a, b) => a.promedio - b.promedio);
+        
+        // Take top 5
+        const top5 = materias.slice(0, 5);
+
+        let html = '<div style="display: flex; flex-direction: column; gap: 12px; padding-top: 8px;">';
+        
+        top5.forEach((materia, index) => {
+            let color = '#22C55E';
+            let bgColor = '#F0FDF4';
+            if (materia.promedio < 4) {
+                color = '#EF4444';
+                bgColor = '#FEF2F2';
+            } else if (materia.promedio < 6) {
+                color = '#F59E0B';
+                bgColor = '#FFFBEB';
+            }
+
+            html += `
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <div style="width: 28px; height: 28px; border-radius: 50%; background: ${bgColor}; color: ${color}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;">
+                            #${index + 1}
+                        </div>
+                        <span style="font-weight: 600; color: #1e293b; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;" title="${materia.nombre}">${materia.nombre}</span>
+                    </div>
+                    <div style="font-weight: 700; color: ${color}; font-size: 1.1rem;">
+                        ${materia.promedio.toFixed(2)}
+                    </div>
+                </div>
+            `;
+        });
+        
+        html += '</div>';
+        dom.innerHTML = html;
+
+    } catch (error) {
+        console.error("Error rendering materias list:", error);
+        dom.innerHTML = '<p style="color: #EF4444; text-align: center; margin-top: 20px;">Error al cargar datos.</p>';
+    }
 }
 
 function renderLineChart() {
@@ -219,13 +235,14 @@ function renderBarChart() {
     const option = {
         tooltip: { trigger: 'axis' },
         grid: { left: '5%', right: '5%', top: '5%', bottom: '10%', containLabel: true },
-        xAxis: { type: 'category', data: ['2022', '2023', '2024'], axisLabel: { color: '#434655' }, axisLine: { show: false }, axisTick: { show: false } },
+        xAxis: { type: 'category', data: ['2022', '2023', '2024', '2025'], axisLabel: { color: '#434655' }, axisLine: { show: false }, axisTick: { show: false } },
         yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed' } }, axisLabel: { show: false }, splitLine: { show: false } },
         series: [{
             data: [
-                { value: 6.2, itemStyle: { color: '#2563EB' } },
-                { value: 7.1, itemStyle: { color: '#b4c5ff' } },
-                { value: 5.8, itemStyle: { color: '#e1e8fd' } }
+                { value: 5.8, itemStyle: { color: '#e1e8fd' } },
+                { value: 6.5, itemStyle: { color: '#b4c5ff' } },
+                { value: 7.8, itemStyle: { color: '#2563EB' } },
+                { value: 8.5, itemStyle: { color: '#1e3a8a' } }
             ],
             type: 'bar',
             barWidth: '40%',

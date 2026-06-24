@@ -53,3 +53,16 @@ export async function Handle_get_promedio_general() {
     console.error(error);
   }
 }
+
+export async function Handle_get_promedio_materias() {
+  try {
+    let response = await fetch(`${getConfig().apiUrl}/notas/promedio/materias`, { headers: { "ngrok-skip-browser-warning": "69420" } });
+    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    else {
+      let data = await response.json();
+      return data;
+    }
+  } catch (error) {
+    console.error(error);
+  }
+}

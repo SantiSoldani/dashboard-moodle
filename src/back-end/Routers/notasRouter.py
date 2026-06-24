@@ -10,7 +10,10 @@ from sqlalchemy.orm import Session
 
 load_dotenv()
 
-router = APIRouter(prefix="/notas", tags=["notas"])
+router = APIRouter(
+    prefix="/notas",
+    tags=["notas"]
+)
 
 
 @router.get("/all")
@@ -42,6 +45,13 @@ async def get_promedio_general(db: Session = Depends(server.get_db)):
         return {"error": str(e)}
     return promedio
 
+@router.get('/promedio/materias')
+def get_promedio_materias(db: Session = Depends(server.get_db)):
+    try:
+        promedio = NotasController.get_promedio_materias(db)
+    except Exception as e:
+        return {"error": str(e)}
+    return promedio
 
 @router.get("/stats/{indicador}/{dni}")
 async def get_stats(indicador: str, dni: str, db: Session = Depends(server.get_db)):

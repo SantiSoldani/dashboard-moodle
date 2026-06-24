@@ -39,6 +39,13 @@ def get_score_actual(dni: str, db):
     result = db.execute(query, {"dni_alumno": dni})
     return result.fetchone()
 
+def get_color_actual(dni: str, db):
+    query = text(
+        """SELECT color FROM "Semaforo" WHERE dni_alumno = :dni_alumno ORDER BY created_at DESC LIMIT 1"""
+    )
+    result = db.execute(query, {"dni_alumno": dni})
+    return result.fetchone()
+
 
 def get_evolucion(db, filtro, valor, piso, techo):
     COLUMNAS_PERMITIDAS = [

@@ -50,3 +50,7 @@ def get_stats(indicador: str, dni: str, db):
 
     else:
         return 0
+
+
+def get_promedio_materias(db):
+    return Notas.get_promedio_materias(db)

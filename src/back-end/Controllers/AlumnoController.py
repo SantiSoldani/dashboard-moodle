@@ -80,6 +80,9 @@ def toState(aprobacion: float) -> str:
 def get_score(dni: str, db) -> float:
     return Alumno.get_score(dni, db)
 
+def get_color(dni: str, db) -> str:
+    return Alumno.get_color(dni, db)
+
 
 def actualizar_Cuatrimestre(db):
 

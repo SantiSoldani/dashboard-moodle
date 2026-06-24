@@ -405,17 +405,7 @@ export const VISTA_ADMIN_DASHBOARD = `
         </header>
 
         <!-- KPIS Institucionales -->
-        <div class="admin-kpi-row" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; margin-bottom: 24px;">
-            <div class="kpi-card-new border-success" style="background: white; border-radius: 12px; padding: 16px; border-left: 4px solid #22C55E; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <div class="kpi-top" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
-                    <span class="kpi-label" style="font-size: 0.75rem; font-weight: 700; color: #434655;">TASA DE RESPUESTA</span>
-                    <div class="kpi-icon-badge" style="color: #22C55E; background: #F0FDF4; border-radius: 50%; width: 24px; height: 24px; display: flex; align-items: center; justify-content: center;"><span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span></div>
-                </div>
-                <div class="kpi-value" style="display: flex; align-items: baseline; gap: 8px;">
-                    <strong id="admin_tasa_respuesta" style="font-size: 2rem; color: #141b2b;">--%</strong>
-                    <span style="color: #22C55E; font-size: 0.9rem; font-weight: 600;">+2.1%</span>
-                </div>
-            </div>
+        <div class="admin-kpi-row" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 24px;">
             <div class="kpi-card-new border-critical" style="background: white; border-radius: 12px; padding: 16px; border-left: 4px solid #EF4444; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                 <div class="kpi-top" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                     <span class="kpi-label" style="font-size: 0.75rem; font-weight: 700; color: #434655;">ALUMNOS EN RIESGO CRÍTICO</span>
@@ -449,50 +439,72 @@ export const VISTA_ADMIN_DASHBOARD = `
         <!-- CHARTS GRID -->
         <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px;">
             <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <div class="panel-header-flex" style="margin-bottom: 16px;">
+                <div class="panel-header-flex" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
                     <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined icon-blue" style="color: #434655;">pentagon</span>
-                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Métricas Agregadas RAC/RAP/RAF/PRE</h2>
+                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Distribución del PRE</h2>
                     </div>
+                    <select class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
+                        <option value="2025 C1">2025 C1</option>
+                        <option value="2024 C2">2024 C2</option>
+                    </select>
                 </div>
                 <div id="chartMeticasAgregadas" style="width: 100%; height: 250px;"></div>
             </div>
             <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <div class="panel-header-flex" style="margin-bottom: 16px;">
+                <div class="panel-header-flex" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
                     <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined icon-blue" style="color: #434655;">grid_view</span>
                         <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Perfil Económico vs Semáforo</h2>
                     </div>
+                    <select class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
+                        <option value="2025 C1">2025 C1</option>
+                        <option value="2024 C2">2024 C2</option>
+                    </select>
                 </div>
                 <div id="chartPerfilSemaforo" style="width: 100%; height: 250px;"></div>
             </div>
             <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <div class="panel-header-flex" style="margin-bottom: 16px;">
+                <div class="panel-header-flex" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
                     <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
-                        <span class="material-symbols-outlined icon-blue" style="color: #434655;">scatter_plot</span>
-                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">PRE vs Nota Promedio 1er Año</h2>
+                        <span class="material-symbols-outlined icon-blue" style="color: #434655;">format_list_numbered</span>
+                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Promedios por Materias</h2>
                     </div>
+                    <select class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
+                        <option value="2025 C1">2025 C1</option>
+                        <option value="2024 C2">2024 C2</option>
+                    </select>
                 </div>
-                <div id="chartPRENota" style="width: 100%; height: 250px;"></div>
+                <div id="listPromedioMaterias" style="width: 100%; height: 250px; overflow-y: auto;">
+                    <!-- Se carga dinámicamente -->
+                </div>
             </div>
         </div>
         
         <div class="charts-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
             <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <div class="panel-header-flex" style="margin-bottom: 16px;">
+                <div class="panel-header-flex" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
                     <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined icon-blue" style="color: #434655;">bar_chart</span>
                         <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Evolución del Semáforo por Cuatrimestre</h2>
                     </div>
+                    <select class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
+                        <option value="2025 C1">2025 C1</option>
+                        <option value="2024 C2">2024 C2</option>
+                    </select>
                 </div>
                 <div id="chartEvolucionSemaforo" style="width: 100%; height: 250px;"></div>
             </div>
             <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <div class="panel-header-flex" style="margin-bottom: 16px;">
+                <div class="panel-header-flex" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
                     <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined icon-blue" style="color: #434655;">compare_arrows</span>
-                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Comparación de Cohortes</h2>
+                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Score x Cohorte</h2>
                     </div>
+                    <select class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
+                        <option value="2025 C1">2025 C1</option>
+                        <option value="2024 C2">2024 C2</option>
+                    </select>
                 </div>
                 <div id="chartComparacionCohortes" style="width: 100%; height: 250px;"></div>
             </div>
