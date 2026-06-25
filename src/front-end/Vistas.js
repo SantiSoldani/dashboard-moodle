@@ -228,14 +228,13 @@ export const VISTA_DATA_ENTRY = `
 `;
 
 export const VISTA_ALUMNO_STATS = `
-    <div class="container new-design stats-page" style="padding-top: 0; position: relative; overflow: hidden; border-radius: 12px; background: #f8fafc;">
+    <div class="container new-design stats-page" style="padding-top: 0; position: relative; overflow: hidden; border-radius: 12px; background: #f8fafc; max-width: 1100px; margin: 0 auto;">
         <div id="stats-color-ribbon" style="height: 8px; width: 100%; position: absolute; top: 0; left: 0; background-color: #dce2f7;"></div>
         
         <div style="padding: 32px;">
             <header class="page-header" style="margin-bottom: 32px;">
                 <div>
                     <h1 id="stats-header-name">Hola, ...</h1>
-                    <p class="subtitle" id="stats-header-subtitle" style="margin-top: 4px;">Ing. Industrial · Cohorte 2022 · última encuesta: 2do cuatrimestre 2024</p>
                 </div>
             </header>
 
@@ -243,16 +242,6 @@ export const VISTA_ALUMNO_STATS = `
                 <!-- Loaded dynamically -->
             </section>
 
-            <section id="student-alert-box" class="alert-panel" style="margin-top: 32px; background-color: #f1f3ff; border: 1px solid #dce2f7; border-radius: 12px; padding: 32px; display: flex; gap: 20px;">
-                <div style="background-color: #2563eb; color: white; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                    <span class="material-symbols-outlined">emoji_objects</span>
-                </div>
-                <div>
-                    <h3 id="alert-title" style="color: #003ea8; margin: 0 0 8px 0; font-size: 1.1rem;">Tu confianza para aprobar viene bajando hace dos cuatrimestres</h3>
-                    <p id="alert-desc" style="color: #434655; margin: 0 0 12px 0;">No es una alarma, es una señal para actuar. Hay tutorías de Análisis Matemático los martes y jueves, y no hace falta estar en crisis para ir.</p>
-                    <a href="#" id="alert-link" style="color: #2563eb; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px;">Ver horarios de tutorías <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span></a>
-                </div>
-            </section>
 
             <div id="instructor-chart-row" style="display: none; margin-top: 32px;">
                 <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -265,13 +254,18 @@ export const VISTA_ALUMNO_STATS = `
             </div>
 
             <div class="charts-grid" id="main-charts-grid" style="display: grid; grid-template-columns: 1fr 2fr; gap: 32px; margin-top: 32px;">
-                <div class="metrics-list-panel card-panel" style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                    <div style="margin-bottom: 24px;">
-                        <h2 id="metric-list-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;">Cómo te sentís este cuatrimestre</h2>
-                        <p class="subtitle" id="metric-list-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;">Tus respuestas en la última encuesta</p>
+                <div id="metrics-column-wrapper" style="display: flex; flex-direction: column; gap: 24px;">
+                    <div id="entrevista-pendiente-banner" style="display: none; background-color: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px 16px; border-left: 4px solid #3b82f6;">
+                        <span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">ENTREVISTA PENDIENTE | DIA: 15/11/2024 10:00 | TUTOR: Prof. Roberto Sánchez</span>
                     </div>
-                    <div id="metrics-list-container" style="display: flex; flex-direction: column; gap: 20px;">
-                        <!-- Loaded dynamically -->
+                    <div class="metrics-list-panel card-panel" style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                        <div style="margin-bottom: 24px;">
+                            <h2 id="metric-list-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;">Cómo te sentís este cuatrimestre</h2>
+                            <p class="subtitle" id="metric-list-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;">Tus respuestas en la última encuesta</p>
+                        </div>
+                        <div id="metrics-list-container" style="display: flex; flex-direction: column; gap: 20px;">
+                            <!-- Loaded dynamically -->
+                        </div>
                     </div>
                 </div>
                 
