@@ -336,7 +336,7 @@ body {
 /* --- NUEVO DISEÑO (NEW DESIGN) --- */
 
 .stats-page.new-design {
-    max-width: 1000px;
+    max-width: 100%;
     margin: 0 auto;
     padding: 20px 0;
     background: transparent;

@@ -228,45 +228,70 @@ export const VISTA_DATA_ENTRY = `
 `;
 
 export const VISTA_ALUMNO_STATS = `
-    <div class="container new-design stats-page">
-
-        <header class="page-header" style="margin-bottom: 24px;">
-            <h1 id="stats-header-name">Hola, ...</h1>
-            <p class="subtitle" id="stats-header-subtitle">Ing. Industrial · Cohorte 2022 · última encuesta: 2do cuatrimestre 2024</p>
-        </header>
-
-        <section class="kpi-section" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px;" id="student-kpi-grid">
-            <!-- Loaded dynamically -->
-        </section>
-
-        <section id="student-alert-box" class="alert-panel" style="margin-top: 24px; background-color: #f1f3ff; border: 1px solid #dce2f7; border-radius: 12px; padding: 24px; display: flex; gap: 16px;">
-            <div style="background-color: #2563eb; color: white; border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
-                <span class="material-symbols-outlined">emoji_objects</span>
-            </div>
-            <div>
-                <h3 id="alert-title" style="color: #003ea8; margin: 0 0 8px 0; font-size: 1.1rem;">Tu confianza para aprobar viene bajando hace dos cuatrimestres</h3>
-                <p id="alert-desc" style="color: #434655; margin: 0 0 12px 0;">No es una alarma, es una señal para actuar. Hay tutorías de Análisis Matemático los martes y jueves, y no hace falta estar en crisis para ir.</p>
-                <a href="#" id="alert-link" style="color: #2563eb; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px;">Ver horarios de tutorías <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span></a>
-            </div>
-        </section>
-
-        <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 2fr; gap: 24px; margin-top: 24px;">
-            <div class="metrics-list-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <div style="margin-bottom: 24px;">
-                    <h2 id="metric-list-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;">Cómo te sentís este cuatrimestre</h2>
-                    <p class="subtitle" id="metric-list-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;">Tus respuestas en la última encuesta</p>
+    <div class="container new-design stats-page" style="padding-top: 0; position: relative; overflow: hidden; border-radius: 12px; background: #f8fafc;">
+        <div id="stats-color-ribbon" style="height: 8px; width: 100%; position: absolute; top: 0; left: 0; background-color: #dce2f7;"></div>
+        
+        <div style="padding: 32px;">
+            <header class="page-header" style="margin-bottom: 32px;">
+                <div>
+                    <h1 id="stats-header-name">Hola, ...</h1>
+                    <p class="subtitle" id="stats-header-subtitle" style="margin-top: 4px;">Ing. Industrial · Cohorte 2022 · última encuesta: 2do cuatrimestre 2024</p>
                 </div>
-                <div id="metrics-list-container" style="display: flex; flex-direction: column; gap: 20px;">
-                    <!-- Loaded dynamically -->
+            </header>
+
+            <section class="kpi-section" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px;" id="student-kpi-grid">
+                <!-- Loaded dynamically -->
+            </section>
+
+            <section id="student-alert-box" class="alert-panel" style="margin-top: 32px; background-color: #f1f3ff; border: 1px solid #dce2f7; border-radius: 12px; padding: 32px; display: flex; gap: 20px;">
+                <div style="background-color: #2563eb; color: white; border-radius: 50%; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <span class="material-symbols-outlined">emoji_objects</span>
+                </div>
+                <div>
+                    <h3 id="alert-title" style="color: #003ea8; margin: 0 0 8px 0; font-size: 1.1rem;">Tu confianza para aprobar viene bajando hace dos cuatrimestres</h3>
+                    <p id="alert-desc" style="color: #434655; margin: 0 0 12px 0;">No es una alarma, es una señal para actuar. Hay tutorías de Análisis Matemático los martes y jueves, y no hace falta estar en crisis para ir.</p>
+                    <a href="#" id="alert-link" style="color: #2563eb; text-decoration: none; font-weight: 600; display: flex; align-items: center; gap: 4px;">Ver horarios de tutorías <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span></a>
+                </div>
+            </section>
+
+            <div id="instructor-chart-row" style="display: none; margin-top: 32px;">
+                <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <div style="margin-bottom: 24px;">
+                        <h2 style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;">Evolución del Score</h2>
+                        <p class="subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;">Histórico del semáforo del alumno</p>
+                    </div>
+                    <div id="chartSemaforoLine" style="width: 100%; height: 300px;"></div>
                 </div>
             </div>
-            
-            <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                <div style="margin-bottom: 24px;">
-                    <h2 id="chart-percepcion-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;">Cómo cambió tu percepción a lo largo del tiempo</h2>
-                    <p class="subtitle" id="chart-percepcion-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;">Solo te mostramos tu propio recorrido — no hay ningún otro alumno en este gráfico</p>
+
+            <div class="charts-grid" id="main-charts-grid" style="display: grid; grid-template-columns: 1fr 2fr; gap: 32px; margin-top: 32px;">
+                <div class="metrics-list-panel card-panel" style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <div style="margin-bottom: 24px;">
+                        <h2 id="metric-list-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;">Cómo te sentís este cuatrimestre</h2>
+                        <p class="subtitle" id="metric-list-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;">Tus respuestas en la última encuesta</p>
+                    </div>
+                    <div id="metrics-list-container" style="display: flex; flex-direction: column; gap: 20px;">
+                        <!-- Loaded dynamically -->
+                    </div>
                 </div>
-                <div id="chartPercepcionLine" style="width: 100%; height: 350px;"></div>
+                
+                <div class="chart-panel card-panel" id="right-panel-container" style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                    <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h2 id="chart-percepcion-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;">Cómo cambió tu percepción a lo largo del tiempo</h2>
+                            <p class="subtitle" id="chart-percepcion-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;">Solo te mostramos tu propio recorrido — no hay ningún otro alumno en este gráfico</p>
+                        </div>
+                        <select id="encuesta-period-selector" style="display: none; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc; cursor: pointer; font-weight: 500;">
+                            <option value="2025 C1">2025 C1</option>
+                            <option value="2024 C2">2024 C2</option>
+                            <option value="2024 C1">2024 C1</option>
+                        </select>
+                    </div>
+                    <div id="chartPercepcionLine" style="width: 100%; height: 350px;"></div>
+                    <div id="encuestas-container" style="display: none; flex-direction: column; gap: 16px;">
+                        <!-- Encuestas dinamicas -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
