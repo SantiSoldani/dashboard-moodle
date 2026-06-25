@@ -69,6 +69,7 @@ def Post_Alumno(alumno: AlumnoDto, db):
 def Get_alumno_by_dni(dni: str, db) -> AlumnoDto:
     print("alumno")
     query = text("""SELECT * FROM "Alumnos" WHERE dni = :dni""")
+    
     alumno_by_dni = db.execute(query, {"dni": dni}).mappings().fetchone()
     print(alumno_by_dni)
     if alumno_by_dni is None:
@@ -85,7 +86,6 @@ def Get_alumno_by_dni(dni: str, db) -> AlumnoDto:
         materias_aprobadas=alumno_by_dni["materias_aprobadas"],
         plan_de_estudios=alumno_by_dni["plan_de_estudios"],
     )
-
 
 def Get_alumnos(db) -> list[AlumnoDto]:
     # SQL QUERY SELECT * FROM alumnos ORDER BY nombre
@@ -126,8 +126,10 @@ def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
             "Alumnos".fecha_inicio,
             "Semaforo".color,
             "Semaforo".score,
-            "Semaforo".created_at
+            "Semaforo".created_at,
+            "Tutor-Alumno".dni_tutor
         FROM "Alumnos"
+        LEFT JOIN "Tutor-Alumno" ON "Alumnos".dni = "Tutor-Alumno".dni_alumno
         LEFT JOIN (
             SELECT *,
                    ROW_NUMBER() OVER (PARTITION BY dni_alumno ORDER BY created_at DESC) as rn

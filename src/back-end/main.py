@@ -15,7 +15,8 @@ from Routers import (
     notasRouter,
     students_router,
     usuarios_router,
-    tutor_alumno_router
+    tutor_alumno_router,
+    solicitudes_router
 )
 
 app = FastAPI()
@@ -45,6 +46,7 @@ app.include_router(moodle_router.router)
 app.include_router(encuestas_router.router)
 app.include_router(usuarios_router.router)
 app.include_router(tutor_alumno_router.router)
+app.include_router(solicitudes_router.router)
 
 load_dotenv()
 

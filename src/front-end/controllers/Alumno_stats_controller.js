@@ -1,8 +1,8 @@
-import { HandleGet_alumnos } from "../models/Alumno.js";
+import { HandleGet_alumnos, HandleGet_tutor, HandleCreate_solicitud } from "../models/Alumno.js";
 
 let chartPercepcionInstance = null;
 
-export async function initAlumnoStats(dniParam) {
+export async function initAlumnoStats(dniParam = null) {
   try {
     let alumno_dni = dniParam;
     if (!alumno_dni) {
@@ -11,7 +11,7 @@ export async function initAlumnoStats(dniParam) {
     }
     const rol = localStorage.getItem("rol") || "Instructor";
     if (!alumno_dni && rol === "Learner") {
-      alumno_dni = "44322111"; // Fallback para que cargue la vista de Alumno
+      alumno_dni = "22669995"; // Fallback para que cargue la vista de Alumno
     }
     if (!alumno_dni) {
       console.warn("No se especificó un DNI de alumno.");
@@ -19,20 +19,42 @@ export async function initAlumnoStats(dniParam) {
     }
 
     let alumno = await HandleGet_alumnos(alumno_dni, "byDNI");
+    let tutor = await HandleGet_tutor(alumno_dni);
+
+    console.log(tutor) //null
+    console.log(alumno)
+    console.log("PARTE 2")
+
     if (alumno) {
       alumno = typeof alumno === "string" ? JSON.parse(alumno) : alumno;
       const rol = localStorage.getItem("rol") || "Instructor";
-
+      console.log("PARTE 3!")
       set_header(alumno);
       render_dashboard_by_role(alumno, rol);
 
       window.addEventListener('resize', () => {
         if (chartPercepcionInstance) chartPercepcionInstance.resize();
       });
+
+      activar_solicitudes(alumno, tutor);
     }
   } catch (error) {
     console.error("Error al cargar datos del alumno:", error);
   }
+}
+
+function activar_solicitudes(alumno, tutor) {
+  let dni_tutor = null;
+  if (tutor == null) {
+    console.log("NO TIENE TUTOR")
+  } else {
+    dni_tutor = tutor.dni_tutor
+  }
+
+  const btn = document.getElementById("btn_crearSolicitud");
+  btn.addEventListener("click", () => {
+    HandleCreate_solicitud(alumno.dni, dni_tutor);
+  });
 }
 
 function set_header(alumno) {
@@ -74,7 +96,7 @@ function render_dashboard_by_role(alumno, rol) {
             <span style="font-size: 0.85rem; font-weight: 700; color: #2563eb; margin-top: 4px;">PLAN 2024</span>
         </div>
         <div style="display: flex; align-items: stretch; justify-content: center;">
-            <button style="background: #2563eb; color: white; border: none; border-radius: 12px; padding: 0 16px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(37,99,235,0.2); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;" onmouseover="this.style.background='#1d4ed8'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2563eb'; this.style.transform='none'">
+            <button id="btn_crearSolicitud" style="background: #2563eb; color: white; border: none; border-radius: 12px; padding: 0 16px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(37,99,235,0.2); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;" onmouseover="this.style.background='#1d4ed8'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2563eb'; this.style.transform='none'">
                 <span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span> SOLICITAR TUTOR / ENTREVISTA
             </button>
         </div>
@@ -125,6 +147,8 @@ function render_dashboard_by_role(alumno, rol) {
       `;
     }
   }
+
+
 
   // List & Chart Titles
   const metricListTitle = document.getElementById("metric-list-title");
@@ -227,7 +251,7 @@ function render_dashboard_by_role(alumno, rol) {
             </div>
         </div>
       `;
-      
+
       if (encuestasContainer) {
         encuestasContainer.innerHTML = `
             <div style="border: 1px solid #e1e8fd; border-radius: 8px; padding: 20px; background: #f8fafc;">

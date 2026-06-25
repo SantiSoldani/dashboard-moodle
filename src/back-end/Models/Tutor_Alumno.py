@@ -9,7 +9,7 @@ def get_alumnos_by_tutor_dni(dni,db):
 
 def get_tutor_by_alumno_dni(dni,db):
     query = text("""SELECT * FROM "Tutor-Alumno" WHERE dni_alumno = :dni""")
-    return db.execute(query, {"dni": dni}).fetchall()
+    return db.execute(query, {"dni": dni}).fetchone()
 
 def post_tutor_alumno(tutor_dni, alumno_dni,db):
     query = text("""INSERT INTO "Tutor-Alumno" (dni_tutor, dni_alumno) VALUES (:tutor_dni, :alumno_dni)""")
