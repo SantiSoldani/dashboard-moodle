@@ -4,6 +4,11 @@ import {
   Handle_get_stats,
   Handle_get_Notas,
 } from "../models/Notas.js";
+import { 
+  HandleGet_solicitudes, 
+  HandleGet_solicitudes_tutor, 
+  HandleMarcar_leida 
+} from "../models/Solicitudes.js";
 
 let allStudents = [];
 let filteredStudents = [];
@@ -44,6 +49,85 @@ export async function initHome() {
   setupCurrentDate();
   setupNavigation();
   await cargarDatosDashboard();
+  loadSolicitudesHome();
+}
+
+async function loadSolicitudesHome() {
+    const listContainer = document.getElementById('home-solicitudes-list');
+    if (!listContainer) return;
+    
+    listContainer.innerHTML = '<div class="alert-empty"><p style="color: #92400e;">Cargando solicitudes...</p></div>';
+    
+    try {
+        const rol = localStorage.getItem("rol");
+        let solicitudes = [];
+        
+        if (rol === "Tutor") {
+            const dni = localStorage.getItem("dni"); // O desde donde guardemos el DNI del usuario logueado
+            if (dni) {
+                solicitudes = await HandleGet_solicitudes_tutor(dni);
+            } else {
+                solicitudes = [];
+                console.warn("No se encontró el DNI del tutor en localStorage");
+            }
+        } else {
+            // Es Instructor/Docente general, ve todas
+            solicitudes = await HandleGet_solicitudes();
+        }
+        
+        // Mostrar solo las no leídas
+        const unread = solicitudes.filter(s => s.leida === false);
+        
+        if (unread.length === 0) {
+            listContainer.innerHTML = '<div class="alert-empty"><p style="color: #059669; font-weight: bold;"><span class="material-symbols-outlined" style="vertical-align: middle;">check_circle</span> No hay notificaciones pendientes</p></div>';
+            return;
+        }
+        
+        listContainer.innerHTML = '';
+        unread.forEach(sol => {
+            const div = document.createElement('div');
+            div.style.cssText = 'background: white; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);';
+            
+            const date = new Date(sol.created_at).toLocaleDateString();
+            const tutorText = sol.dni_tutor ? `<span style="font-size: 0.75rem; color: #64748b;">Tutor: ${sol.dni_tutor}</span>` : `<span style="font-size: 0.75rem; color: #f59e0b; font-weight: bold;">Sin Tutor</span>`;
+            
+            div.innerHTML = `
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <strong style="color: #92400e; font-size: 0.95rem;">Solicitud de Alumno: ${sol.dni_alumno}</strong>
+                    <div style="display: flex; gap: 12px; align-items: center;">
+                        <span style="font-size: 0.75rem; color: #94a3b8;">${date}</span>
+                        ${tutorText}
+                    </div>
+                </div>
+                <button class="btn-marcar-leida" data-sol-id="${sol.id}" title="Marcar como leída" style="background: transparent; border: none; cursor: pointer; color: #10b981; display: flex; align-items: center; justify-content: center; padding: 4px; border-radius: 4px; transition: background 0.2s;">
+                    <span class="material-symbols-outlined" style="font-size: 24px;">check_circle</span>
+                </button>
+            `;
+            listContainer.appendChild(div);
+        });
+        
+        // Event listeners para marcar leida
+        listContainer.querySelectorAll('.btn-marcar-leida').forEach(btn => {
+            btn.addEventListener('click', async (e) => {
+                const btnElem = e.currentTarget;
+                const id = btnElem.getAttribute('data-sol-id');
+                btnElem.innerHTML = '<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span>';
+                try {
+                    await HandleMarcar_leida(id);
+                    // Recargar notificaciones
+                    loadSolicitudesHome();
+                } catch (error) {
+                    console.error(error);
+                    alert("Error al marcar la notificación como leída.");
+                    btnElem.innerHTML = '<span class="material-symbols-outlined" style="font-size: 24px;">check_circle</span>';
+                }
+            });
+        });
+        
+    } catch (error) {
+        console.error(error);
+        listContainer.innerHTML = '<div class="alert-empty"><p style="color: #ef4444;">Error al cargar solicitudes</p></div>';
+    }
 }
 
 // Configurar la fecha actual de forma elegante en español

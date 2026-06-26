@@ -46,24 +46,43 @@ export const VISTA_HOME = `
             </article>
         </section>
 
-        <!-- ALUMNOS EN RIESGO DE DESERCION -->
-        <section class="alert-panel">
-            <div class="alert-header">
-                <div class="alert-title-wrap">
-                    <span class="material-symbols-outlined">notification_important</span>
-                    <h3>Riesgo Inminente</h3>
+        <!-- ALUMNOS EN RIESGO DE DESERCION Y SOLICITUDES -->
+        <section class="alert-panel" style="display: flex; gap: 24px; padding: 0; background: transparent; border: none; box-shadow: none;">
+            <div style="flex: 1; min-width: 300px; background: #fff5f5; border: 1px solid #fecaca; border-radius: 12px; padding: 24px;">
+                <div class="alert-header">
+                    <div class="alert-title-wrap">
+                        <span class="material-symbols-outlined">notification_important</span>
+                        <h3>Riesgo Inminente</h3>
+                    </div>
+                    <span class="alert-badge">Prioridad de Acompañamiento</span>
                 </div>
-                <span class="alert-badge">Prioridad de Acompañamiento</span>
+
+                <div id="criticalList" class="alert-content critical-list">
+                    <!-- Se cargará dinámicamente -->
+                    <div class="alert-empty">
+                        <div class="alert-empty-icon">
+                            <span class="material-symbols-outlined"
+                                style="color:var(--critical); font-size: 32px;">hourglass_empty</span>
+                        </div>
+                        <p>Cargando alertas de riesgo...</p>
+                    </div>
+                </div>
             </div>
 
-            <div id="criticalList" class="alert-content critical-list">
-                <!-- Se cargará dinámicamente -->
-                <div class="alert-empty">
-                    <div class="alert-empty-icon">
-                        <span class="material-symbols-outlined"
-                            style="color:var(--critical); font-size: 32px;">hourglass_empty</span>
+            <div style="flex: 1; min-width: 300px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 24px;">
+                <div class="alert-header" style="border-bottom: 2px solid #fcd34d; padding-bottom: 12px; margin-bottom: 0;">
+                    <div class="alert-title-wrap">
+                        <span class="material-symbols-outlined" style="color: #d97706;">notifications_active</span>
+                        <h3 style="color: #92400e; margin: 0; font-size: 1.1rem; font-weight: 700;">Solicitudes Pendientes</h3>
                     </div>
-                    <p>Cargando alertas de riesgo...</p>
+                </div>
+                <div id="home-solicitudes-list" class="alert-content" style="margin-top: 16px; display: flex; flex-direction: column; gap: 12px; max-height: 400px; overflow-y: auto; padding-right: 8px;">
+                    <div class="alert-empty">
+                        <div class="alert-empty-icon">
+                            <span class="material-symbols-outlined" style="color:#d97706; font-size: 32px;">hourglass_empty</span>
+                        </div>
+                        <p style="color: #92400e;">Cargando solicitudes...</p>
+                    </div>
                 </div>
             </div>
         </section>
@@ -303,6 +322,7 @@ export const VISTA_TUTORES = `
 
         <!-- KPIS -->
         <div class="tutores-kpi-row">
+        <div class="kpi_contadores_div">
             <div class="kpi-card-tutor blue-kpi">
                 <div class="kpi-icon-container"><span class="material-symbols-outlined">group</span></div>
                 <div class="kpi-info">
@@ -315,6 +335,16 @@ export const VISTA_TUTORES = `
                 <div class="kpi-info">
                     <span class="kpi-title">Cantidad de Alumnos</span>
                     <strong class="kpi-value" id="alumnos_counter">--.---</strong>
+                </div>
+            </div>
+        </div>
+            <div class="kpi-card-tutor" style="border-left: 4px solid #f59e0b; flex-grow: 1; flex-basis: 300px; display: flex; flex-direction: column; align-items: stretch; background: #fffbeb; padding: 16px;">
+                <div class="kpi-header" style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px; border-bottom: 1px solid #fde68a; padding-bottom: 8px;">
+                    <span class="material-symbols-outlined" style="color: #d97706;">notifications_active</span>
+                    <h3 style="margin: 0; font-size: 1.1rem; color: #92400e; font-weight: 700;">Solicitudes / Notificaciones</h3>
+                </div>
+                <div id="admin-solicitudes-list" style="overflow-y: auto; max-height: 150px; flex-grow: 1; display: flex; flex-direction: column; gap: 8px; padding-right: 4px;">
+                    <div style="font-size: 0.85rem; color: #d97706; padding: 4px; text-align: center;">Cargando...</div>
                 </div>
             </div>
         </div>

@@ -11,5 +11,8 @@ def marcar_leida(id: int, db: Session, ):
 def eliminar_solicitud(id:int , db : Session):
     return Solicitudes.eliminar_solicitud(id,db)
 
+def obtener_solicitudes(db: Session):
+    return Solicitudes.obtener_solicitudes(db)
+
 def obtener_solicitudes_tutor(dni:str , db:Session ):
     return Solicitudes.obtener_solicitudes_tutor(dni,db)
