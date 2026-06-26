@@ -5,6 +5,7 @@ import {
   VISTA_TUTORES,
   VISTA_ADMIN_DASHBOARD,
   VISTA_ADMIN_TOOLS,
+  VISTA_ENTREVISTA,
 } from "./Vistas.js";
 import { initHome } from "./controllers/home_controller.js";
 import { initDataEntry } from "./controllers/data_entry_controller.js";
@@ -12,6 +13,7 @@ import { initAlumnoStats } from "./controllers/Alumno_stats_controller.js";
 import { initTutores } from "./controllers/tutores_controller.js";
 import { initAdminDashboard } from "./controllers/admin_dashboard_controller.js";
 import { initAdminTools } from "./controllers/admin_tools_controller.js";
+import { initEntrevista } from "./controllers/entrevista_controller.js";
 
 window.addEventListener("load", () => {
   // Determine current route from hash or default to home
@@ -59,6 +61,9 @@ export function navegar(nombreVista) {
   } else if (nombreVista === "admin_tools") {
     root.innerHTML = VISTA_ADMIN_TOOLS;
     initAdminTools();
+  } else if (nombreVista === "entrevista") {
+    root.innerHTML = VISTA_ENTREVISTA;
+    initEntrevista();
   } else {
     // Fallback
     root.innerHTML = "<h2>Vista no encontrada</h2>";

@@ -7,16 +7,16 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-
 from Routers import (
     data_router,
     encuestas_router,
+    entrevista_router,
     moodle_router,
     notasRouter,
+    solicitudes_router,
     students_router,
-    usuarios_router,
     tutor_alumno_router,
-    solicitudes_router
+    usuarios_router,
 )
 
 app = FastAPI()
@@ -47,8 +47,10 @@ app.include_router(encuestas_router.router)
 app.include_router(usuarios_router.router)
 app.include_router(tutor_alumno_router.router)
 app.include_router(solicitudes_router.router)
+app.include_router(entrevista_router.router)
 
 load_dotenv()
+
 
 @app.get("/")
 def root():

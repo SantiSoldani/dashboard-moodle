@@ -362,3 +362,12 @@ def get_scores_historicos(db, dni):
         return [SimpleNamespace(**row) for row in rows]
     except Exception as e:
         raise Exception(e)
+
+
+def reset_pre(db, dni, pre):
+    try:
+        query = text("""UPDATE "Alumnos" SET "PRE" = :pre WHERE dni = :dni""")
+        db.execute(query, {"dni": dni, "pre": pre})
+        db.commit()
+    except Exception as e:
+        print(e)

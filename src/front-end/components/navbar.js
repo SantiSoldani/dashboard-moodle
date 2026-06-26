@@ -16,11 +16,13 @@ class navBar extends HTMLElement {
         if (rol === 'Administrador') {
             const isAdminDashboard = hash === 'admin_dashboard';
             const isAdminTools = hash === 'admin_tools';
+            const isEntrevista = hash === 'entrevista';
             navLinks = `
                 <li class="${isAdminDashboard ? 'active' : ''}"><a href="#admin_dashboard">📈 Dashboard General</a></li>
                 <li class="${isAdminTools ? 'active' : ''}"><a href="#admin_tools">⚙️ Herramientas</a></li>
                 <li class="${hash === 'tutores' ? 'active' : ''}"><a href="#tutores">👨‍🏫 Tutores</a></li>
                 <li style="border-left: 1px solid #ccc; margin-left: 8px; padding-left: 8px;" class="${isHome ? 'active' : ''}"><a href="#home">📊 Panel Instructor</a></li>
+                <li class="${isEntrevista ? 'active' : ''}"><a href="#entrevista">🗣️ Entrevista</a></li>
                 <li class="${isDataEntry ? 'active' : ''}"><a href="#data_entry">📁 Cargar Datos</a></li>
             `;
         } else if (rol !== 'Learner') {

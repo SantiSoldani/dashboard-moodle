@@ -230,7 +230,7 @@ export const VISTA_DATA_ENTRY = `
 export const VISTA_ALUMNO_STATS = `
     <div class="container new-design stats-page" style="padding-top: 0; position: relative; overflow: hidden; border-radius: 12px; background: #f8fafc; max-width: 1100px; margin: 0 auto;">
         <div id="stats-color-ribbon" style="height: 8px; width: 100%; position: absolute; top: 0; left: 0; background-color: #dce2f7;"></div>
-        
+
         <div style="padding: 32px;">
             <header class="page-header" style="margin-bottom: 32px;">
                 <div>
@@ -268,7 +268,7 @@ export const VISTA_ALUMNO_STATS = `
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="chart-panel card-panel" id="right-panel-container" style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
@@ -331,9 +331,9 @@ export const VISTA_TUTORES = `
                         <span class="material-symbols-outlined">search</span>
                         <input type="text" placeholder="Buscar...">
                     </div>
-                    
+
                     <button id="btnAltaTutor" class="btn-primary-small"><span class="material-symbols-outlined">person_add</span> Dar de Alta Tutor</button>
-                    
+
                     <div id="inlineAltaForm" style="display: none; align-items: center; gap: 8px; background: #eff6ff; padding: 4px 8px; border-radius: 8px; border: 1px solid #bfdbfe;">
                         <span class="material-symbols-outlined" style="color: #2563eb; font-size: 20px; margin-left: 4px;">badge</span>
                         <input type="text" id="inputDniAlta" placeholder="DNI del Tutor" style="border: none; background: transparent; outline: none; width: 130px; font-size: 0.9rem; color: #1e3a8a;">
@@ -354,7 +354,7 @@ export const VISTA_TUTORES = `
                         </tr>
                     </thead>
                     <tbody>
-                        
+
                     </tbody>
                 </table>
             </div>
@@ -370,7 +370,7 @@ export const VISTA_TUTORES = `
                 <button id="btnCerrarAsignacion" class="btn-icon" style="color: #64748b;"><span class="material-symbols-outlined">close</span></button>
             </div>
             <p class="panel-desc mb-4">Marque los alumnos que desea asignarle a este tutor.</p>
-            
+
             <div class="list-container-t" style="max-width: 600px; margin: 0 auto;">
                 <div class="list-header-flex-t">
                     <h3>Seleccionar Alumnos</h3>
@@ -432,7 +432,7 @@ export const VISTA_ADMIN_DASHBOARD = `
                 </div>
                 <div class="kpi-value" style="display: flex; align-items: baseline; gap: 8px;">
                     <strong id="admin_riesgo_critico" style="font-size: 2rem; color: #141b2b;">--%</strong>
-                    
+
                 </div>
             </div>
             <div class="kpi-card-new border-primary" style="background: white; border-radius: 12px; padding: 16px; border-left: 4px solid #2563EB; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -499,7 +499,7 @@ export const VISTA_ADMIN_DASHBOARD = `
                 </div>
             </div>
         </div>
-        
+
         <div class="charts-grid" style="display: grid; grid-template-columns: 2fr 1fr; gap: 24px; margin-bottom: 24px;">
             <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                 <div class="panel-header-flex" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
@@ -561,7 +561,7 @@ export const VISTA_ADMIN_TOOLS = `
                     <div id="msgAdmin" class="msg-feedback hidden" style="margin-top: 10px; padding: 10px; border-radius: 4px;"></div>
                 </form>
             </div>
-            
+
             <!-- CONFIGURACION COEFICIENTES -->
             <div class="tool-panel card-panel">
                 <div class="panel-header-flex">
@@ -603,6 +603,92 @@ export const VISTA_ADMIN_TOOLS = `
                     <div id="msgCoef" class="msg-feedback hidden" style="margin-top: 10px; padding: 10px; border-radius: 4px;"></div>
                 </form>
             </div>
+        </div>
+    </div>
+`;
+
+export const VISTA_ENTREVISTA = `
+    <div class="container new-design entrevista-page">
+        <component-navbar></component-navbar>
+
+        <header class="page-header" style="margin-bottom: 24px;">
+            <h1>Entrevista</h1>
+            <p class="subtitle">Registro y consulta del puntaje de entrevista de los alumnos.</p>
+        </header>
+
+        <div class="entrevista-grid">
+
+            <div class="card-panel">
+                <div class="panel-header-flex">
+                    <div class="panel-header-t">
+                        <span class="material-symbols-outlined icon-blue">assignment</span>
+                        <h2>Registrar Entrevista</h2>
+                    </div>
+                </div>
+
+                <form id="formRegistrarEntrevista" class="entrevista-form">
+                    <div class="form-group">
+                        <label for="entrevista-dni-alumno">DNI del Alumno</label>
+                        <input type="text" id="entrevista-dni-alumno" placeholder="Ingrese el DNI del alumno" autocomplete="off">
+                    </div>
+
+                    <div id="entrevista-likert-container"></div>
+
+                    <button type="submit" class="btn-primary-large-t" id = "btn_enviar" style="width: 100%; margin-top: 8px; justify-content: center;">
+                        <span class="material-symbols-outlined">save</span> Guardar Entrevista
+                    </button>
+                </form>
+            </div>
+
+            <div class="card-panel">
+                <div class="panel-header-flex">
+                    <div class="panel-header-t">
+                        <span class="material-symbols-outlined icon-blue">grade</span>
+                        <h2>Puntaje de Entrevista</h2>
+                    </div>
+                </div>
+
+                <div class="score-panel">
+
+                    <div class="score-block">
+                        <p class="score-block-title">
+                            <span class="material-symbols-outlined">search</span>
+                            Consultar Puntaje
+                        </p>
+                        <div style="margin-bottom: 12px;">
+                            <label for="consulta-dni-alumno" style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase;">Ingrese DNI</label>
+                            <input type="text" id="consulta-dni-alumno" placeholder="Ingrese el DNI del alumno" autocomplete="off" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; color: #334155; background: #ffffff; outline: none; font-family: 'Inter', sans-serif;">
+                        </div>
+                        <button id="btn-consultar-puntaje" class="btn-primary-small" style="width: 100%; justify-content: center;">
+                            <span class="material-symbols-outlined">manage_search</span> Consultar
+                        </button>
+                        <div class="score-result-area" id="score-result-area">
+                            <span class="score-result-label">Puntaje de entrevista:</span>
+                            <span class="score-result-value placeholder" id="score-result-value">— Sin consultar —</span>
+                        </div>
+                    </div>
+
+                    <div class="score-block">
+                        <p class="score-block-title">
+                            <span class="material-symbols-outlined">edit_note</span>
+                            Actualizar Puntaje
+                        </p>
+                        <div style="margin-bottom: 12px;">
+                            <label for="actualizar-dni-alumno" style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase;">Ingrese DNI</label>
+                            <input type="text" id="actualizar-dni-alumno" placeholder="Ingrese el DNI del alumno" autocomplete="off" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; color: #334155; background: #ffffff; outline: none; font-family: 'Inter', sans-serif;">
+                        </div>
+                        <div style="margin-bottom: 12px;">
+                            <label for="actualizar-puntaje-input" style="display: block; font-size: 0.75rem; font-weight: 700; color: #64748b; margin-bottom: 8px; letter-spacing: 0.5px; text-transform: uppercase;">Nuevo Puntaje</label>
+                            <input type="number" id="actualizar-puntaje-input" placeholder="Ej: 7.45" min="0" max="10" step="0.01" style="width: 100%; padding: 10px 14px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 0.95rem; color: #334155; background: #ffffff; outline: none; font-family: 'Inter', sans-serif;">
+                        </div>
+                        <button id="btn-actualizar-puntaje" class="btn-primary-large-t" style="width: 100%; justify-content: center;">
+                            <span class="material-symbols-outlined">update</span> Actualizar Puntaje
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
         </div>
     </div>
 `;
