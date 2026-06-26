@@ -35,7 +35,7 @@ def Handle_respuestas(encuestas: list, db):
 
 def get_encuesta(db, dni: str) -> list[SimpleNamespace]:
 
-    query = text("""SELECT *
+    query = text("""SELECT pregunta, respuesta
                 FROM "Respuestas"
                 WHERE dni_alumno = :dni
                 AND created_at = (

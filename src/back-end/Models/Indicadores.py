@@ -3,6 +3,7 @@ from types import SimpleNamespace
 
 from numpy import flatnonzero
 from sqlalchemy import text
+from sqlalchemy.sql.selectable import elem
 
 
 @dataclass
@@ -55,3 +56,33 @@ def set_indicadores_cuatrimestrales(db, objeto: SimpleNamespace):
     )
 
     return
+
+
+def get_indicadores_cuatrimestrales(db, dni):
+    try:
+        query = text("""
+                    SELECT ic.rap, ic.rac, ic.raf
+                    FROM "indicadores_cuatrimestrales" ic
+                    WHERE ic.dni_alumno = :dni
+                    """)
+        row = db.execute(query, {"dni": dni}).mappings().fetchone()
+        if row is None:
+            raise Exception("el alumno no tiene indicadores guardados")
+        return SimpleNamespace(**row)
+    except Exception as e:
+        raise Exception(e)
+
+
+def get_indicadores_iniciales(db, dni):
+    try:
+        query = text("""
+                    SELECT i.pse, i.ic, i.pep, i.cl, i.cv, i.loc
+                    FROM "Indicadores" i
+                    WHERE i.dni_alumno = :dni
+                    """)
+        row = db.execute(query, {"dni": dni}).mappings().fetchone()
+        if row is None:
+            raise Exception("el alumno no tiene indicadores guardados")
+        return SimpleNamespace(**row)
+    except Exception as e:
+        raise Exception(e)

@@ -1,7 +1,7 @@
 from collections import defaultdict
 from types import SimpleNamespace
 
-from Models import Alumno, Semaforo
+from Models import Alumno, Indicadores, Semaforo
 from Models.Alumno import AlumnoDto
 from sqlalchemy.sql.expression import Null
 
@@ -80,6 +80,7 @@ def toState(aprobacion: float) -> str:
 def get_score(dni: str, db) -> float:
     return Alumno.get_score(dni, db)
 
+
 def get_color(dni: str, db) -> str:
     return Alumno.get_color(dni, db)
 
@@ -114,11 +115,38 @@ def iniciales_filtrados(db, filtro, valor):
     return raw
 
 
-def get_evolucion_semaforos(db, filtro, valor, piso, techo):
+def get_evolucion_semaforos(db, valor, piso, techo):
 
-    raw = Semaforo.get_evolucion(db, filtro, valor, piso, techo)
+    raw = Semaforo.get_evolucion(db, valor, piso, techo)
 
     return raw
 
+
 def get_criticos(db):
     return Semaforo.get_criticos(db)
+
+
+def get_semaforoXpre_cohorte(db, cohorte):
+    return Alumno.get_semaforo_pre(db, cohorte)
+
+
+def get_scoreXcohorte(db):
+    return Alumno.get_scoreXcohorte(db)
+
+
+def get_indicadores_alumnos(db, tipo, dni):
+
+    if tipo == "iniciales":
+        return Indicadores.get_indicadores_iniciales(db, dni)
+    elif tipo == "cuatrimestrales":
+        return Indicadores.get_indicadores_cuatrimestrales(db, dni)
+    else:
+        raise Exception("no existe ese tipo de indicador")
+
+
+def get_datos_iniciales(db, dni):
+    return Alumno.get_datosIniciales(db, dni)
+
+
+def get_rendimiento_academico(db, dni):
+    return Alumno.get_scores_historicos(db, dni)

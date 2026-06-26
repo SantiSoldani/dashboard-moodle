@@ -39,6 +39,7 @@ def get_score_actual(dni: str, db):
     result = db.execute(query, {"dni_alumno": dni})
     return result.fetchone()
 
+
 def get_color_actual(dni: str, db):
     query = text(
         """SELECT color FROM "Semaforo" WHERE dni_alumno = :dni_alumno ORDER BY created_at DESC LIMIT 1"""
@@ -47,39 +48,33 @@ def get_color_actual(dni: str, db):
     return result.fetchone()
 
 
-def get_evolucion(db, filtro, valor, piso, techo):
-    COLUMNAS_PERMITIDAS = [
-        "plan_de_estudios",
-        "materias_aprobadas",
-        "cuatrimestre",
-        "fecha_inicio",
-    ]
+def get_evolucion(db, valor, piso, techo):
 
-    if filtro != -1 and filtro not in COLUMNAS_PERMITIDAS:
-        raise ValueError("no existe la columna a la que se quiere acceder")
-    if piso != -1 and techo != -1:
-        fecha_piso = datetime.strptime(piso, "%d-%m-%Y")
-        fecha_techo = datetime.strptime(techo, "%d-%m-%Y")
-    else:
-        fecha_piso = None
-        fecha_techo = None
-
-    filtro_clause = f"a.{filtro}" if filtro != -1 else "NULL"
-    group_by_clause = f"a.{filtro}, s.created_at" if filtro != -1 else "s.created_at"
+    fecha_piso = datetime.strptime(piso, "%d-%m-%Y")
+    fecha_techo = datetime.strptime(techo, "%d-%m-%Y")
 
     try:
-        query = text(f"""
+        query = text("""
             SELECT
-                AVG(s.score) AS "score promedio",
-                s.created_at AS "fecha",
-                {filtro_clause} AS "filtro"
-            FROM "Semaforo" s
-            JOIN "Alumnos" a ON a.dni = s.dni_alumno
-            WHERE (:valor = -1 OR a.{filtro} = :valor)
-            AND (:fecha_piso IS NULL OR :fecha_techo IS NULL OR s.created_at BETWEEN :fecha_piso AND :fecha_techo)
-            GROUP BY {group_by_clause}
-            ORDER BY s.created_at
-        """)
+                fecha,
+                color,
+                COUNT(*) AS cantidad
+            FROM (
+                SELECT DISTINCT ON (s.dni_alumno, DATE(s.created_at))
+                    s.dni_alumno,
+                    DATE(s.created_at) AS fecha,
+                    s.color
+                FROM "Semaforo" s
+                JOIN "Alumnos" a
+                    ON a.dni = s.dni_alumno
+                WHERE a.fecha_inicio = :valor
+                  AND s.created_at BETWEEN :fecha_piso AND :fecha_techo
+                ORDER BY s.dni_alumno, DATE(s.created_at), s.created_at DESC
+            ) t
+            GROUP BY fecha, color
+            ORDER BY fecha, color;
+
+                    """)
         rows = (
             db.execute(
                 query,
@@ -96,6 +91,7 @@ def get_evolucion(db, filtro, valor, piso, techo):
     except Exception as e:
         print(e)
         return []
+
 
 def get_criticos(db):
     query = text(

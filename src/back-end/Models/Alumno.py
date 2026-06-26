@@ -6,6 +6,7 @@ from types import SimpleNamespace
 
 from pydantic.networks import EmailStr
 from sqlalchemy import text
+from sqlalchemy.sql.selectable import elem
 from sqlalchemy.sql.sqltypes import SmallInteger
 
 
@@ -69,7 +70,7 @@ def Post_Alumno(alumno: AlumnoDto, db):
 def Get_alumno_by_dni(dni: str, db) -> AlumnoDto:
     print("alumno")
     query = text("""SELECT * FROM "Alumnos" WHERE dni = :dni""")
-    
+
     alumno_by_dni = db.execute(query, {"dni": dni}).mappings().fetchone()
     print(alumno_by_dni)
     if alumno_by_dni is None:
@@ -86,6 +87,7 @@ def Get_alumno_by_dni(dni: str, db) -> AlumnoDto:
         materias_aprobadas=alumno_by_dni["materias_aprobadas"],
         plan_de_estudios=alumno_by_dni["plan_de_estudios"],
     )
+
 
 def Get_alumnos(db) -> list[AlumnoDto]:
     # SQL QUERY SELECT * FROM alumnos ORDER BY nombre
@@ -177,7 +179,7 @@ def aumentar_cuatrimestre(db):
 
 def fetch_semaforos(db, dni):
     query = text(
-        """SELECT color, score, created_at as fecha FROM "Semaforo" WHERE dni_alumno = :dni ORDER BY created_at"""
+        """SELECT color, score, DATE(created_at) as fecha FROM "Semaforo" WHERE dni_alumno = :dni ORDER BY fecha"""
     )
 
     try:
@@ -254,16 +256,16 @@ def get_iniciales_filtrados(db, filtro, valor):
     try:
         if filtro in COLUMNAS_PERMITIDAS:
             query = text(f"""
-                            SELECT {filtro},
-                            AVG(pse) AS "perfil socio-economico",
-                            AVG(ic) AS "interrupcion de la carrera",
-                            AVG(pep) AS "perfil educativo de los padres/tutores",
-                            AVG(cl) AS "carga laboral",
-                            AVG(cv) AS "carga vital",
-                            AVG(loc) AS "localidad"
+                            SELECT a.{filtro},
+                            AVG(i.pse) AS "perfil socio-economico",
+                            AVG(i.ic) AS "interrupcion de la carrera",
+                            AVG(i.pep) AS "perfil educativo de los padres/tutores",
+                            AVG(i.cl) AS "carga laboral",
+                            AVG(i.cv) AS "carga vital",
+                            AVG(i.loc) AS "localidad"
                             FROM "Indicadores" i
                             JOIN "Alumnos" a
-                            ON a.dni = i.dni
+                            ON a.dni = i.dni_alumno
                             WHERE (:valor = -1 OR a.{filtro} = :valor)
                             GROUP BY a.{filtro}
                             ORDER BY a.{filtro}
@@ -273,5 +275,90 @@ def get_iniciales_filtrados(db, filtro, valor):
 
         else:
             raise ValueError("la columna seleccionada no existe")
+    except Exception as e:
+        raise Exception(e)
+
+
+def get_semaforo_pre(db, cohorte):
+
+    try:
+        query = text(""" SELECT DISTINCT ON (a.dni)
+            s.score,
+            a."PRE" AS perfil
+        FROM "Alumnos" a
+        JOIN "Semaforo" s
+            ON s.dni_alumno = a.dni
+        WHERE a.fecha_inicio = :cohorte
+          AND a."PRE" IS NOT NULL
+        ORDER BY a.dni, s.created_at DESC;
+                    """)
+        rows = db.execute(query, {"cohorte": cohorte}).mappings().fetchall()
+        return [SimpleNamespace(**row) for row in rows]
+
+    except Exception as e:
+        raise Exception(e)
+
+
+def get_scoreXcohorte(db):
+
+    try:
+        query = text("""
+            SELECT
+                a.fecha_inicio AS cohorte,
+                AVG(t.score) AS promedio_score
+            FROM "Alumnos" a
+            JOIN (
+                SELECT DISTINCT ON (s.dni_alumno)
+                    s.dni_alumno,
+                    s.score
+                FROM "Semaforo" s
+                ORDER BY s.dni_alumno, s.created_at DESC
+            ) t
+                ON t.dni_alumno = a.dni
+            GROUP BY a.fecha_inicio
+            ORDER BY cohorte;
+                    """)
+        rows = db.execute(query).mappings().fetchall()
+        return [SimpleNamespace(**row) for row in rows]
+
+    except Exception as e:
+        raise Exception(e)
+
+
+def get_datosIniciales(db, dni):
+
+    try:
+        query = text("""
+                        SELECT a.materias_aprobadas as "materias aprobadas",
+                        a.plan_de_estudios as "plan de estudio",
+                        (a.materias_aprobadas - m.cantidad) AS "materias respecto al plan"
+                        FROM "Alumnos" a
+                        JOIN "materiasXcuatrimestre" m
+                        ON m.numero = a.cuatrimestre
+                        WHERE a.dni = :dni
+                    """)
+        row = db.execute(query, {"dni": dni}).mappings().fetchone()
+        if row is None:
+            raise Exception("no se encontro el alumno")
+
+        return SimpleNamespace(**row)
+    except Exception as e:
+        raise Exception(e)
+
+
+def get_scores_historicos(db, dni):
+
+    try:
+        query = text("""
+                        SELECT DATE(created_at) as "fecha",
+                        score
+                        FROM "Semaforo"
+                        WHERE dni_alumno = :dni
+                        ORDER BY fecha
+                    """)
+        rows = db.execute(query, {"dni": dni}).mappings().fetchall()
+        if rows is None:
+            raise Exception("no se encontro el alumno")
+        return [SimpleNamespace(**row) for row in rows]
     except Exception as e:
         raise Exception(e)

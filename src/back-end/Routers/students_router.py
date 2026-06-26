@@ -85,18 +85,17 @@ async def get_indicadores_filtrados(
 # luego en la parte de piso se pone la fecha piso de las encuestas y en techo la fecha techo
 # de la misma manera cualquiera de los campos enviados de ser parseados a -1 seran ignorados, si paso todo -1 entonces simplemente traera todos los semaforos
 # ejemplo --> get/semaforos/fecha_inicio/-1/20-03-2020/17-07-2027 --> traeria todos los promedios de semaforo ordenados por fecha de inicio, registrados desde el 20 de febrero de 2020 hasta el 17 de julio de 2027
-@router.get("/get/semaforos/{filtro}/{valor}/{piso}/{techo}", status_code=200)
+@router.get("/get/semaforos/{valor}/{piso}/{techo}", status_code=200)
 async def get_evolucion_semaforos(
-    filtro: str, valor: int, piso, techo, db: Session = Depends(server.get_db)
+    valor: int, piso, techo, db: Session = Depends(server.get_db)
 ):
 
     try:
-        semaforos = AlumnoController.get_evolucion_semaforos(
-            db, filtro, valor, piso, techo
-        )
+        semaforos = AlumnoController.get_evolucion_semaforos(db, valor, piso, techo)
         return semaforos
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/get/criticos", status_code=200)
 async def get_criticos(db: Session = Depends(server.get_db)):
@@ -104,8 +103,8 @@ async def get_criticos(db: Session = Depends(server.get_db)):
         criticos = AlumnoController.get_criticos(db)
         return [c.__dict__ for c in criticos]
     except Exception as e:
-        print(f"Error en get_criticos: {e}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/get/color/{dni}", status_code=200)
 async def get_color(dni: str, db: Session = Depends(server.get_db)):
@@ -113,5 +112,48 @@ async def get_color(dni: str, db: Session = Depends(server.get_db)):
         color = AlumnoController.get_color(dni, db)
         return color
     except Exception as e:
-        print(f"Error en get_color: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/get/semaforoXpre/{cohorte}", status_code=200)
+async def get_semaforoXpre(cohorte: int, db: Session = Depends(server.get_db)):
+    try:
+        semaforo_promedio = AlumnoController.get_semaforoXpre_cohorte(db, cohorte)
+        return semaforo_promedio
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/get/scoreXcohorte", status_code=200)
+async def get_scoreXcohorte(db: Session = Depends(server.get_db)):
+    try:
+        scores = AlumnoController.get_scoreXcohorte(db)
+        return scores
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/get/indicadores_Bydni/{tipo}/{dni}")
+async def get_indicadores_alumno(
+    tipo: str, dni: str, db: Session = Depends(server.get_db)
+):
+    try:
+        return AlumnoController.get_indicadores_alumnos(db, tipo, dni)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/get/datos_iniciales/{dni}")
+async def get_datos_iniciales(dni: str, db: Session = Depends(server.get_db)):
+    try:
+        return AlumnoController.get_datos_iniciales(db, dni)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/get/rendimiento_academico/{dni}")
+async def get_rendimiento_academico(dni: str, db: Session = Depends(server.get_db)):
+    try:
+        return AlumnoController.get_rendimiento_academico(db, dni)
+    except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
