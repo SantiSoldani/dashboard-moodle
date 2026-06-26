@@ -493,9 +493,10 @@ export const VISTA_ADMIN_DASHBOARD = `
                         <span class="material-symbols-outlined icon-blue" style="color: #434655;">pentagon</span>
                         <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Distribución del PRE</h2>
                     </div>
-                    <select class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
-                        <option value="2025 C1">2025 C1</option>
-                        <option value="2024 C2">2024 C2</option>
+                    <select id="selectDistribucionPRE" class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
                     </select>
                 </div>
                 <div id="chartMeticasAgregadas" style="width: 100%; height: 250px;"></div>
@@ -506,9 +507,10 @@ export const VISTA_ADMIN_DASHBOARD = `
                         <span class="material-symbols-outlined icon-blue" style="color: #434655;">grid_view</span>
                         <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Perfil Económico vs Semáforo</h2>
                     </div>
-                    <select class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
-                        <option value="2025 C1">2025 C1</option>
-                        <option value="2024 C2">2024 C2</option>
+                    <select id="selectPerfilSemaforo" class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
                     </select>
                 </div>
                 <div id="chartPerfilSemaforo" style="width: 100%; height: 250px;"></div>
@@ -550,10 +552,7 @@ export const VISTA_ADMIN_DASHBOARD = `
                         <span class="material-symbols-outlined icon-blue" style="color: #434655;">compare_arrows</span>
                         <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Score x Cohorte</h2>
                     </div>
-                    <select class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
-                        <option value="2025 C1">2025 C1</option>
-                        <option value="2024 C2">2024 C2</option>
-                    </select>
+                    <!-- Select removed because Score x Cohorte brings all cohorts at once -->
                 </div>
                 <div id="chartComparacionCohortes" style="width: 100%; height: 250px;"></div>
             </div>

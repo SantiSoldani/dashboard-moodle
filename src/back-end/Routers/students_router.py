@@ -115,7 +115,7 @@ async def get_color(dni: str, db: Session = Depends(server.get_db)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/get/semaforoXpre/{cohorte}", status_code=200)
+@router.get("/get/semaforosXpre/{cohorte}", status_code=200)
 async def get_semaforoXpre(cohorte: int, db: Session = Depends(server.get_db)):
     try:
         semaforo_promedio = AlumnoController.get_semaforoXpre_cohorte(db, cohorte)

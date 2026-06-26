@@ -1,4 +1,4 @@
-import { HandleGet_alumnos } from "../models/Alumno.js";
+import { HandleGet_alumnos, HandleGet_indicadores_iniciales, HandleGet_semaforosXpre, HandleGet_scoreXcohorte } from "../models/Alumno.js";
 import { Handle_get_promedio_general, Handle_get_promedio_materias } from "../models/Notas.js";
 
 let allStudents = [];
@@ -10,7 +10,17 @@ export async function initAdminDashboard() {
     await cargarDatos();
     calcularYMostrarMetricas();
     renderizarGraficos();
-    
+
+    const selectPRE = document.getElementById('selectDistribucionPRE');
+    if (selectPRE) {
+        selectPRE.addEventListener('change', renderRadarChart);
+    }
+
+    const selectPerfilSemaforo = document.getElementById('selectPerfilSemaforo');
+    if (selectPerfilSemaforo) {
+        selectPerfilSemaforo.addEventListener('change', renderHeatmapChart);
+    }
+
     window.addEventListener('resize', () => {
         chartInstances.forEach(chart => {
             if (chart) chart.resize();
@@ -64,7 +74,7 @@ function calcularYMostrarMetricas() {
 function renderizarGraficos() {
     if (typeof echarts === 'undefined') return;
 
-    chartInstances.forEach(chart => { if(chart) chart.dispose(); });
+    chartInstances.forEach(chart => { if (chart) chart.dispose(); });
     chartInstances = [];
 
     renderRadarChart();
@@ -74,21 +84,58 @@ function renderizarGraficos() {
     renderBarChart();
 }
 
-function renderRadarChart() {
+async function renderRadarChart() {
     const dom = document.getElementById('chartMeticasAgregadas');
     if (!dom) return;
-    const chart = echarts.init(dom);
-    chartInstances.push(chart);
+
+    let chart = echarts.getInstanceByDom(dom);
+    if (!chart) {
+        chart = echarts.init(dom);
+        chartInstances.push(chart);
+    }
+
+    chart.showLoading();
+
+    const selectPRE = document.getElementById('selectDistribucionPRE');
+    const anio = selectPRE ? selectPRE.value : "2024";
+    let tipo = "iniciales";
+    let filtro = "fecha_inicio"
+    const dataFromApi = await HandleGet_indicadores_iniciales(tipo, filtro, anio);
+    console.log(dataFromApi)
+    chart.hideLoading();
+
+    let radarData = [0, 0, 0, 0, 0, 0];
+    
+    let dataObj = null;
+    if (dataFromApi) {
+        if (Array.isArray(dataFromApi)) {
+            dataObj = dataFromApi.length > 0 ? dataFromApi[0] : null;
+        } else {
+            dataObj = dataFromApi;
+        }
+    }
+
+    if (dataObj) {
+        radarData = [
+            dataObj["perfil socio-economico"] || 0,
+            dataObj["interrupcion de la carrera"] || 0,
+            dataObj["perfil educativo de los padres/tutores"] || 0,
+            dataObj["carga vital"] || 0,
+            dataObj["carga laboral"] || 0,
+            dataObj["localidad"] || 0
+        ];
+    }
 
     const option = {
         tooltip: {},
         radar: {
             indicator: [
-                { name: 'PSE', max: 100 },
-                { name: 'IC', max: 100 },
-                { name: 'CL', max: 100 },
-                { name: 'CV', max: 100 },
-                { name: 'LOC', max: 100 }
+                { name: 'PSE', max: 1 },
+                { name: 'IC', max: 1 },
+                { name: 'PEP', max: 1 },
+                { name: 'CV', max: 1 },
+                { name: 'CL', max: 1 },
+                { name: 'LOC', max: 1 }
             ],
             axisName: { color: '#434655' }
         },
@@ -97,8 +144,8 @@ function renderRadarChart() {
             type: 'radar',
             data: [
                 {
-                    value: [80, 75, 90, 60, 85],
-                    name: 'Promedio Institucional',
+                    value: radarData,
+                    name: `Promedio Institucional ${anio}`,
                     itemStyle: { color: '#2563EB' },
                     areaStyle: { color: 'rgba(37, 99, 235, 0.2)' }
                 }
@@ -108,21 +155,65 @@ function renderRadarChart() {
     chart.setOption(option);
 }
 
-function renderHeatmapChart() {
+async function renderHeatmapChart() {
     const dom = document.getElementById('chartPerfilSemaforo');
     if (!dom) return;
-    const chart = echarts.init(dom);
-    chartInstances.push(chart);
+    
+    let chart = echarts.getInstanceByDom(dom);
+    if (!chart) {
+        chart = echarts.init(dom);
+        chartInstances.push(chart);
+    }
+
+    chart.showLoading();
+
+    const selectPerfilSemaforo = document.getElementById('selectPerfilSemaforo');
+    const anio = selectPerfilSemaforo ? selectPerfilSemaforo.value : "2024";
+
+    const dataFromApi = await HandleGet_semaforosXpre(anio);
+    
+    chart.hideLoading();
 
     const xData = ['Desafiante', 'Medio-Bajo', 'Medio-Alto', 'Favorable'];
     const yData = ['Crítico', 'Alerta', 'Estable', 'Alto'];
-    // Mock Data format: [xIndex, yIndex, value]
-    const data = [
-        [0, 0, 45], [0, 1, 30], [0, 2, 10], [0, 3, 5],
-        [1, 0, 25], [1, 1, 40], [1, 2, 20], [1, 3, 10],
-        [2, 0, 15], [2, 1, 25], [2, 2, 45], [2, 3, 20],
-        [3, 0, 5],  [3, 1, 15], [3, 2, 30], [3, 3, 60]
+    
+    const matrix = [
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0]
     ];
+
+    function getIndex(val) {
+        if (val < 0.25) return 0;
+        if (val < 0.5) return 1;
+        if (val < 0.75) return 2;
+        return 3;
+    }
+
+    if (dataFromApi && Array.isArray(dataFromApi)) {
+        dataFromApi.forEach(item => {
+            const pre = parseFloat(item.perfil);
+            const score = parseFloat(item.score);
+            if (!isNaN(pre) && !isNaN(score)) {
+                let x = getIndex(pre);
+                let y = getIndex(score);
+                matrix[x][y]++;
+            }
+        });
+    }
+
+    let heatmapData = [];
+    let maxVal = 0;
+    for (let x = 0; x < 4; x++) {
+        for (let y = 0; y < 4; y++) {
+            let val = matrix[x][y];
+            heatmapData.push([x, y, val]);
+            if (val > maxVal) maxVal = val;
+        }
+    }
+
+    if (maxVal === 0) maxVal = 10;
 
     const option = {
         tooltip: { position: 'top' },
@@ -131,7 +222,7 @@ function renderHeatmapChart() {
         yAxis: { type: 'category', data: yData, axisLabel: { color: '#434655' }, name: 'RAF', nameLocation: 'end' },
         visualMap: {
             min: 0,
-            max: 100,
+            max: maxVal,
             calculable: true,
             orient: 'horizontal',
             left: 'center',
@@ -142,7 +233,7 @@ function renderHeatmapChart() {
         series: [{
             name: 'Distribución',
             type: 'heatmap',
-            data: data,
+            data: heatmapData,
             label: { show: true, color: '#141b2b' }
         }]
     };
@@ -164,12 +255,12 @@ async function renderPromedioMateriasList() {
 
         // Sort ascending (lowest averages first)
         materias.sort((a, b) => a.promedio - b.promedio);
-        
+
         // Take top 5
         const top5 = materias.slice(0, 5);
 
         let html = '<div style="display: flex; flex-direction: column; gap: 12px; padding-top: 8px;">';
-        
+
         top5.forEach((materia, index) => {
             let color = '#22C55E';
             let bgColor = '#F0FDF4';
@@ -195,7 +286,7 @@ async function renderPromedioMateriasList() {
                 </div>
             `;
         });
-        
+
         html += '</div>';
         dom.innerHTML = html;
 
@@ -226,24 +317,59 @@ function renderLineChart() {
     chart.setOption(option);
 }
 
-function renderBarChart() {
+async function renderBarChart() {
     const dom = document.getElementById('chartComparacionCohortes');
     if (!dom) return;
-    const chart = echarts.init(dom);
-    chartInstances.push(chart);
+    
+    let chart = echarts.getInstanceByDom(dom);
+    if (!chart) {
+        chart = echarts.init(dom);
+        chartInstances.push(chart);
+    }
+    
+    chart.showLoading();
+    const dataFromApi = await HandleGet_scoreXcohorte();
+    chart.hideLoading();
+
+    let xAxisData = [];
+    let seriesData = [];
+
+    if (dataFromApi && Array.isArray(dataFromApi)) {
+        const validCohortes = dataFromApi.filter(item => item.cohorte !== -1);
+        
+        validCohortes.sort((a, b) => a.cohorte - b.cohorte);
+        
+        validCohortes.forEach((item, index) => {
+            xAxisData.push(String(item.cohorte));
+            
+            let val = parseFloat(item.promedio_score);
+            if (isNaN(val)) val = 0;
+            
+            val = parseFloat(val.toFixed(2));
+            
+            // Assign varying shades of blue based on index for aesthetics
+            const colors = ['#e1e8fd', '#b4c5ff', '#60a5fa', '#3b82f6', '#2563EB', '#1d4ed8', '#1e3a8a'];
+            const color = colors[index % colors.length];
+            
+            seriesData.push({
+                value: val,
+                itemStyle: { color: color }
+            });
+        });
+    }
+
+    if (xAxisData.length === 0) {
+        xAxisData = ['Sin Datos'];
+        seriesData = [0];
+    }
 
     const option = {
         tooltip: { trigger: 'axis' },
         grid: { left: '5%', right: '5%', top: '5%', bottom: '10%', containLabel: true },
-        xAxis: { type: 'category', data: ['2022', '2023', '2024', '2025'], axisLabel: { color: '#434655' }, axisLine: { show: false }, axisTick: { show: false } },
-        yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed' } }, axisLabel: { show: false }, splitLine: { show: false } },
+        xAxis: { type: 'category', data: xAxisData, axisLabel: { color: '#434655' }, axisLine: { show: false }, axisTick: { show: false } },
+        yAxis: { type: 'value', axisLabel: { show: false }, splitLine: { show: false } },
         series: [{
-            data: [
-                { value: 5.8, itemStyle: { color: '#e1e8fd' } },
-                { value: 6.5, itemStyle: { color: '#b4c5ff' } },
-                { value: 7.8, itemStyle: { color: '#2563EB' } },
-                { value: 8.5, itemStyle: { color: '#1e3a8a' } }
-            ],
+            data: seriesData,
             type: 'bar',
             barWidth: '40%',
             label: { show: true, position: 'insideBottom', color: '#141b2b', formatter: '{c}' },

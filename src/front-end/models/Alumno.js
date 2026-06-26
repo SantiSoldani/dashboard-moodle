@@ -79,3 +79,75 @@ export async function HandleCreate_solicitud(dni_alumno, dni_tutor = null) {
     console.error("Error al intentar crear una solicitud", error);
   }
 }
+
+export async function HandleGet_indicadores_iniciales(tipo, filtro, anio) {
+  try {
+    const rol = localStorage.getItem("rol") || "Admin";
+    const headers = {
+      "ngrok-skip-browser-warning": "69420",
+      "X-Role": rol
+    };
+
+    // El endpoint es: alumnos/get/indicadores/iniciales/"fecha_inicio"/<año de cohorte>
+    const response = await fetch(`${alumnosAPI}/get/indicadores/${tipo}/${filtro}/${anio}`, { headers });
+
+    if (!response.ok) {
+      throw new Error(`Error en el fetch de indicadores iniciales: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al traer los indicadores iniciales", error);
+    return null;
+  }
+}
+
+export async function HandleGet_semaforosXpre(anio) {
+  try {
+    const rol = localStorage.getItem("rol") || "Admin";
+    const headers = {
+      "ngrok-skip-browser-warning": "69420",
+      "X-Role": rol
+    };
+    
+    // ruta de la api = alumnos/get/semaforosXpre/<año de cohorte>
+    const response = await fetch(`${alumnosAPI}/get/semaforosXpre/${anio}`, { headers });
+    
+    if (!response.ok) {
+      throw new Error(`Error en el fetch de semaforosXpre: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al traer semaforosXpre", error);
+    return [];
+  }
+}
+
+export async function HandleGet_scoreXcohorte() {
+  try {
+    const rol = localStorage.getItem("rol") || "Admin";
+    const headers = {
+      "ngrok-skip-browser-warning": "69420",
+      "X-Role": rol
+    };
+    
+    // ruta de la api = alumnos/get/scoreXcohorte
+    const response = await fetch(`${alumnosAPI}/get/scoreXcohorte`, { headers });
+    
+    if (!response.ok) {
+      throw new Error(`Error en el fetch de scoreXcohorte: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al traer scoreXcohorte", error);
+    return [];
+  }
+}
+
+
+
