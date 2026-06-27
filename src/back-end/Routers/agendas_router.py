@@ -1,0 +1,26 @@
+from Controllers import AgendaController
+from fastapi import APIRouter, Request, Depends
+from sqlmodel import Session
+import server
+
+router = APIRouter(
+    prefix="/agendas"
+)
+
+@router.get("/buscar")
+def buscar_entrevista(dni, db : Session = Depends(server.get_db)):
+    return AgendaController.buscar_entrevista(dni, db)
+
+@router.post("/crear")
+def crear_entrevista(request: Request, db : Session = Depends(server.get_db)):
+    data = request.json()
+    dni_alumno = data.get("dni_alumno")
+    dni_entrevistador = data.get("dni_entrevistador")
+    fecha_agendada = data.get("fecha_agendada")
+    return AgendaController.crear_entrevista(dni_alumno, dni_entrevistador, fecha_agendada, db)
+
+@router.post("/marcar")
+def marcar_entrevista(request: Request, db : Session = Depends(server.get_db)):
+    data = request.json()
+    id_entrevista = data.get("id_entrevista")
+    return AgendaController.marcar_entrevista(id_entrevista, db)

@@ -67,10 +67,10 @@ def obtener_solicitudes_tutor(dni: str, db):
     solicitudes = []
     for row in results:
         solicitudes.append(Solicitud(
-            id=row[0],
-            dni_alumno=row[1],
-            dni_tutor=row[2],
-            leida=row[3],
-            created_at=row[4]
+            id=row.id,
+            dni_alumno=row.dni_alumno,
+            dni_tutor=row.dni_tutor,
+            leida=row.leida,
+            created_at=row.created_at
         ))
     return solicitudes

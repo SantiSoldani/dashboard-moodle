@@ -18,6 +18,7 @@ from Routers import (
     students_router,
     tutor_alumno_router,
     usuarios_router,
+    agendas_router,
 )
 
 app = FastAPI()
@@ -50,6 +51,7 @@ app.include_router(tutor_alumno_router.router)
 app.include_router(solicitudes_router.router)
 app.include_router(entrevista_router.router)
 app.include_router(config_router.router)
+app.include_router(agendas_router.router)
 
 load_dotenv()
 
