@@ -7,9 +7,9 @@ router = APIRouter(
     prefix="/agendas"
 )
 
-@router.get("/buscar")
-def buscar_entrevista(dni, db : Session = Depends(server.get_db)):
-    return AgendaController.buscar_entrevista(dni, db)
+@router.get("/buscar/{dni_alumno}")
+def buscar_entrevista(dni_alumno, db : Session = Depends(server.get_db)):
+    return AgendaController.buscar_entrevista(dni_alumno, db)
 
 @router.post("/crear")
 def crear_entrevista(request: Request, db : Session = Depends(server.get_db)):

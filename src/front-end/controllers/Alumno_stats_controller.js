@@ -1,4 +1,4 @@
-import { HandleGet_alumnos, HandleGet_tutor, HandleCreate_solicitud, HandleGet_indicadores_Bydni, HandleGet_encuesta_ByDni, HandleGet_evolucion_semaforos } from "../models/Alumno.js";
+import { HandleGet_alumnos, HandleGet_tutor, HandleCreate_solicitud, HandleGet_indicadores_Bydni, HandleGet_encuesta_ByDni, HandleGet_evolucion_semaforos, HandleGet_rendimiento_academico, HandleGet_agenda_pendiente, HandleGet_usuario_by_dni, HandleGet_solicitud_pendiente } from "../models/Alumno.js";
 
 let chartPercepcionInstance = null;
 
@@ -12,7 +12,7 @@ export async function initAlumnoStats(dniParam = null) {
 
     const rol = localStorage.getItem("rol") || "Instructor";
     if (!alumno_dni && rol === "Learner") {
-      alumno_dni = "22669995"; // Fallback para que cargue la vista de Alumno
+      alumno_dni = "20926120"; // Fallback para que cargue la vista de Alumno
     }
     if (!alumno_dni) {
       console.warn("No se especificó un DNI de alumno.");
@@ -29,19 +29,33 @@ export async function initAlumnoStats(dniParam = null) {
     let indicadoresCuatrimestrales = await HandleGet_indicadores_Bydni(tipo, alumno_dni);
     let encuesta = await HandleGet_encuesta_ByDni(alumno_dni);
     let evolucionSemaforos = await HandleGet_evolucion_semaforos(alumno_dni);
+    let rendimientoAcademico = await HandleGet_rendimiento_academico(alumno_dni);
+
+    let entrevistaPendienteStr = null;
+    let solicitudPendiente = null;
+    if (rol === "Learner") {
+      let agendaPendiente = await HandleGet_agenda_pendiente(alumno_dni);
+      if (agendaPendiente) {
+        let entrevistador = await HandleGet_usuario_by_dni(agendaPendiente.dni_entrevistador);
+        if (entrevistador) {
+          entrevistaPendienteStr = `ENTREVISTA PENDIENTE | DIA: ${agendaPendiente.fecha_agendada} | TUTOR: ${entrevistador.nombre} ${entrevistador.apellido}`;
+        }
+      }
+      solicitudPendiente = await HandleGet_solicitud_pendiente(alumno_dni);
+    }
 
     if (alumno) {
       alumno = typeof alumno === "string" ? JSON.parse(alumno) : alumno;
       const rol = localStorage.getItem("rol") || "Instructor";
 
       set_header(alumno);
-      render_dashboard_by_role(alumno, rol, indicadores, tutor, indicadoresCuatrimestrales, encuesta, evolucionSemaforos);
+      render_dashboard_by_role(alumno, rol, indicadores, tutor, indicadoresCuatrimestrales, encuesta, evolucionSemaforos, rendimientoAcademico, entrevistaPendienteStr, solicitudPendiente);
 
       window.addEventListener('resize', () => {
         if (chartPercepcionInstance) chartPercepcionInstance.resize();
       });
 
-      if (rol === "Learner") {
+      if (rol === "Learner" && !solicitudPendiente) {
         activar_solicitudes(alumno, tutor);
       }
     }
@@ -77,25 +91,29 @@ function set_header(alumno) {
   }
 }
 
-function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null, indicadoresCuatrimestrales = null, encuesta = null, evolucionSemaforos = null) {
+function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null, indicadoresCuatrimestrales = null, encuesta = null, evolucionSemaforos = null, rendimientoAcademico = null, entrevistaPendienteStr = null, solicitudPendiente = null) {
   const isStudent = rol === "Learner";
   const formatKpi = (val) => val !== undefined && val !== null ? `${(val * 10).toFixed(1).replace(/\\.0$/, '')}/10` : "-/10";
 
   let encuestasHTML = "";
-  if (encuesta && Array.isArray(encuesta) && encuesta.length > 5) {
-    const encuestasFiltradas = encuesta.slice(5);
-    encuestasHTML = `
-      <div style="border: 1px solid #e1e8fd; border-radius: 8px; padding: 20px; background: #f8fafc;">
-          <div style="display: flex; flex-direction: column; gap: 16px;">
-              ${encuestasFiltradas.map(e => `
-                  <div>
-                      <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">${e.pregunta}</span>
-                      <strong style="color: #141b2b; font-size: 0.95rem;">${e.respuesta}</strong>
-                  </div>
-              `).join('')}
-          </div>
-      </div>
-    `;
+  if (encuesta && Array.isArray(encuesta)) {
+    const encuestasFiltradas = encuesta.filter(e => isNaN(Number(e.respuesta)));
+    if (encuestasFiltradas.length > 0) {
+      encuestasHTML = `
+        <div style="border: 1px solid #e1e8fd; border-radius: 8px; padding: 20px; background: #f8fafc;">
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                ${encuestasFiltradas.map(e => `
+                    <div>
+                        <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">${e.pregunta}</span>
+                        <strong style="color: #141b2b; font-size: 0.95rem;">${e.respuesta}</strong>
+                    </div>
+                `).join('')}
+            </div>
+        </div>
+      `;
+    } else {
+      encuestasHTML = `<div style="padding: 20px; text-align: center; color: #64748b; font-weight: 600; border: 1px solid #e1e8fd; border-radius: 8px; background: #f8fafc;">No hay respuestas cualitativas disponibles.</div>`;
+    }
   } else {
     encuestasHTML = `<div style="padding: 20px; text-align: center; color: #64748b; font-weight: 600; border: 1px solid #e1e8fd; border-radius: 8px; background: #f8fafc;">No hay respuestas de encuesta disponibles.</div>`;
   }
@@ -104,24 +122,63 @@ function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null,
   const kpiGrid = document.getElementById("student-kpi-grid");
   if (kpiGrid) {
     if (isStudent) {
+      let matAprobadas = alumno.materias_aprobadas !== undefined && alumno.materias_aprobadas !== null ? alumno.materias_aprobadas : '-';
+      let respectoAlPlanText = '-';
+      let respectoAlPlanColor = '#141b2b';
+
+      if (encuesta && Array.isArray(encuesta)) {
+        const qAtrasado = encuesta.find(q => q.pregunta.toLowerCase().includes("atrasado"));
+        const qAdelantado = encuesta.find(q => q.pregunta.toLowerCase().includes("adelantaste"));
+
+        let atrasadoVal = qAtrasado ? parseInt(qAtrasado.respuesta) : 0;
+        let adelantadoVal = qAdelantado ? parseInt(qAdelantado.respuesta) : 0;
+
+        if (isNaN(atrasadoVal)) atrasadoVal = 0;
+        if (isNaN(adelantadoVal)) adelantadoVal = 0;
+
+        if (atrasadoVal > 0) {
+          respectoAlPlanText = `-${atrasadoVal}`;
+          respectoAlPlanColor = '#ef4444'; // Red
+        } else if (adelantadoVal > 0) {
+          respectoAlPlanText = `+${adelantadoVal}`;
+          respectoAlPlanColor = '#22c55e'; // Green
+        } else {
+          respectoAlPlanText = `0`;
+          respectoAlPlanColor = '#64748b'; // Gray
+        }
+      }
+
+      let btnHTML = "";
+      if (solicitudPendiente) {
+        btnHTML = `
+          <button id="btn_crearSolicitud" disabled style="background: #94a3b8; color: white; border: none; border-radius: 12px; padding: 0 16px; font-weight: 700; font-size: 0.85rem; cursor: not-allowed; box-shadow: 0 4px 6px rgba(148,163,184,0.2); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+              <span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span> ENTREVISTA/TUTOR YA SOLICITADO
+          </button>
+        `;
+      } else {
+        btnHTML = `
+          <button id="btn_crearSolicitud" style="background: #2563eb; color: white; border: none; border-radius: 12px; padding: 0 16px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(37,99,235,0.2); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;" onmouseover="this.style.background='#1d4ed8'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2563eb'; this.style.transform='none'">
+              <span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span> SOLICITAR TUTOR / ENTREVISTA
+          </button>
+        `;
+      }
+
       kpiGrid.style.gridTemplateColumns = "repeat(4, 1fr)";
       kpiGrid.innerHTML = `
         <div class="kpi-card-new" style="background: white; border-radius: 12px; padding: 16px 20px; border: 1px solid #cbd5e1; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px;">
             <span style="font-size: 0.8rem; font-weight: 700; color: #434655; text-align: left; line-height: 1.3;">MATERIAS APROBADAS TOTALES:</span>
-            <strong style="font-size: 2.5rem; color: #141b2b; line-height: 1; flex-shrink: 0;">12</strong>
+            <strong style="font-size: 2.5rem; color: #141b2b; line-height: 1; flex-shrink: 0;">${matAprobadas}</strong>
         </div>
         <div class="kpi-card-new" style="background: white; border-radius: 12px; padding: 16px 20px; border: 1px solid #cbd5e1; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 12px;">
             <span style="font-size: 0.8rem; font-weight: 700; color: #434655; text-align: left; line-height: 1.3;">MATERIAS RESPECTO AL PLAN:</span>
-            <strong style="font-size: 2.5rem; color: #ea580c; font-weight: 900; line-height: 1; flex-shrink: 0;">+1</strong>
+            <strong style="font-size: 2.5rem; color: ${respectoAlPlanColor}; font-weight: 900; line-height: 1; flex-shrink: 0;">${respectoAlPlanText}</strong>
         </div>
         <div class="kpi-card-new" style="background: #eff6ff; border-radius: 12px; padding: 16px; border: 1px solid #bfdbfe; box-shadow: 0 1px 3px rgba(0,0,0,0.1); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-            <span style="font-size: 0.95rem; font-weight: 900; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.5px;">${alumno.carrera || "INGENIERIA INDUSTRIAL"}</span>
-            <span style="font-size: 0.85rem; font-weight: 700; color: #2563eb; margin-top: 4px;">PLAN 2024</span>
+            <span style="font-size: 0.95rem; font-weight: 900; color: #1e3a8a; text-transform: uppercase; letter-spacing: 0.5px;">${alumno.carrera ? alumno.carrera.toUpperCase() : "INGENIERIA INDUSTRIAL"}</span>
+            <span style="font-size: 0.85rem; font-weight: 700; color: #2563eb; margin-top: 4px;">PLAN ${alumno.plan_de_estudios || "2024"}</span>
         </div>
         <div style="display: flex; align-items: stretch; justify-content: center;">
-            <button id="btn_crearSolicitud" style="background: #2563eb; color: white; border: none; border-radius: 12px; padding: 0 16px; font-weight: 700; font-size: 0.85rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(37,99,235,0.2); width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;" onmouseover="this.style.background='#1d4ed8'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='#2563eb'; this.style.transform='none'">
-                <span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span> SOLICITAR TUTOR / ENTREVISTA
-            </button>
+            ${btnHTML}
         </div>
       `;
     } else {
@@ -195,7 +252,14 @@ function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null,
     if (mainChartsGrid) mainChartsGrid.style.gridTemplateColumns = "1fr 1fr";
     if (rightPanelContainer) rightPanelContainer.style.order = "-1";
     if (metricsListPanel) metricsListPanel.style.order = "1";
-    if (entrevistaBanner) entrevistaBanner.style.display = "block";
+    if (entrevistaBanner) {
+      if (entrevistaPendienteStr) {
+        entrevistaBanner.style.display = "block";
+        entrevistaBanner.innerHTML = `<span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">${entrevistaPendienteStr}</span>`;
+      } else {
+        entrevistaBanner.style.display = "none";
+      }
+    }
     if (encuestasContainer) encuestasContainer.style.display = "none";
     if (chartPercepcionLine) chartPercepcionLine.style.display = "block";
     if (periodSelector) periodSelector.style.display = "none";
@@ -261,7 +325,7 @@ function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null,
     }
   }
   // Chart
-  renderChart(isStudent, evolucionSemaforos);
+  renderChart(isStudent, evolucionSemaforos, rendimientoAcademico);
 }
 
 
@@ -269,7 +333,7 @@ function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null,
 
 let chartSemaforoInstance = null;
 
-function renderChart(isStudent, evolucionSemaforos = null) {
+function renderChart(isStudent, evolucionSemaforos = null, rendimientoAcademico = null) {
   if (typeof echarts === 'undefined') return;
 
   if (isStudent) {
@@ -299,12 +363,21 @@ function renderChart(isStudent, evolucionSemaforos = null) {
     seriesDataSemaforo = ultimosSemaforos.map(e => (e.score * 100).toFixed(1));
   }
 
+  let xAxisDataPercepcion = ['1C 2022', '2C 2022', '1C 2023', '2C 2023', '1C 2024', '2C 2024'];
+  let seriesDataPercepcion = [15, 35, 35, 55, 30, 65];
+
+  if (isStudent && rendimientoAcademico && rendimientoAcademico.length > 0) {
+    const ultimosRendimientos = rendimientoAcademico.slice(-5);
+    xAxisDataPercepcion = ultimosRendimientos.map(r => r.fecha);
+    seriesDataPercepcion = ultimosRendimientos.map(r => (r.score * 100).toFixed(1));
+  }
+
   const option = isStudent ? {
     tooltip: { trigger: 'axis', backgroundColor: 'rgba(255, 255, 255, 0.95)', borderColor: '#e2e8f0', textStyle: { color: '#1e293b' } },
     grid: { left: '5%', right: '5%', top: '10%', bottom: '15%', containLabel: true },
     xAxis: {
       type: 'category',
-      data: ['1C 2022', '2C 2022', '1C 2023', '2C 2023', '1C 2024', '2C 2024'],
+      data: xAxisDataPercepcion,
       axisLine: { lineStyle: { color: '#cbd5e1' } },
       axisLabel: { color: '#64748b', fontWeight: '500' }
     },
@@ -320,7 +393,7 @@ function renderChart(isStudent, evolucionSemaforos = null) {
       {
         name: 'Rendimiento',
         type: 'line',
-        data: [15, 35, 35, 55, 30, 65],
+        data: seriesDataPercepcion,
         smooth: true,
         symbol: 'circle',
         symbolSize: 8,

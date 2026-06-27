@@ -206,3 +206,76 @@ export async function HandleGet_evolucion_semaforos(dni) {
     return [];
   }
 }
+
+export async function HandleGet_rendimiento_academico(dni) {
+  try {
+    const rol = localStorage.getItem("rol") || "Instructor";
+    const headers = {
+      "ngrok-skip-browser-warning": "69420",
+      "X-Role": rol
+    };
+    const response = await fetch(`${alumnosAPI}/get/rendimiento_academico/${dni}`, { headers });
+    if (!response.ok) {
+      throw new Error(`Error en el fetch de rendimiento academico: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al traer el rendimiento academico", error);
+    return [];
+  }
+}
+
+export async function HandleGet_agenda_pendiente(dni_alumno) {
+  try {
+    const headers = {
+      "ngrok-skip-browser-warning": "69420"
+    };
+    const response = await fetch(`${getConfig()}/agendas/buscar/${dni_alumno}`, { headers });
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error(`Error al buscar agenda: ${response.status}`);
+    }
+    const data = await response.json();
+    return data; // Puede ser null o un objeto Agenda
+  } catch (error) {
+    console.error("Error al buscar agenda pendiente", error);
+    return null;
+  }
+}
+
+export async function HandleGet_usuario_by_dni(dni_usuario) {
+  try {
+    const headers = {
+      "ngrok-skip-browser-warning": "69420"
+    };
+    const response = await fetch(`${getConfig()}/usuarios/dni/${dni_usuario}`, { headers });
+    if (!response.ok) {
+      throw new Error(`Error al buscar usuario: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al buscar usuario por dni", error);
+    return null;
+  }
+}
+
+export async function HandleGet_solicitud_pendiente(dni_alumno) {
+  try {
+    const headers = {
+      "ngrok-skip-browser-warning": "69420"
+    };
+    const response = await fetch(`${solicitudesAPI}/buscar/${dni_alumno}`, { headers });
+    if (!response.ok) {
+      if (response.status === 404) return null;
+      throw new Error(`Error al buscar solicitud: ${response.status}`);
+    }
+    const data = await response.json();
+    return data; // Puede ser null o un objeto Solicitud
+  } catch (error) {
+    console.error("Error al buscar solicitud pendiente", error);
+    return null;
+  }
+}
+

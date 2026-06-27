@@ -11,6 +11,10 @@ router = APIRouter(
 async def listar_solicitudes(db: Session = Depends(server.get_db)):
     return SolicitudesController.obtener_solicitudes(db)
 
+@router.get("/buscar/{dni_alumno}")
+async def buscar_solicitud(dni_alumno:str , db: Session = Depends(server.get_db)):
+    return SolicitudesController.buscar_solicitud(dni_alumno,db)
+
 @router.get("/listar/{dni_tutor}", status_code=200)
 async def listar_solicitudes_tutor(dni_tutor:str , db: Session = Depends(server.get_db)):
     return SolicitudesController.obtener_solicitudes_tutor(dni_tutor,db)

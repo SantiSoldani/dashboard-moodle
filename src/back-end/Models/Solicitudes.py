@@ -39,6 +39,19 @@ def marcar_leida(id: int, db):
     db.commit()
     return
 
+def buscar_solicitud(dni: str, db):
+    query = text("""SELECT * FROM "Solicitudes" WHERE dni_alumno = :dni AND leida = False""")
+    result = db.execute(query, {"dni": dni}).fetchone()
+    if result:
+        return Solicitud(
+            id=result.id,
+            dni_alumno=result.dni_alumno,
+            dni_tutor=result.dni_tutor,
+            leida=result.leida,
+            created_at=result.created_at
+        )
+    return None
+
 def eliminar_solicitud(id: int, db):
     query = text("""DELETE FROM "Solicitudes" WHERE id = :id""")
     db.execute(query, {"id": id})

@@ -4,7 +4,10 @@ from fastapi import APIRouter, Depends, File, status
 from sqlalchemy.orm import Session
 from starlette.exceptions import HTTPException
 
-router = APIRouter(prefix="/encuesta")
+router = APIRouter(
+    prefix="/encuesta",
+    tags=["encuesta"]
+    )
 
 
 @router.get("/ByDni/{dni}", status_code=200)

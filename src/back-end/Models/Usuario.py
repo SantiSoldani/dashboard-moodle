@@ -48,7 +48,7 @@ def get_usuario_by_dni(dni: str, db):
     result = db.execute(query, {"dni": dni}).fetchone()
     if result:
         return UsuarioDTO(
-            dni=result[0], rol=result[1], ult_coneccion=result[2], created_at=result[3]
+            dni = result.dni, rol=result.rol, ult_coneccion=result.ult_coneccion, created_at=result.created_at, nombre=result.nombre, apellido=result.apellido, email=result.email
         )
     return None
 
