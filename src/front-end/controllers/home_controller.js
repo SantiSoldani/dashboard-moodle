@@ -3,11 +3,12 @@ import {
   Handle_get_Nota_Alumno,
   Handle_get_stats,
   Handle_get_Notas,
+  Handle_get_promedio_general
 } from "../models/Notas.js";
-import { 
-  HandleGet_solicitudes, 
-  HandleGet_solicitudes_tutor, 
-  HandleMarcar_leida 
+import {
+  HandleGet_solicitudes,
+  HandleGet_solicitudes_tutor,
+  HandleMarcar_leida
 } from "../models/Solicitudes.js";
 
 let allStudents = [];
@@ -53,45 +54,45 @@ export async function initHome() {
 }
 
 async function loadSolicitudesHome() {
-    const listContainer = document.getElementById('home-solicitudes-list');
-    if (!listContainer) return;
-    
-    listContainer.innerHTML = '<div class="alert-empty"><p style="color: #92400e;">Cargando solicitudes...</p></div>';
-    
-    try {
-        const rol = localStorage.getItem("rol");
-        let solicitudes = [];
-        
-        if (rol === "Tutor") {
-            const dni = localStorage.getItem("dni"); // O desde donde guardemos el DNI del usuario logueado
-            if (dni) {
-                solicitudes = await HandleGet_solicitudes_tutor(dni);
-            } else {
-                solicitudes = [];
-                console.warn("No se encontró el DNI del tutor en localStorage");
-            }
-        } else {
-            // Es Instructor/Docente general, ve todas
-            solicitudes = await HandleGet_solicitudes();
-        }
-        
-        // Mostrar solo las no leídas
-        const unread = solicitudes.filter(s => s.leida === false);
-        
-        if (unread.length === 0) {
-            listContainer.innerHTML = '<div class="alert-empty"><p style="color: #059669; font-weight: bold;"><span class="material-symbols-outlined" style="vertical-align: middle;">check_circle</span> No hay notificaciones pendientes</p></div>';
-            return;
-        }
-        
-        listContainer.innerHTML = '';
-        unread.forEach(sol => {
-            const div = document.createElement('div');
-            div.style.cssText = 'background: white; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);';
-            
-            const date = new Date(sol.created_at).toLocaleDateString();
-            const tutorText = sol.dni_tutor ? `<span style="font-size: 0.75rem; color: #64748b;">Tutor: ${sol.dni_tutor}</span>` : `<span style="font-size: 0.75rem; color: #f59e0b; font-weight: bold;">Sin Tutor</span>`;
-            
-            div.innerHTML = `
+  const listContainer = document.getElementById('home-solicitudes-list');
+  if (!listContainer) return;
+
+  listContainer.innerHTML = '<div class="alert-empty"><p style="color: #92400e;">Cargando solicitudes...</p></div>';
+
+  try {
+    const rol = localStorage.getItem("rol");
+    let solicitudes = [];
+
+    if (rol === "Tutor") {
+      const dni = localStorage.getItem("dni"); // O desde donde guardemos el DNI del usuario logueado
+      if (dni) {
+        solicitudes = await HandleGet_solicitudes_tutor(dni);
+      } else {
+        solicitudes = [];
+        console.warn("No se encontró el DNI del tutor en localStorage");
+      }
+    } else {
+      // Es Instructor/Docente general, ve todas
+      solicitudes = await HandleGet_solicitudes();
+    }
+
+    // Mostrar solo las no leídas
+    const unread = solicitudes.filter(s => s.leida === false);
+
+    if (unread.length === 0) {
+      listContainer.innerHTML = '<div class="alert-empty"><p style="color: #059669; font-weight: bold;"><span class="material-symbols-outlined" style="vertical-align: middle;">check_circle</span> No hay notificaciones pendientes</p></div>';
+      return;
+    }
+
+    listContainer.innerHTML = '';
+    unread.forEach(sol => {
+      const div = document.createElement('div');
+      div.style.cssText = 'background: white; border: 1px solid #fde68a; border-radius: 8px; padding: 12px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 2px rgba(0,0,0,0.05);';
+
+      const date = new Date(sol.created_at).toLocaleDateString();
+      const tutorText = sol.dni_tutor ? `<span style="font-size: 0.75rem; color: #64748b;">Tutor: ${sol.dni_tutor}</span>` : `<span style="font-size: 0.75rem; color: #f59e0b; font-weight: bold;">Sin Tutor</span>`;
+
+      div.innerHTML = `
                 <div style="display: flex; flex-direction: column; gap: 4px;">
                     <strong style="color: #92400e; font-size: 0.95rem;">Solicitud de Alumno: ${sol.dni_alumno}</strong>
                     <div style="display: flex; gap: 12px; align-items: center;">
@@ -103,31 +104,31 @@ async function loadSolicitudesHome() {
                     <span class="material-symbols-outlined" style="font-size: 24px;">check_circle</span>
                 </button>
             `;
-            listContainer.appendChild(div);
-        });
-        
-        // Event listeners para marcar leida
-        listContainer.querySelectorAll('.btn-marcar-leida').forEach(btn => {
-            btn.addEventListener('click', async (e) => {
-                const btnElem = e.currentTarget;
-                const id = btnElem.getAttribute('data-sol-id');
-                btnElem.innerHTML = '<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span>';
-                try {
-                    await HandleMarcar_leida(id);
-                    // Recargar notificaciones
-                    loadSolicitudesHome();
-                } catch (error) {
-                    console.error(error);
-                    alert("Error al marcar la notificación como leída.");
-                    btnElem.innerHTML = '<span class="material-symbols-outlined" style="font-size: 24px;">check_circle</span>';
-                }
-            });
-        });
-        
-    } catch (error) {
-        console.error(error);
-        listContainer.innerHTML = '<div class="alert-empty"><p style="color: #ef4444;">Error al cargar solicitudes</p></div>';
-    }
+      listContainer.appendChild(div);
+    });
+
+    // Event listeners para marcar leida
+    listContainer.querySelectorAll('.btn-marcar-leida').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        const btnElem = e.currentTarget;
+        const id = btnElem.getAttribute('data-sol-id');
+        btnElem.innerHTML = '<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span>';
+        try {
+          await HandleMarcar_leida(id);
+          // Recargar notificaciones
+          loadSolicitudesHome();
+        } catch (error) {
+          console.error(error);
+          alert("Error al marcar la notificación como leída.");
+          btnElem.innerHTML = '<span class="material-symbols-outlined" style="font-size: 24px;">check_circle</span>';
+        }
+      });
+    });
+
+  } catch (error) {
+    console.error(error);
+    listContainer.innerHTML = '<div class="alert-empty"><p style="color: #ef4444;">Error al cargar solicitudes</p></div>';
+  }
 }
 
 // Configurar la fecha actual de forma elegante en español
@@ -191,7 +192,6 @@ function setupNavigation() {
 
       const dni = row.dataset.dni;
       if (dni) {
-        console.log(dni);
         window.abrirModalAlumnoStats(dni);
       }
     });
@@ -214,13 +214,13 @@ async function cargarDatosDashboard() {
 
   filteredStudents = [...allStudents];
 
-  calcularYMostrarMetricas();
+  await calcularYMostrarMetricas();
   mostrarAlumnosCriticos();
   mostrarListadoGeneral();
 }
 
 // Calcular métricas del dashboard
-function calcularYMostrarMetricas() {
+async function calcularYMostrarMetricas() {
   // 1. Total Inscriptos
   const totalInscriptos = allStudents.length;
   if (totalCountElement) {
@@ -228,46 +228,22 @@ function calcularYMostrarMetricas() {
   }
 
   // 2. Alumnos de 1er año y su promedio
-  // Identificamos el año de ingreso más reciente en el dataset
-  let maxYear = 0;
-  allStudents.forEach((alumno) => {
-    const year = parseInt(alumno.fecha_inicio);
-    if (year > maxYear) maxYear = year;
-  });
-
-  // Fallback por si no hay datos
-  if (maxYear === 0) maxYear = new Date().getFullYear();
-
-  const alumnos1erAnio = allStudents.filter(
-    (alumno) => parseInt(alumno.fecha_inicio) === maxYear,
-  );
-
-  //HAY QUE HACER DEVUELTA LA FUNCION DE PROMEDIOS
-  let sumScore = 0;
-  let countScore = 0;
-
-  alumnos1erAnio.forEach((alumno) => {
-    if (alumno.score !== undefined && alumno.score !== null) {
-      sumScore += parseFloat(alumno.score);
-      countScore++;
-    }
-  });
-  //TODO ESTO DEL CALCULO DE PROMEDIO ESTA MAL PORQUE ASUME QUE EL SCORE SE CALCULA A PARTIR DEL PROMEDIO DE LAS NOTAS
-  //HABRIA QUE IMPLEMENTAR UN ENDPOINT PARA TRAER NOTAS POR ALUMNO Y QUE CALCULE EL PROMEDIO CON APLAZOS DE LAS NOTAS DE CADA ALUMNO
-  let promedio1erAnio = 0;
-  if (countScore > 0) {
-    promedio1erAnio = sumScore / countScore;
-    // Si el score está en escala [0, 1], lo escalamos a [0, 10] para la nota estándar académica
-    if (promedio1erAnio <= 1.0) {
-      promedio1erAnio = promedio1erAnio * 10;
-    }
-  } else {
-    // Fallback realista para la demo si no hay notas cargadas aún
-    promedio1erAnio = totalInscriptos > 0 ? 7.64 : 0.0;
+  let promedio1erAnio = null;
+  try {
+      const promResponse = await Handle_get_promedio_general();
+      if (promResponse !== undefined && promResponse !== null) {
+          promedio1erAnio = typeof promResponse === 'string' ? parseFloat(promResponse) : promResponse;
+      }
+  } catch (error) {
+      console.error("Error al obtener promedio general:", error);
   }
 
   if (avgScoreElement) {
-    avgScoreElement.textContent = promedio1erAnio.toFixed(2);
+    if (promedio1erAnio !== null) {
+      avgScoreElement.textContent = promedio1erAnio.toFixed(2);
+    } else {
+      avgScoreElement.textContent = "--";
+    }
   }
 
   // 3. Cantidad de alumnos críticos (rojo)
@@ -360,7 +336,7 @@ function mostrarListadoGeneral() {
     row.className = "placeholder-row";
     row.innerHTML = `<td colspan="7">No se encontraron alumnos para la búsqueda o filtro aplicado.</td>`;
     studentsTableBody.appendChild(row);
-    
+
     if (pageIndicator) pageIndicator.textContent = `Página 1 de 1`;
     if (btnPrevPage) btnPrevPage.disabled = true;
     if (btnNextPage) btnNextPage.disabled = true;
@@ -368,7 +344,7 @@ function mostrarListadoGeneral() {
   }
 
   const totalPages = Math.ceil(filteredStudents.length / itemsPerPage);
-  
+
   if (currentPage > totalPages) currentPage = totalPages;
   if (currentPage < 1) currentPage = 1;
 

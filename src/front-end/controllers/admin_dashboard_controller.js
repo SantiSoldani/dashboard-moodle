@@ -101,11 +101,10 @@ async function renderRadarChart() {
     let tipo = "iniciales";
     let filtro = "fecha_inicio"
     const dataFromApi = await HandleGet_indicadores_iniciales(tipo, filtro, anio);
-    console.log(dataFromApi)
     chart.hideLoading();
 
     let radarData = [0, 0, 0, 0, 0, 0];
-    
+
     let dataObj = null;
     if (dataFromApi) {
         if (Array.isArray(dataFromApi)) {
@@ -158,7 +157,7 @@ async function renderRadarChart() {
 async function renderHeatmapChart() {
     const dom = document.getElementById('chartPerfilSemaforo');
     if (!dom) return;
-    
+
     let chart = echarts.getInstanceByDom(dom);
     if (!chart) {
         chart = echarts.init(dom);
@@ -171,12 +170,12 @@ async function renderHeatmapChart() {
     const anio = selectPerfilSemaforo ? selectPerfilSemaforo.value : "2024";
 
     const dataFromApi = await HandleGet_semaforosXpre(anio);
-    
+
     chart.hideLoading();
 
     const xData = ['Desafiante', 'Medio-Bajo', 'Medio-Alto', 'Favorable'];
     const yData = ['Crítico', 'Alerta', 'Estable', 'Alto'];
-    
+
     const matrix = [
         [0, 0, 0, 0],
         [0, 0, 0, 0],
@@ -320,13 +319,13 @@ function renderLineChart() {
 async function renderBarChart() {
     const dom = document.getElementById('chartComparacionCohortes');
     if (!dom) return;
-    
+
     let chart = echarts.getInstanceByDom(dom);
     if (!chart) {
         chart = echarts.init(dom);
         chartInstances.push(chart);
     }
-    
+
     chart.showLoading();
     const dataFromApi = await HandleGet_scoreXcohorte();
     chart.hideLoading();
@@ -336,21 +335,21 @@ async function renderBarChart() {
 
     if (dataFromApi && Array.isArray(dataFromApi)) {
         const validCohortes = dataFromApi.filter(item => item.cohorte !== -1);
-        
+
         validCohortes.sort((a, b) => a.cohorte - b.cohorte);
-        
+
         validCohortes.forEach((item, index) => {
             xAxisData.push(String(item.cohorte));
-            
+
             let val = parseFloat(item.promedio_score);
             if (isNaN(val)) val = 0;
-            
+
             val = parseFloat(val.toFixed(2));
-            
+
             // Assign varying shades of blue based on index for aesthetics
             const colors = ['#e1e8fd', '#b4c5ff', '#60a5fa', '#3b82f6', '#2563EB', '#1d4ed8', '#1e3a8a'];
             const color = colors[index % colors.length];
-            
+
             seriesData.push({
                 value: val,
                 itemStyle: { color: color }

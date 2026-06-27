@@ -49,7 +49,6 @@ export async function HandleGet_tutor(dni_alumno) {
       throw new Error("Error en el fetch del tutor");
     }
     const data = await response.json();
-    console.log("DATA", data)
     return data;
   } catch (error) {
     console.error("Error al traer el tutor", error);
@@ -110,14 +109,14 @@ export async function HandleGet_semaforosXpre(anio) {
       "ngrok-skip-browser-warning": "69420",
       "X-Role": rol
     };
-    
+
     // ruta de la api = alumnos/get/semaforosXpre/<año de cohorte>
     const response = await fetch(`${alumnosAPI}/get/semaforosXpre/${anio}`, { headers });
-    
+
     if (!response.ok) {
       throw new Error(`Error en el fetch de semaforosXpre: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data;
   } catch (error) {
@@ -133,14 +132,14 @@ export async function HandleGet_scoreXcohorte() {
       "ngrok-skip-browser-warning": "69420",
       "X-Role": rol
     };
-    
+
     // ruta de la api = alumnos/get/scoreXcohorte
     const response = await fetch(`${alumnosAPI}/get/scoreXcohorte`, { headers });
-    
+
     if (!response.ok) {
       throw new Error(`Error en el fetch de scoreXcohorte: ${response.status}`);
     }
-    
+
     const data = await response.json();
     return data;
   } catch (error) {
@@ -149,5 +148,61 @@ export async function HandleGet_scoreXcohorte() {
   }
 }
 
+export async function HandleGet_indicadores_Bydni(tipo, dni) {
+  try {
+    const rol = localStorage.getItem("rol") || "Instructor";
+    const headers = {
+      "ngrok-skip-browser-warning": "69420",
+      "X-Role": rol
+    };
 
+    const response = await fetch(`${alumnosAPI}/get/indicadores_Bydni/${tipo}/${dni}`, { headers });
+    if (!response.ok) {
+      throw new Error(`Error en el fetch de indicadores por dni: ${response.status}`);
+    }
 
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al traer los indicadores por dni", error);
+    return null;
+  }
+}
+
+export async function HandleGet_encuesta_ByDni(dni) {
+  try {
+    const rol = localStorage.getItem("rol") || "Instructor";
+    const headers = {
+      "ngrok-skip-browser-warning": "69420",
+      "X-Role": rol
+    };
+    const response = await fetch(`${getConfig()}/encuesta/ByDni/${dni}`, { headers });
+    if (!response.ok) {
+      throw new Error(`Error en el fetch de encuesta por dni: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al traer la encuesta por dni", error);
+    return [];
+  }
+}
+
+export async function HandleGet_evolucion_semaforos(dni) {
+  try {
+    const rol = localStorage.getItem("rol") || "Instructor";
+    const headers = {
+      "ngrok-skip-browser-warning": "69420",
+      "X-Role": rol
+    };
+    const response = await fetch(`${alumnosAPI}/get/evolucion_semaforos/${dni}`, { headers });
+    if (!response.ok) {
+      throw new Error(`Error en el fetch de evolucion semaforos: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al traer la evolucion de semaforos", error);
+    return [];
+  }
+}

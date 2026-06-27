@@ -1,4 +1,4 @@
-import { HandleGet_alumnos, HandleGet_tutor, HandleCreate_solicitud } from "../models/Alumno.js";
+import { HandleGet_alumnos, HandleGet_tutor, HandleCreate_solicitud, HandleGet_indicadores_Bydni, HandleGet_encuesta_ByDni, HandleGet_evolucion_semaforos } from "../models/Alumno.js";
 
 let chartPercepcionInstance = null;
 
@@ -7,8 +7,9 @@ export async function initAlumnoStats(dniParam = null) {
     let alumno_dni = dniParam;
     if (!alumno_dni) {
       const params = new URLSearchParams(window.location.search);
-      alumno_dni = params.get("alumno");
+      alumno_dni = params.get("dni_moodle");
     }
+
     const rol = localStorage.getItem("rol") || "Instructor";
     if (!alumno_dni && rol === "Learner") {
       alumno_dni = "22669995"; // Fallback para que cargue la vista de Alumno
@@ -18,25 +19,31 @@ export async function initAlumnoStats(dniParam = null) {
       return;
     }
 
+    console.log("ACA!")
     let alumno = await HandleGet_alumnos(alumno_dni, "byDNI");
     let tutor = await HandleGet_tutor(alumno_dni);
 
-    console.log(tutor) //null
-    console.log(alumno)
-    console.log("PARTE 2")
+    let tipo = "iniciales"
+    let indicadores = await HandleGet_indicadores_Bydni(tipo, alumno_dni);
+    tipo = "cuatrimestrales"
+    let indicadoresCuatrimestrales = await HandleGet_indicadores_Bydni(tipo, alumno_dni);
+    let encuesta = await HandleGet_encuesta_ByDni(alumno_dni);
+    let evolucionSemaforos = await HandleGet_evolucion_semaforos(alumno_dni);
 
     if (alumno) {
       alumno = typeof alumno === "string" ? JSON.parse(alumno) : alumno;
       const rol = localStorage.getItem("rol") || "Instructor";
-      console.log("PARTE 3!")
+
       set_header(alumno);
-      render_dashboard_by_role(alumno, rol);
+      render_dashboard_by_role(alumno, rol, indicadores, tutor, indicadoresCuatrimestrales, encuesta, evolucionSemaforos);
 
       window.addEventListener('resize', () => {
         if (chartPercepcionInstance) chartPercepcionInstance.resize();
       });
 
-      activar_solicitudes(alumno, tutor);
+      if (rol === "Learner") {
+        activar_solicitudes(alumno, tutor);
+      }
     }
   } catch (error) {
     console.error("Error al cargar datos del alumno:", error);
@@ -45,12 +52,8 @@ export async function initAlumnoStats(dniParam = null) {
 
 function activar_solicitudes(alumno, tutor) {
   let dni_tutor = null;
-  if (tutor == null) {
-    console.log("NO TIENE TUTOR")
-  } else {
+  if (tutor != null)
     dni_tutor = tutor.dni_tutor
-  }
-
   const btn = document.getElementById("btn_crearSolicitud");
   btn.addEventListener("click", () => {
     HandleCreate_solicitud(alumno.dni, dni_tutor);
@@ -74,8 +77,28 @@ function set_header(alumno) {
   }
 }
 
-function render_dashboard_by_role(alumno, rol) {
+function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null, indicadoresCuatrimestrales = null, encuesta = null, evolucionSemaforos = null) {
   const isStudent = rol === "Learner";
+  const formatKpi = (val) => val !== undefined && val !== null ? `${(val * 10).toFixed(1).replace(/\\.0$/, '')}/10` : "-/10";
+
+  let encuestasHTML = "";
+  if (encuesta && Array.isArray(encuesta) && encuesta.length > 5) {
+    const encuestasFiltradas = encuesta.slice(5);
+    encuestasHTML = `
+      <div style="border: 1px solid #e1e8fd; border-radius: 8px; padding: 20px; background: #f8fafc;">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+              ${encuestasFiltradas.map(e => `
+                  <div>
+                      <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">${e.pregunta}</span>
+                      <strong style="color: #141b2b; font-size: 0.95rem;">${e.respuesta}</strong>
+                  </div>
+              `).join('')}
+          </div>
+      </div>
+    `;
+  } else {
+    encuestasHTML = `<div style="padding: 20px; text-align: center; color: #64748b; font-weight: 600; border: 1px solid #e1e8fd; border-radius: 8px; background: #f8fafc;">No hay respuestas de encuesta disponibles.</div>`;
+  }
 
   // KPIs
   const kpiGrid = document.getElementById("student-kpi-grid");
@@ -103,13 +126,14 @@ function render_dashboard_by_role(alumno, rol) {
       `;
     } else {
       kpiGrid.style.gridTemplateColumns = "repeat(5, 1fr)";
+
       kpiGrid.innerHTML = `
         <div class="kpi-card-new border-primary" style="background: white; border-radius: 12px; padding: 24px; border-left: 4px solid #2563EB; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
             <div class="kpi-top" style="display: flex; justify-content: space-between; margin-bottom: 12px;">
                 <span class="kpi-label" style="font-size: 0.75rem; font-weight: 700; color: #434655;">PERFIL SOCIOECONÓMICO</span>
             </div>
             <div class="kpi-value">
-                <strong style="font-size: 1.5rem; color: #141b2b;">-/10</strong>
+                <strong style="font-size: 1.5rem; color: #141b2b;">${indicadores ? formatKpi(indicadores.pse) : '-/10'}</strong>
             </div>
         </div>
         <div class="kpi-card-new border-warning" style="background: white; border-radius: 12px; padding: 24px; border-left: 4px solid #F59E0B; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -117,7 +141,7 @@ function render_dashboard_by_role(alumno, rol) {
                 <span class="kpi-label" style="font-size: 0.75rem; font-weight: 700; color: #434655;">PERFIL EDUCATIVO PADRES</span>
             </div>
             <div class="kpi-value">
-                <strong style="font-size: 1.5rem; color: #141b2b;">-/10</strong>
+                <strong style="font-size: 1.5rem; color: #141b2b;">${indicadores ? formatKpi(indicadores.pep) : '-/10'}</strong>
             </div>
         </div>
         <div class="kpi-card-new border-success" style="background: white; border-radius: 12px; padding: 24px; border-left: 4px solid #22C55E; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -125,7 +149,7 @@ function render_dashboard_by_role(alumno, rol) {
                 <span class="kpi-label" style="font-size: 0.75rem; font-weight: 700; color: #434655;">CARGA LABORAL</span>
             </div>
             <div class="kpi-value">
-                <strong style="font-size: 1.5rem; color: #141b2b;">-/10</strong>
+                <strong style="font-size: 1.5rem; color: #141b2b;">${indicadores ? formatKpi(indicadores.cl) : '-/10'}</strong>
             </div>
         </div>
         <div class="kpi-card-new border-critical" style="background: white; border-radius: 12px; padding: 24px; border-left: 4px solid #EF4444; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -133,7 +157,7 @@ function render_dashboard_by_role(alumno, rol) {
                 <span class="kpi-label" style="font-size: 0.75rem; font-weight: 700; color: #434655;">CARGA VITAL/MOTIVACIONAL</span>
             </div>
             <div class="kpi-value">
-                <strong style="font-size: 1.5rem; color: #141b2b;">-/10</strong>
+                <strong style="font-size: 1.5rem; color: #141b2b;">${indicadores ? formatKpi(indicadores.cv) : '-/10'}</strong>
             </div>
         </div>
         <div class="kpi-card-new border-gray" style="background: white; border-radius: 12px; padding: 24px; border-left: 4px solid #475569; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
@@ -141,7 +165,7 @@ function render_dashboard_by_role(alumno, rol) {
                 <span class="kpi-label" style="font-size: 0.75rem; font-weight: 700; color: #434655;">UBICACIÓN</span>
             </div>
             <div class="kpi-value">
-                <strong style="font-size: 1.5rem; color: #141b2b;">-/10</strong>
+                <strong style="font-size: 1.5rem; color: #141b2b;">${indicadores ? formatKpi(indicadores.loc) : '-/10'}</strong>
             </div>
         </div>
       `;
@@ -205,81 +229,39 @@ function render_dashboard_by_role(alumno, rol) {
   const listContainer = document.getElementById("metrics-list-container");
   if (listContainer) {
     if (isStudent) {
-      listContainer.innerHTML = `
-        <div style="border: 1px solid #e1e8fd; border-radius: 8px; padding: 20px; background: #f8fafc;">
-            <div style="display: flex; flex-direction: column; gap: 16px;">
-                <div>
-                    <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">¿Cómo evaluás el impacto de tu situación laboral actual sobre el rendimiento de este cuatrimestre?</span>
-                    <strong style="color: #141b2b; font-size: 0.95rem;">5 - Impacto muy alto</strong>
-                </div>
-                <div>
-                    <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">¿Cómo evaluás tu motivación para continuar la carrera este cuatrimestre comparado con el anterior?</span>
-                    <strong style="color: #141b2b; font-size: 0.95rem;">4 - Menos motivado</strong>
-                </div>
-                <div>
-                    <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">¿Disponés del tiempo semanal necesario fuera del horario de clases para dedicarle al estudio y las entregas este cuatrimestre?</span>
-                    <strong style="color: #141b2b; font-size: 0.95rem;">4 - Muy poco tiempo</strong>
-                </div>
-                <div>
-                    <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">¿Qué tan seguro te sentís de poder aprobar las materias en las que te inscribiste?</span>
-                    <strong style="color: #141b2b; font-size: 0.95rem;">4 - Poco seguro</strong>
-                </div>
-            </div>
-        </div>
-      `;
+      listContainer.innerHTML = encuestasHTML;
     } else {
       listContainer.innerHTML = `
         <div style="border-bottom: 1px solid #e1e8fd; padding-bottom: 12px; display: flex; gap: 16px;">
             <span class="material-symbols-outlined" style="color: #2563EB;">school</span>
             <div>
                 <span style="font-size: 0.75rem; font-weight: 700; color: #434655;">RENDIMIENTO ACADÉMICO FINAL</span><br/>
-                <strong style="color: #141b2b; font-size: 1.1rem;">-</strong>
+                <strong style="color: #141b2b; font-size: 1.1rem;">${indicadoresCuatrimestrales ? formatKpi(indicadoresCuatrimestrales.raf) : '-'}</strong>
             </div>
         </div>
         <div style="border-bottom: 1px solid #e1e8fd; padding-bottom: 12px; display: flex; gap: 16px;">
             <span class="material-symbols-outlined" style="color: #F59E0B;">psychology</span>
             <div>
                 <span style="font-size: 0.75rem; font-weight: 700; color: #434655;">RENDIMIENTO ACADÉMICO PERCIBIDO</span><br/>
-                <strong style="color: #141b2b; font-size: 1.1rem;">-</strong>
+                <strong style="color: #141b2b; font-size: 1.1rem;">${indicadoresCuatrimestrales ? formatKpi(indicadoresCuatrimestrales.rap) : '-'}</strong>
             </div>
         </div>
         <div style="display: flex; gap: 16px;">
             <span class="material-symbols-outlined" style="color: #22C55E;">calculate</span>
             <div>
                 <span style="font-size: 0.75rem; font-weight: 700; color: #434655;">RENDIMIENTO ACADÉMICO CUANTITATIVO</span><br/>
-                <strong style="color: #141b2b; font-size: 1.1rem;">-</strong>
+                <strong style="color: #141b2b; font-size: 1.1rem;">${indicadoresCuatrimestrales ? formatKpi(indicadoresCuatrimestrales.rac) : '-'}</strong>
             </div>
         </div>
       `;
 
       if (encuestasContainer) {
-        encuestasContainer.innerHTML = `
-            <div style="border: 1px solid #e1e8fd; border-radius: 8px; padding: 20px; background: #f8fafc;">
-                <div style="display: flex; flex-direction: column; gap: 16px;">
-                    <div>
-                        <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">¿Cómo evaluás tu motivación para continuar la carrera este cuatrimestre comparado con el anterior?</span>
-                        <strong style="color: #141b2b; font-size: 0.95rem;">4 - Menos motivado</strong>
-                    </div>
-                    <div>
-                        <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">¿Disponés del tiempo semanal necesario fuera del horario de clases para dedicarle al estudio?</span>
-                        <strong style="color: #141b2b; font-size: 0.95rem;">4 - Muy poco tiempo</strong>
-                    </div>
-                    <div>
-                        <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">¿Qué tan seguro te sentís de poder aprobar las materias en las que te inscribiste?</span>
-                        <strong style="color: #141b2b; font-size: 0.95rem;">4 - Poco seguro</strong>
-                    </div>
-                    <div>
-                        <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">¿Cómo evaluás el impacto de tu situación laboral actual sobre el rendimiento de este cuatrimestre?</span>
-                        <strong style="color: #141b2b; font-size: 0.95rem;">5 - Impacto muy alto</strong>
-                    </div>
-                </div>
-            </div>
-          `;
+        encuestasContainer.innerHTML = encuestasHTML;
       }
     }
   }
   // Chart
-  renderChart(isStudent);
+  renderChart(isStudent, evolucionSemaforos);
 }
 
 
@@ -287,7 +269,7 @@ function render_dashboard_by_role(alumno, rol) {
 
 let chartSemaforoInstance = null;
 
-function renderChart(isStudent) {
+function renderChart(isStudent, evolucionSemaforos = null) {
   if (typeof echarts === 'undefined') return;
 
   if (isStudent) {
@@ -306,6 +288,15 @@ function renderChart(isStudent) {
       chartSemaforoInstance.dispose();
     }
     chartSemaforoInstance = echarts.init(dom);
+  }
+
+  let xAxisDataSemaforo = ['1C 2023', '2C 2023', '1C 2024', '2C 2024'];
+  let seriesDataSemaforo = [15, 30, 45, 75];
+
+  if (evolucionSemaforos && evolucionSemaforos.length > 0) {
+    const ultimosSemaforos = evolucionSemaforos.slice(-8);
+    xAxisDataSemaforo = ultimosSemaforos.map(e => e.fecha);
+    seriesDataSemaforo = ultimosSemaforos.map(e => (e.score * 100).toFixed(1));
   }
 
   const option = isStudent ? {
@@ -357,7 +348,7 @@ function renderChart(isStudent) {
     grid: { left: '5%', right: '5%', top: '10%', bottom: '15%', containLabel: true },
     xAxis: {
       type: 'category',
-      data: ['1C 2023', '2C 2023', '1C 2024', '2C 2024'],
+      data: xAxisDataSemaforo,
       axisLine: { lineStyle: { color: '#dce2f7' } },
       axisLabel: { color: '#434655' }
     },
@@ -373,7 +364,7 @@ function renderChart(isStudent) {
       {
         name: 'Score de Riesgo',
         type: 'line',
-        data: [15, 30, 45, 75],
+        data: seriesDataSemaforo,
         smooth: true,
         symbolSize: 8,
         lineStyle: { width: 3 }

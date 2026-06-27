@@ -67,7 +67,7 @@ def get_indicadores_cuatrimestrales(db, dni):
                     """)
         row = db.execute(query, {"dni": dni}).mappings().fetchone()
         if row is None:
-            raise Exception("el alumno no tiene indicadores guardados")
+            return None
         return SimpleNamespace(**row)
     except Exception as e:
         raise Exception(e)
@@ -82,7 +82,7 @@ def get_indicadores_iniciales(db, dni):
                     """)
         row = db.execute(query, {"dni": dni}).mappings().fetchone()
         if row is None:
-            raise Exception("el alumno no tiene indicadores guardados")
+            return None
         return SimpleNamespace(**row)
     except Exception as e:
         raise Exception(e)
