@@ -37,3 +37,16 @@ def get_materias_del_cuatrimestre(db, cuatrimestre, plan):
     except Exception as e:
         print(e)
         return None
+
+
+def set_pesos(db, pesos):
+    try:
+        for nombre, peso in pesos.__dict__.items():
+            query = text(""" UPDATE "Materia" SET
+                             coeficiente = :peso
+                             WHERE nombre = :nombre
+                        """)
+            db.execute(query, {"nombre": nombre, "peso": peso})
+        db.commit()
+    except Exception as e:
+        print(e)

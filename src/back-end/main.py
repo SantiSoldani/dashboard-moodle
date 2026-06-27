@@ -8,6 +8,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from Routers import (
+    config_router,
     data_router,
     encuestas_router,
     entrevista_router,
@@ -48,6 +49,7 @@ app.include_router(usuarios_router.router)
 app.include_router(tutor_alumno_router.router)
 app.include_router(solicitudes_router.router)
 app.include_router(entrevista_router.router)
+app.include_router(config_router.router)
 
 load_dotenv()
 

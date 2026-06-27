@@ -591,46 +591,161 @@ export const VISTA_ADMIN_TOOLS = `
                 </form>
             </div>
 
-            <!-- CONFIGURACION COEFICIENTES -->
+            <!-- CONFIGURACION COEFICIENTES INICIALES -->
             <div class="tool-panel card-panel">
                 <div class="panel-header-flex">
                     <div class="panel-header-t">
-                        <span class="material-symbols-outlined icon-blue">settings</span>
-                        <h2>Configuración de Coeficientes de Riesgo</h2>
+                        <span class="material-symbols-outlined icon-blue">settings_accessibility</span>
+                        <h2>Coeficientes Iniciales</h2>
                     </div>
                 </div>
                 <p style="color: #64748b; margin-bottom: 16px; font-size: 0.9rem;">
-                    Ajuste los pesos relativos de cada variable para el cálculo del índice de riesgo de los estudiantes. El valor base es 1.0. Si aumenta un coeficiente, los demás disminuirán para mantener el balance.
+                    Ajuste los pesos relativos de los factores iniciales. La suma total debe ser exactamente 6.
                 </p>
-                <form id="formCoeficientes" class="admin-form">
-                    <div class="coeficientes-grid" style="display: flex; flex-direction: column; gap: 24px;">
+                <form id="formCoefIniciales" class="admin-form">
+                    <div class="coeficientes-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div class="form-group">
-                            <label style="display: flex; justify-content: space-between;">
-                                <span>Coeficiente Asistencia</span>
-                                <span id="valAsistencia" style="color: #3b82f6; font-weight: bold;">1.0</span>
-                            </label>
-                            <input type="range" class="coef-slider" id="coefAsistencia" min="0" max="3" step="0.1" value="1.0" style="width: 100%; cursor: pointer;">
+                            <label>Perfil Socioeconómico</label>
+                            <input type="number" class="coef-input-iniciales" id="coefSocioeconomico" min="0" max="6" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
                         </div>
                         <div class="form-group">
-                            <label style="display: flex; justify-content: space-between;">
-                                <span>Coeficiente Tareas</span>
-                                <span id="valTareas" style="color: #3b82f6; font-weight: bold;">1.0</span>
-                            </label>
-                            <input type="range" class="coef-slider" id="coefTareas" min="0" max="3" step="0.1" value="1.0" style="width: 100%; cursor: pointer;">
+                            <label>Interrupción Carrera</label>
+                            <input type="number" class="coef-input-iniciales" id="coefInterrupcion" min="0" max="6" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
                         </div>
                         <div class="form-group">
-                            <label style="display: flex; justify-content: space-between;">
-                                <span>Coeficiente Exámenes</span>
-                                <span id="valExamenes" style="color: #3b82f6; font-weight: bold;">1.0</span>
-                            </label>
-                            <input type="range" class="coef-slider" id="coefExamenes" min="0" max="3" step="0.1" value="1.0" style="width: 100%; cursor: pointer;">
+                            <label>Perfil Educativo Padres</label>
+                            <input type="number" class="coef-input-iniciales" id="coefEducacionPadres" min="0" max="6" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Carga Vital</label>
+                            <input type="number" class="coef-input-iniciales" id="coefCargaVital" min="0" max="6" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Carga Laboral</label>
+                            <input type="number" class="coef-input-iniciales" id="coefCargaLaboral" min="0" max="6" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Localización</label>
+                            <input type="number" class="coef-input-iniciales" id="coefLocalizacion" min="0" max="6" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
                         </div>
                     </div>
-                    <button type="submit" class="btn-primary-large-t" style="margin-top: 16px;">
-                        <span class="material-symbols-outlined">tune</span> Guardar Configuración
+                    <div style="margin-top: 12px; font-weight: bold; color: #1e293b;" id="sumaInicialesDisplay">Suma Total: 6.00 / 6</div>
+                    <div id="errorIniciales" style="color: #ef4444; font-size: 0.85rem; display: none;">La suma de los coeficientes debe ser igual a 6.</div>
+                    <button type="submit" class="btn-primary-large-t" id="btnGuardarIniciales" style="margin-top: 16px; width: 100%;">
+                        <span class="material-symbols-outlined">save</span> Guardar Iniciales
                     </button>
-                    <div id="msgCoef" class="msg-feedback hidden" style="margin-top: 10px; padding: 10px; border-radius: 4px;"></div>
+                    <div id="msgIniciales" class="msg-feedback hidden" style="margin-top: 10px; padding: 10px; border-radius: 4px;"></div>
                 </form>
+            </div>
+
+            <!-- CONFIGURACION COEFICIENTES CUATRIMESTRALES -->
+            <div class="tool-panel card-panel">
+                <div class="panel-header-flex">
+                    <div class="panel-header-t">
+                        <span class="material-symbols-outlined icon-blue">bar_chart</span>
+                        <h2>Coeficientes Cuatrimestrales</h2>
+                    </div>
+                </div>
+                <p style="color: #64748b; margin-bottom: 16px; font-size: 0.9rem;">
+                    Ajuste los pesos del rendimiento cuatrimestral. La suma total debe ser exactamente 2.
+                </p>
+                <form id="formCoefCuatri" class="admin-form">
+                    <div class="coeficientes-grid" style="display: flex; flex-direction: column; gap: 16px;">
+                        <div class="form-group">
+                            <label>Rendimiento Académico Percibido</label>
+                            <input type="number" class="coef-input-cuatri" id="coefRendPercibido" min="0" max="2" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Rendimiento Académico Cuantitativo</label>
+                            <input type="number" class="coef-input-cuatri" id="coefRendCuantitativo" min="0" max="2" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px; font-weight: bold; color: #1e293b;" id="sumaCuatriDisplay">Suma Total: 2.00 / 2</div>
+                    <div id="errorCuatri" style="color: #ef4444; font-size: 0.85rem; display: none;">La suma de los coeficientes debe ser igual a 2.</div>
+                    <button type="submit" class="btn-primary-large-t" id="btnGuardarCuatri" style="margin-top: 16px; width: 100%;">
+                        <span class="material-symbols-outlined">save</span> Guardar Cuatrimestrales
+                    </button>
+                    <div id="msgCuatri" class="msg-feedback hidden" style="margin-top: 10px; padding: 10px; border-radius: 4px;"></div>
+                </form>
+            </div>
+
+            <!-- CONFIGURACION PESOS DE MATERIAS -->
+            <div class="tool-panel card-panel">
+                <div class="panel-header-flex">
+                    <div class="panel-header-t">
+                        <span class="material-symbols-outlined icon-blue">book</span>
+                        <h2>Pesos de Materias</h2>
+                    </div>
+                </div>
+                <p style="color: #64748b; margin-bottom: 16px; font-size: 0.9rem;">
+                    Ajuste los pesos por materia. Grupo 1 debe sumar 3. Grupo 2 debe sumar 4.
+                </p>
+                <form id="formPesosMaterias" class="admin-form">
+                    <h3 style="font-size: 1rem; color: #1e293b; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">Grupo 1 (Suma = 3)</h3>
+                    <div class="coeficientes-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div class="form-group">
+                            <label>Análisis Matemático 1</label>
+                            <input type="number" class="coef-input-mat1" id="pesoMat1" min="0" max="3" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Álgebra 1-B</label>
+                            <input type="number" class="coef-input-mat1" id="pesoAlg1b" min="0" max="3" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Fund. de la Química</label>
+                            <input type="number" class="coef-input-mat1" id="pesoFundQuimica" min="0" max="3" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 24px; font-weight: bold; color: #1e293b;" id="sumaMat1Display">Suma Grupo 1: 3.00 / 3</div>
+                    <div id="errorMat1" style="color: #ef4444; font-size: 0.85rem; display: none; margin-top: -16px; margin-bottom: 24px;">La suma del Grupo 1 debe ser igual a 3.</div>
+
+                    <h3 style="font-size: 1rem; color: #1e293b; margin-bottom: 12px; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">Grupo 2 (Suma = 4)</h3>
+                    <div class="coeficientes-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+                        <div class="form-group">
+                            <label>Análisis Matemático 2</label>
+                            <input type="number" class="coef-input-mat2" id="pesoMat2" min="0" max="4" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Álgebra 2</label>
+                            <input type="number" class="coef-input-mat2" id="pesoAlg2" min="0" max="4" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Fund. Programación</label>
+                            <input type="number" class="coef-input-mat2" id="pesoFundProg" min="0" max="4" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                        <div class="form-group">
+                            <label>Física A</label>
+                            <input type="number" class="coef-input-mat2" id="pesoFisicaA" min="0" max="4" step="0.1" value="1.0" style="width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 12px;">
+                        </div>
+                    </div>
+                    <div style="font-weight: bold; color: #1e293b;" id="sumaMat2Display">Suma Grupo 2: 4.00 / 4</div>
+                    <div id="errorMat2" style="color: #ef4444; font-size: 0.85rem; display: none;">La suma del Grupo 2 debe ser igual a 4.</div>
+
+                    <button type="submit" class="btn-primary-large-t" id="btnGuardarMaterias" style="margin-top: 16px; width: 100%;">
+                        <span class="material-symbols-outlined">save</span> Guardar Pesos
+                    </button>
+                    <div id="msgMaterias" class="msg-feedback hidden" style="margin-top: 10px; padding: 10px; border-radius: 4px;"></div>
+                </form>
+            </div>
+
+            <!-- DESCARGAR BASE DE DATOS -->
+            <div class="tool-panel card-panel">
+                <div class="panel-header-flex">
+                    <div class="panel-header-t">
+                        <span class="material-symbols-outlined icon-blue">download</span>
+                        <h2>Descarga de Base de Datos</h2>
+                    </div>
+                </div>
+                <p style="color: #64748b; margin-bottom: 16px; font-size: 0.9rem;">
+                    Exporte toda la base de datos actual en formato CSV para copias de seguridad o análisis externos.
+                </p>
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px 0;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: #94a3b8; margin-bottom: 16px;">storage</span>
+                    <button class="btn-primary-large-t" id="btnDescargarDB" style="width: 100%;">
+                        <span class="material-symbols-outlined">cloud_download</span> Descargar CSV
+                    </button>
+                    <div id="msgDescargaDB" class="msg-feedback hidden" style="margin-top: 10px; padding: 10px; border-radius: 4px;"></div>
+                </div>
             </div>
         </div>
     </div>

@@ -42,3 +42,34 @@ export async function Post_csv(file, which_file, subject = null) {
     return false;
   }
 }
+
+export async function Get_Database() {
+  try {
+    const response = await fetch(`${getBackendURL()}/data/download/database`, {
+      method: "GET",
+      headers: {
+        "ngrok-skip-browser-warning": "69420"
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP Error: ${response.status}`);
+    }
+
+    // El browser va a manejar el blob como archivo y mostrar el propmt de descarga real
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'database_dashboard.csv';
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+
+    return true;
+  } catch (error) {
+    console.error("Error al descargar la base de datos:", error);
+    return false;
+  }
+}

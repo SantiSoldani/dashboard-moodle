@@ -1,100 +1,193 @@
 import { getBackendURL } from '../config.js';
+import { Get_Database } from '../models/Files.js';
+import { Post_Config_Iniciales, Post_Config_Cuatrimestrales, Post_Config_Materias } from '../models/config.js';
 
 export function initAdminTools() {
     setupAltaAdminForm();
-    setupForm('formCoeficientes', 'msgCoef', 'Coeficientes actualizados correctamente.');
-
-    // Logic for auto-balancing sliders
-    const coefAsistencia = document.getElementById('coefAsistencia');
-    const coefTareas = document.getElementById('coefTareas');
-    const coefExamenes = document.getElementById('coefExamenes');
-
-    if (coefAsistencia && coefTareas && coefExamenes) {
-        const sliders = [coefAsistencia, coefTareas, coefExamenes];
-        const valDisplays = [
-            document.getElementById('valAsistencia'),
-            document.getElementById('valTareas'),
-            document.getElementById('valExamenes')
-        ];
-
-        const updateDisplays = () => {
-            sliders.forEach((slider, i) => {
-                if (valDisplays[i]) {
-                    valDisplays[i].textContent = parseFloat(slider.value).toFixed(1);
-                }
-            });
+    setupValidationGroup(
+        '.coef-input-iniciales', 6, 'sumaInicialesDisplay', 'Suma Total: $val / 6',
+        'errorIniciales', 'btnGuardarIniciales'
+    );
+    setupForm('formCoefIniciales', 'msgIniciales', 'Coeficientes iniciales actualizados.', async () => {
+        const data = {
+            pse: parseFloat(document.getElementById('coefSocioeconomico').value),
+            ic: parseFloat(document.getElementById('coefInterrupcion').value),
+            pep: parseFloat(document.getElementById('coefEducacionPadres').value),
+            cv: parseFloat(document.getElementById('coefCargaVital').value),
+            cl: parseFloat(document.getElementById('coefCargaLaboral').value),
+            loc: parseFloat(document.getElementById('coefLocalizacion').value)
         };
+        return await Post_Config_Iniciales(data);
+    });
 
-        sliders.forEach((slider, index) => {
-            slider.addEventListener('input', (e) => {
-                let newVal = parseFloat(e.target.value);
-                let others = sliders.filter((_, i) => i !== index);
+    setupValidationGroup(
+        '.coef-input-cuatri', 2, 'sumaCuatriDisplay', 'Suma Total: $val / 2',
+        'errorCuatri', 'btnGuardarCuatri'
+    );
+    setupForm('formCoefCuatri', 'msgCuatri', 'Coeficientes cuatrimestrales actualizados.', async () => {
+        const data = {
+            rap: parseFloat(document.getElementById('coefRendPercibido').value),
+            rac: parseFloat(document.getElementById('coefRendCuantitativo').value)
+        };
+        return await Post_Config_Cuatrimestrales(data);
+    });
 
-                let targetSum = 3.0 - newVal;
+    setupValidationGroupMulti(
+        ['.coef-input-mat1', '.coef-input-mat2'],
+        [3, 4],
+        ['sumaMat1Display', 'sumaMat2Display'],
+        ['Suma Grupo 1: $val / 3', 'Suma Grupo 2: $val / 4'],
+        ['errorMat1', 'errorMat2'],
+        'btnGuardarMaterias'
+    );
+    setupForm('formPesosMaterias', 'msgMaterias', 'Pesos de materias actualizados.', async () => {
+        const data = {
+            mate1: parseFloat(document.getElementById('pesoMat1').value),
+            algebra1: parseFloat(document.getElementById('pesoAlg1b').value),
+            fdlq: parseFloat(document.getElementById('pesoFundQuimica').value),
+            mate2: parseFloat(document.getElementById('pesoMat2').value),
+            algebra2: parseFloat(document.getElementById('pesoAlg2').value),
+            fdlp: parseFloat(document.getElementById('pesoFundProg').value),
+            fisica: parseFloat(document.getElementById('pesoFisicaA').value)
+        };
+        return await Post_Config_Materias(data);
+    });
 
-                let val1 = parseFloat(others[0].value);
-                let val2 = parseFloat(others[1].value);
+    const btnDescargar = document.getElementById('btnDescargarDB');
+    if (btnDescargar) {
+        btnDescargar.addEventListener('click', async () => {
+            const originalText = btnDescargar.innerHTML;
+            btnDescargar.innerHTML = '<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Descargando...';
+            btnDescargar.disabled = true;
 
-                let currentSum = val1 + val2;
-                if (currentSum === 0) {
-                    val1 = targetSum / 2;
-                    val2 = targetSum / 2;
-                } else {
-                    let ratio1 = val1 / currentSum;
-                    let ratio2 = val2 / currentSum;
-                    val1 = targetSum * ratio1;
-                    val2 = targetSum * ratio2;
-                }
+            const success = await Get_Database();
+            if (success) {
+                mostrarMensaje('msgDescargaDB', 'Descarga completada con éxito.', 'success');
+            } else {
+                mostrarMensaje('msgDescargaDB', 'Error al descargar la base de datos.', 'error');
+            }
 
-                others[0].value = val1.toFixed(1);
-                others[1].value = val2.toFixed(1);
-
-                updateDisplays();
-            });
+            btnDescargar.innerHTML = originalText;
+            btnDescargar.disabled = false;
         });
-
-        // Form submit override to save locally
-        const formCoef = document.getElementById('formCoeficientes');
-        if (formCoef) {
-            formCoef.addEventListener('submit', (e) => {
-                localStorage.setItem('coefAsistencia', coefAsistencia.value);
-                localStorage.setItem('coefTareas', coefTareas.value);
-                localStorage.setItem('coefExamenes', coefExamenes.value);
-            });
-        }
-
-        // Load saved coeficientes if any
-        const savedAsis = localStorage.getItem('coefAsistencia');
-        const savedTar = localStorage.getItem('coefTareas');
-        const savedExa = localStorage.getItem('coefExamenes');
-
-        if (savedAsis) coefAsistencia.value = savedAsis;
-        if (savedTar) coefTareas.value = savedTar;
-        if (savedExa) coefExamenes.value = savedExa;
-
-        updateDisplays();
     }
 }
 
-function setupForm(formId, msgId, successText) {
+function setupValidationGroup(inputSelector, targetSum, displayId, displayText, errorId, buttonId) {
+    const inputs = document.querySelectorAll(inputSelector);
+    if (!inputs.length) return;
+    const display = document.getElementById(displayId);
+    const errorEl = document.getElementById(errorId);
+    const btn = document.getElementById(buttonId);
+
+    const validate = () => {
+        let sum = 0;
+        inputs.forEach(inp => sum += parseFloat(inp.value) || 0);
+        sum = Math.round(sum * 100) / 100;
+
+        if (display) display.textContent = displayText.replace('$val', sum.toFixed(2));
+
+        if (sum !== targetSum) {
+            if (errorEl) errorEl.style.display = 'block';
+            if (btn) btn.disabled = true;
+            if (btn) btn.style.opacity = '0.5';
+            if (btn) btn.style.cursor = 'not-allowed';
+            return false;
+        } else {
+            if (errorEl) errorEl.style.display = 'none';
+            if (btn) btn.disabled = false;
+            if (btn) btn.style.opacity = '1';
+            if (btn) btn.style.cursor = 'pointer';
+            return true;
+        }
+    };
+
+    inputs.forEach(inp => {
+        inp.addEventListener('input', validate);
+    });
+
+    validate();
+}
+
+function setupValidationGroupMulti(inputSelectors, targetSums, displayIds, displayTexts, errorIds, buttonId) {
+    const btn = document.getElementById(buttonId);
+    if (!btn) return;
+
+    const validateAll = () => {
+        let allValid = true;
+        for (let i = 0; i < inputSelectors.length; i++) {
+            const inputs = document.querySelectorAll(inputSelectors[i]);
+            const targetSum = targetSums[i];
+            const display = document.getElementById(displayIds[i]);
+            const errorEl = document.getElementById(errorIds[i]);
+
+            let sum = 0;
+            inputs.forEach(inp => sum += parseFloat(inp.value) || 0);
+            sum = Math.round(sum * 100) / 100;
+
+            if (display) display.textContent = displayTexts[i].replace('$val', sum.toFixed(2));
+
+            if (sum !== targetSum) {
+                if (errorEl) errorEl.style.display = 'block';
+                allValid = false;
+            } else {
+                if (errorEl) errorEl.style.display = 'none';
+            }
+        }
+
+        if (!allValid) {
+            btn.disabled = true;
+            btn.style.opacity = '0.5';
+            btn.style.cursor = 'not-allowed';
+        } else {
+            btn.disabled = false;
+            btn.style.opacity = '1';
+            btn.style.cursor = 'pointer';
+        }
+    };
+
+    for (let i = 0; i < inputSelectors.length; i++) {
+        const inputs = document.querySelectorAll(inputSelectors[i]);
+        inputs.forEach(inp => inp.addEventListener('input', validateAll));
+    }
+
+    validateAll();
+}
+
+function setupForm(formId, msgId, successText, submitAction) {
     const form = document.getElementById(formId);
     if (!form) return;
 
-    form.addEventListener('submit', (e) => {
+    form.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // Simular guardado
         const submitBtn = form.querySelector('button[type="submit"]');
         const originalText = submitBtn.innerHTML;
         submitBtn.innerHTML = '<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Procesando...';
         submitBtn.disabled = true;
 
-        setTimeout(() => {
+        try {
+            let success = true;
+            if (submitAction) {
+                success = await submitAction();
+            } else {
+                // Simular guardado
+                await new Promise(r => setTimeout(r, 800));
+            }
+
+            if (success) {
+                mostrarMensaje(msgId, successText, 'success');
+                // Note: we don't reset the form values so the user sees the saved coefficients
+            } else {
+                mostrarMensaje(msgId, 'Error al guardar los coeficientes.', 'error');
+            }
+        } catch (error) {
+            console.error(error);
+            mostrarMensaje(msgId, 'Excepción al intentar guardar.', 'error');
+        } finally {
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
-            form.reset();
-            mostrarMensaje(msgId, successText, 'success');
-        }, 800);
+        }
     });
 }
 

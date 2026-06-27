@@ -12,8 +12,7 @@ def post_entrevista(db, entrevista):
         + ((entrevista.cl - 1) / 4)
         + ((entrevista.cv - 1) / 4)
         + ((entrevista.loc - 1) / 4)
-        + ((entrevista.ra - 1) / 4)
-    ) / 7
+    ) / 6
 
     Entrevista.post_entrevista(db, entrevista)
 

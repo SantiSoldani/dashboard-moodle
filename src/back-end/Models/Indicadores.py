@@ -3,6 +3,7 @@ from types import SimpleNamespace
 
 from numpy import flatnonzero
 from sqlalchemy import text
+from sqlalchemy.orm import query_expression
 from sqlalchemy.sql.selectable import elem
 
 
@@ -86,3 +87,62 @@ def get_indicadores_iniciales(db, dni):
         return SimpleNamespace(**row)
     except Exception as e:
         raise Exception(e)
+
+
+def new_config_iniciales(db, config):
+
+    try:
+        query = text(
+            """INSERT INTO "Config_indicadores_iniciales" (pse, ic, pep, cl, cv, loc) VALUES(:pse, :ic, :pep, :cl, :cv, :loc) """
+        )
+        db.execute(query, config.__dict__)
+        db.commit()
+
+    except Exception as e:
+        print(e)
+
+
+def new_config_cuatrimestrales(db, config):
+
+    try:
+        query = text(
+            """INSERT INTO "Config_indicadores_cuatrimestrales" (rac, rap) VALUES(:rac, :rap) """
+        )
+
+        db.execute(query, config.__dict__)
+        db.commit()
+
+    except Exception as e:
+        print(e)
+
+
+def get_pesos_iniciales(db):
+
+    try:
+        query = text(
+            """SELECT pse, ic, pep, cl, cv, loc FROM "Config_indicadores_iniciales"
+                ORDER BY created_at DESC
+                LIMIT 1"""
+        )
+
+        pesos = db.execute(query).mappings().fetchone()
+        return SimpleNamespace(**pesos)
+
+    except Exception as e:
+        print(e)
+
+
+def get_pesos_cuatrimestrales(db):
+
+    try:
+        query = text(
+            """SELECT rac, rap FROM "Config_indicadores_cuatrimestrales"
+                ORDER BY created_at DESC
+                LIMIT 1"""
+        )
+
+        pesos = db.execute(query).mappings().fetchone()
+        return SimpleNamespace(**pesos)
+
+    except Exception as e:
+        print(e)

@@ -3,7 +3,7 @@ from types import SimpleNamespace
 import numpy as np
 import pandas as pd
 from Controllers import AlumnoController, IndicadoresController, MateriasController
-from Models import Semaforo
+from Models import Indicadores, Semaforo
 
 # from numpy._core import astype, float128
 
@@ -80,20 +80,7 @@ def get_states_From_notas(path: str, db):
     return get_states_From_notas_from_df(df, db)
 
 
-# SECCION DE CALCULOS PARA LOS ALUMNOS A PARTIR DE 2DO AÑO
-def obtener_color_semaforo(score):
-    """Mapea el score final al color del semáforo institucional."""
-    if score <= 0.25:
-        return "Verde"
-    elif score <= 0.50:
-        return "Amarillo"
-    elif score <= 0.75:
-        return "Naranja"
-    else:
-        return "Rojo"
-
-
-def calculo_inicial_from_df(df: pd.DataFrame):
+def calculo_inicial_from_df(df: pd.DataFrame, db):
     """
     Procesa la Encuesta Inicial para calcular el Perfil de Riesgo Estructural (PRE).
     Trabaja directamente con un DataFrame en memoria.
@@ -112,10 +99,21 @@ def calculo_inicial_from_df(df: pd.DataFrame):
             "pre",
         ]
     )
+    pesos = Indicadores.get_pesos_iniciales(db)
+    if pesos is not None:
+        df_final["pre"] = (
+            pesos.pse * df["PSE"]
+            + pesos.ic * df["IC"]
+            + pesos.pep * df["PEP"]
+            + pesos.cl * df["CL"]
+            + pesos.cv * df["CV"]
+            + pesos.loc * df["LOC"]
+        ) / 6
+    else:
+        df_final["pre"] = (
+            df["PSE"] + df["IC"] + df["PEP"] + df["CL"] + df["CV"] + df["LOC"]
+        ) / 6
 
-    df_final["pre"] = (
-        df["PSE"] + df["IC"] + df["PEP"] + df["CL"] + df["CV"] + df["LOC"]
-    ) / 6
     df_final["dni"] = df["dni"]
     df_final["nombre"] = df["nombre"]
     df_final["apellido"] = df["apellido"]
@@ -138,10 +136,10 @@ def calculo_inicial_from_df(df: pd.DataFrame):
 
 
 # Mantener compatibilidad con path (DEPRECADO)
-def calculo_inicial(path_csv_resultados):
-    """DEPRECADO: Usar calculo_inicial_from_df() con un DataFrame."""
-    df = pd.read_csv(path_csv_resultados)
-    return calculo_inicial_from_df(df)
+# def calculo_inicial(path_csv_resultados):
+#    """DEPRECADO: Usar calculo_inicial_from_df() con un DataFrame."""
+#    df = pd.read_csv(path_csv_resultados)
+#    return calculo_inicial_from_df(df)
 
 
 def calculo_cuatrimestral_from_df(df: pd.DataFrame, db):
@@ -171,8 +169,11 @@ def calculo_cuatrimestral_from_df(df: pd.DataFrame, db):
         + (df["MOT"] - 1) / 4
         + (df["SEG"] - 1) / 4
     ) / 4
-    df["RAF"] = (df["RAC"] + df["RAP"]) / 2
-
+    pesos = Indicadores.get_pesos_cuatrimestrales(db)
+    if pesos is None:
+        df["RAF"] = (df["RAC"] + df["RAP"]) / 2
+    else:
+        df["RAF"] = (pesos.rac * df["RAC"] + pesos.raf * df["RAP"]) / 2
     # Luego iterar solo para obtener datos del alumno
     resultados = []
     indicadores_persistibles = []
