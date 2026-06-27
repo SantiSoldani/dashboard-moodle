@@ -31,14 +31,17 @@ export async function initAlumnoStats(dniParam = null) {
     let evolucionSemaforos = await HandleGet_evolucion_semaforos(alumno_dni);
     let rendimientoAcademico = await HandleGet_rendimiento_academico(alumno_dni);
 
-    let entrevistaPendienteStr = null;
+    let entrevistaPendienteData = null;
     let solicitudPendiente = null;
     if (rol === "Learner") {
       let agendaPendiente = await HandleGet_agenda_pendiente(alumno_dni);
       if (agendaPendiente) {
         let entrevistador = await HandleGet_usuario_by_dni(agendaPendiente.dni_entrevistador);
         if (entrevistador) {
-          entrevistaPendienteStr = `ENTREVISTA PENDIENTE | DIA: ${agendaPendiente.fecha_agendada} | TUTOR: ${entrevistador.nombre} ${entrevistador.apellido}`;
+          entrevistaPendienteData = {
+            fecha: agendaPendiente.fecha_agendada,
+            tutor: `${entrevistador.nombre} ${entrevistador.apellido}`
+          };
         }
       }
       solicitudPendiente = await HandleGet_solicitud_pendiente(alumno_dni);
@@ -49,7 +52,7 @@ export async function initAlumnoStats(dniParam = null) {
       const rol = localStorage.getItem("rol") || "Instructor";
 
       set_header(alumno);
-      render_dashboard_by_role(alumno, rol, indicadores, tutor, indicadoresCuatrimestrales, encuesta, evolucionSemaforos, rendimientoAcademico, entrevistaPendienteStr, solicitudPendiente);
+      render_dashboard_by_role(alumno, rol, indicadores, tutor, indicadoresCuatrimestrales, encuesta, evolucionSemaforos, rendimientoAcademico, entrevistaPendienteData, solicitudPendiente);
 
       window.addEventListener('resize', () => {
         if (chartPercepcionInstance) chartPercepcionInstance.resize();
@@ -74,10 +77,28 @@ function activar_solicitudes(alumno, tutor) {
   });
 }
 
-function set_header(alumno) {
+function set_header(alumno, rol) {
   const headerName = document.getElementById("stats-header-name");
   if (headerName) {
-    headerName.textContent = `Hola, ${alumno.nombre} ${alumno.apellido}`;
+    if (rol === "Learner") {
+      headerName.textContent = `Hola, ${alumno.nombre} ${alumno.apellido}`;
+    } else {
+      headerName.innerHTML = `
+        <div style="display: flex; align-items: center; gap: 16px;">
+            <span>${alumno.nombre} ${alumno.apellido}</span>
+            <button id="btn_agendarEntrevista" style="background: #2563eb; color: white; border: none; border-radius: 8px; padding: 6px 12px; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(37,99,235,0.2); display: flex; align-items: center; gap: 6px;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+                <span class="material-symbols-outlined" style="font-size: 16px;">calendar_month</span> Agendar Entrevista
+            </button>
+        </div>
+      `;
+      
+      const btn = document.getElementById("btn_agendarEntrevista");
+      if (btn) {
+        btn.addEventListener("click", () => {
+            abrir_modal_agenda(alumno);
+        });
+      }
+    }
   }
 
   const ribbon = document.getElementById("stats-color-ribbon");
@@ -91,7 +112,73 @@ function set_header(alumno) {
   }
 }
 
-function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null, indicadoresCuatrimestrales = null, encuesta = null, evolucionSemaforos = null, rendimientoAcademico = null, entrevistaPendienteStr = null, solicitudPendiente = null) {
+function abrir_modal_agenda(alumno) {
+    let modal = document.getElementById("modal_agenda");
+    if (!modal) {
+        modal = document.createElement("div");
+        modal.id = "modal_agenda";
+        modal.style.position = "fixed";
+        modal.style.top = "0";
+        modal.style.left = "0";
+        modal.style.width = "100%";
+        modal.style.height = "100%";
+        modal.style.backgroundColor = "rgba(15, 23, 42, 0.5)"; // overlay color matches theme
+        modal.style.display = "flex";
+        modal.style.justifyContent = "center";
+        modal.style.alignItems = "center";
+        modal.style.zIndex = "99999";
+        modal.style.backdropFilter = "blur(4px)";
+        document.body.appendChild(modal);
+    }
+    
+    modal.innerHTML = `
+        <div style="background: white; padding: 24px; border-radius: 12px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #cbd5e1;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
+                <span class="material-symbols-outlined" style="color: #2563eb; font-size: 28px;">edit_calendar</span>
+                <h3 style="margin: 0; color: #1e293b; font-size: 1.25rem;">Agendar Entrevista</h3>
+            </div>
+            <p style="margin-top: 0; margin-bottom: 20px; color: #475569; font-size: 0.95rem;">
+                Establecé una fecha y hora para la entrevista con <strong>${alumno.nombre} ${alumno.apellido}</strong>.
+            </p>
+            <div style="margin-bottom: 24px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 700; font-size: 0.85rem; color: #334155;">FECHA Y HORA</label>
+                <input type="datetime-local" id="input_fecha_agenda" style="width: 100%; padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; box-sizing: border-box; font-family: inherit; font-size: 1rem; color: #1e293b; background: #f8fafc;" />
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 12px;">
+                <button id="btn_cancelar_agenda" style="background: white; border: 1px solid #cbd5e1; padding: 8px 16px; border-radius: 8px; cursor: pointer; color: #475569; font-weight: 700; transition: all 0.2s;" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='white'">Cancelar</button>
+                <button id="btn_confirmar_agenda" style="background: #2563eb; color: white; border: none; padding: 8px 24px; border-radius: 8px; cursor: pointer; font-weight: 700; transition: all 0.2s; box-shadow: 0 4px 6px rgba(37,99,235,0.2);" onmouseover="this.style.background='#1d4ed8'; this.style.transform='translateY(-1px)'" onmouseout="this.style.background='#2563eb'; this.style.transform='none'">Agendar</button>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById("btn_cancelar_agenda").addEventListener("click", () => {
+        modal.remove();
+    });
+    
+    document.getElementById("btn_confirmar_agenda").addEventListener("click", async () => {
+        const fecha = document.getElementById("input_fecha_agenda").value;
+        if (!fecha) {
+            alert("Por favor, seleccioná una fecha válida.");
+            return;
+        }
+        
+        const dni_entrevistador = localStorage.getItem("dni") || "0"; 
+        
+        // Dynamic import to avoid circular dependencies if any, but better to import at top
+        const { HandleCreate_agenda } = await import('../models/Alumno.js');
+        const res = await HandleCreate_agenda(alumno.dni, dni_entrevistador, fecha);
+        
+        if (res) {
+            modal.remove();
+            // Refresh to show banner
+            window.location.reload();
+        } else {
+            alert("Error al agendar entrevista. Por favor, intentá nuevamente.");
+        }
+    });
+}
+
+function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null, indicadoresCuatrimestrales = null, encuesta = null, evolucionSemaforos = null, rendimientoAcademico = null, entrevistaPendienteData = null, solicitudPendiente = null) {
   const isStudent = rol === "Learner";
   const formatKpi = (val) => val !== undefined && val !== null ? `${(val * 10).toFixed(1).replace(/\\.0$/, '')}/10` : "-/10";
 
@@ -253,9 +340,30 @@ function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null,
     if (rightPanelContainer) rightPanelContainer.style.order = "-1";
     if (metricsListPanel) metricsListPanel.style.order = "1";
     if (entrevistaBanner) {
-      if (entrevistaPendienteStr) {
-        entrevistaBanner.style.display = "block";
-        entrevistaBanner.innerHTML = `<span style="font-size: 0.8rem; font-weight: 700; color: #1e293b;">${entrevistaPendienteStr}</span>`;
+      if (entrevistaPendienteData) {
+        entrevistaBanner.style.display = "flex";
+        entrevistaBanner.style.justifyContent = "space-between";
+        entrevistaBanner.style.alignItems = "center";
+        
+        let dateObj = new Date(entrevistaPendienteData.fecha);
+        let formattedDate = !isNaN(dateObj) 
+            ? `${dateObj.toLocaleDateString('es-AR')} ${dateObj.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'})}`
+            : entrevistaPendienteData.fecha;
+
+        entrevistaBanner.innerHTML = `
+          <div style="display: flex; align-items: center; gap: 8px;">
+              <span class="material-symbols-outlined" style="color: #3b82f6; font-size: 20px;">info</span>
+              <span style="font-size: 0.85rem; font-weight: 800; color: #1e293b; letter-spacing: 0.5px;">ENTREVISTA PENDIENTE</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="material-symbols-outlined" style="font-size: 18px; color: #475569;">event</span>
+              <span style="font-size: 0.85rem; font-weight: 700; color: #1e293b;">DÍA: ${formattedDate}</span>
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="material-symbols-outlined" style="font-size: 18px; color: #475569;">person</span>
+              <span style="font-size: 0.85rem; font-weight: 700; color: #1e293b;">TUTOR: ${entrevistaPendienteData.tutor}</span>
+          </div>
+        `;
       } else {
         entrevistaBanner.style.display = "none";
       }

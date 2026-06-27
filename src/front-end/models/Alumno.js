@@ -279,3 +279,40 @@ export async function HandleGet_solicitud_pendiente(dni_alumno) {
   }
 }
 
+export async function HandleCreate_agenda(dni_alumno, dni_entrevistador, fecha_agendada) {
+  try {
+    const headers = {
+      "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420"
+    };
+    const body = JSON.stringify({ dni_alumno, dni_entrevistador, fecha_agendada });
+    const response = await fetch(`${getConfig()}/agendas/crear`, { method: "POST", headers, body });
+    if (!response.ok) {
+      throw new Error(`Error al crear agenda: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al crear agenda", error);
+    return null;
+  }
+}
+
+export async function HandleMarcar_agenda(id_entrevista) {
+  try {
+    const headers = {
+      "Content-Type": "application/json",
+      "ngrok-skip-browser-warning": "69420"
+    };
+    const body = JSON.stringify({ id_entrevista });
+    const response = await fetch(`${getConfig()}/agendas/marcar`, { method: "POST", headers, body });
+    if (!response.ok) {
+      throw new Error(`Error al marcar agenda: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al marcar agenda", error);
+    return null;
+  }
+}

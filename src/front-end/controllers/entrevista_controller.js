@@ -250,6 +250,16 @@ async function onGuardarEntrevista(payload) {
   }
 
   if (result.ok) {
+    try {
+      const { HandleGet_agenda_pendiente, HandleMarcar_agenda } = await import('../models/Alumno.js');
+      const agenda = await HandleGet_agenda_pendiente(payload.dni);
+      if (agenda && agenda.id) {
+         await HandleMarcar_agenda(agenda.id);
+      }
+    } catch (e) {
+      console.error("Error al marcar la entrevista en agendas", e);
+    }
+
     mostrarToast("Entrevista guardada correctamente.", "success");
     document.getElementById("formRegistrarEntrevista")?.reset();
     document
