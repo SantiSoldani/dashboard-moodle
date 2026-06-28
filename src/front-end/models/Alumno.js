@@ -15,10 +15,15 @@ const tutoresAPI = `${getConfig()}/tutor_alumno`;
 export async function HandleGet_alumnos(dni = null, which = "get") {
   try {
     const rol = localStorage.getItem("rol") || "Instructor";
+    const dni_usuario = localStorage.getItem("dni") || null;
     const headers = {
       "ngrok-skip-browser-warning": "69420",
       "X-Role": rol
     };
+
+    if (rol === "Tutor" && dni_usuario) {
+      headers["x-tutor-dni"] = dni_usuario;
+    }
 
     let response;
 

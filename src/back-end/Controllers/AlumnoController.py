@@ -52,13 +52,18 @@ def Actualizar_estado(alumnos: list[tuple], db):
     return db.commit()
 
 
-def Get_alumnos(db) -> list[AlumnoDto]:
-    alumnos = Alumno.Get_alumnos(db)
+def Get_alumnos(db, tutor_dni=None) -> list[AlumnoDto]:
+    alumnos = Alumno.Get_alumnos(db, tutor_dni)
     return alumnos
 
 
-def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
-    alumnos = Alumno.Get_alumnos_with_stats(db)
+def Get_alumnos_with_stats(db, tutor_dni=None) -> list[AlumnoDto]:
+    alumnos = Alumno.Get_alumnos_with_stats(db, tutor_dni)
+    return alumnos
+
+
+def Get_alumnos_with_stats_by_page(limit, page, db) -> list[AlumnoDto]:
+    alumnos = Alumno.Get_alumnos_with_stats_by_page(limit, page, db)
     return alumnos
 
 
@@ -122,8 +127,8 @@ def get_evolucion_semaforos(db, valor, piso, techo):
     return raw
 
 
-def get_criticos(db):
-    return Semaforo.get_criticos(db)
+def get_criticos(db, tutor_dni=None):
+    return Semaforo.get_criticos(db, tutor_dni)
 
 
 def get_semaforoXpre_cohorte(db, cohorte):

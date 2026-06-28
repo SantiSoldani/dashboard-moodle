@@ -89,11 +89,21 @@ def Get_alumno_by_dni(dni: str, db) -> AlumnoDto:
     )
 
 
-def Get_alumnos(db) -> list[AlumnoDto]:
+def Get_alumnos(db, tutor_dni=None) -> list[AlumnoDto]:
     # SQL QUERY SELECT * FROM alumnos ORDER BY nombre
     alumnos_list = []
-    query = text("""SELECT *  FROM "Alumnos" ORDER BY dni""")
-    fetched_alumnos = (db.execute(query)).mappings().fetchall()
+    if tutor_dni:
+        query = text("""
+            SELECT "Alumnos".* 
+            FROM "Alumnos" 
+            INNER JOIN "Tutor-Alumno" ON "Alumnos".dni = "Tutor-Alumno".dni_alumno 
+            WHERE "Tutor-Alumno".dni_tutor = :tutor_dni
+            ORDER BY "Alumnos".dni
+        """)
+        fetched_alumnos = (db.execute(query, {"tutor_dni": tutor_dni})).mappings().fetchall()
+    else:
+        query = text("""SELECT *  FROM "Alumnos" ORDER BY dni""")
+        fetched_alumnos = (db.execute(query)).mappings().fetchall()
     for alumno in fetched_alumnos:
         # print(alumno["PRE"] is not nan)
         # print(alumno["PRE"])
@@ -113,12 +123,12 @@ def Get_alumnos(db) -> list[AlumnoDto]:
     return alumnos_list
 
 
-def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
+def Get_alumnos_with_stats(db, tutor_dni=None) -> list[AlumnoDto]:
     """
     Trae a todos los alumnos pero agregar la informacion de la nueva tabla 'Semaforo'
     """
     alumnos = []
-    query = text("""
+    base_query = """
         SELECT
             "Alumnos".nombre,
             "Alumnos".apellido,
@@ -137,14 +147,56 @@ def Get_alumnos_with_stats(db) -> list[AlumnoDto]:
                    ROW_NUMBER() OVER (PARTITION BY dni_alumno ORDER BY created_at DESC) as rn
             FROM "Semaforo"
         ) "Semaforo" ON "Alumnos".dni = "Semaforo".dni_alumno AND "Semaforo".rn = 1
-        ORDER BY "Alumnos".dni ASC
-    """)
+    """
+    
+    if tutor_dni:
+        base_query += """ WHERE "Tutor-Alumno".dni_tutor = :tutor_dni """
+        
+    base_query += """ ORDER BY "Alumnos".dni ASC """
+    query = text(base_query)
 
-    fetched = (db.execute(query)).mappings().fetchall()
+    if tutor_dni:
+        fetched = (db.execute(query, {"tutor_dni": tutor_dni})).mappings().fetchall()
+    else:
+        fetched = (db.execute(query)).mappings().fetchall()
     for row in fetched:
         data = dict(row)
         if data.get("color") is None:
             data["color"] = "gris"
+        if data.get("score") is None:
+            data["score"] = 0
+        alumnos.append(SimpleNamespace(**data))
+    return alumnos
+
+def Get_alumnos_with_stats_by_page(limit, page, db):
+    offset = page*limit
+    """
+    Trae a los alumnos que no tienen tutor asignado, ordenados por score ascendente (menor a mayor).
+    """
+    alumnos = []
+    query = text("""
+        SELECT
+            "Alumnos".dni,
+            "Alumnos".nombre,
+            "Alumnos".apellido,
+            "Alumnos".email,
+            "Tutor-Alumno".dni_tutor,
+            "Semaforo".score
+        FROM "Alumnos"
+        LEFT JOIN "Tutor-Alumno" ON "Alumnos".dni = "Tutor-Alumno".dni_alumno
+        LEFT JOIN (
+            SELECT *,
+                   ROW_NUMBER() OVER (PARTITION BY dni_alumno ORDER BY created_at DESC) as rn
+            FROM "Semaforo"
+        ) "Semaforo" ON "Alumnos".dni = "Semaforo".dni_alumno AND "Semaforo".rn = 1
+        WHERE "Tutor-Alumno".dni_tutor IS NULL
+        ORDER BY "Semaforo".score ASC
+        LIMIT :limit OFFSET :offset
+    """)
+
+    fetched = (db.execute(query, {"limit": limit, "offset": offset})).mappings().fetchall()
+    for row in fetched:
+        data = dict(row)
         if data.get("score") is None:
             data["score"] = 0
         alumnos.append(SimpleNamespace(**data))

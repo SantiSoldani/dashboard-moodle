@@ -17,9 +17,8 @@ export const VISTA_HOME = `
                     <span class="material-symbols-outlined">person</span>
                 </div>
                 <div class="kpi-details">
-                    <p class="label">Alumnos Inscriptos</p>
+                    <p class="label">Cantidad de Alumnos</p>
                     <h2 id="totalAlumnosCount">0</h2>
-                    <p class="subtext">Total en el sistema</p>
                 </div>
             </article>
 
@@ -30,7 +29,6 @@ export const VISTA_HOME = `
                 <div class="kpi-details">
                     <p class="label">Promedio 1er Año</p>
                     <h2 id="avgScore1erAnio">0.00</h2>
-                    <p class="subtext">Cohorte de Ingreso</p>
                 </div>
             </article>
 
@@ -253,7 +251,7 @@ export const VISTA_ALUMNO_STATS = `
         <div style="padding: 32px;">
             <header class="page-header" style="margin-bottom: 32px;">
                 <div>
-                    <h1 id="stats-header-name">Hola, ...</h1>
+                    <h1 id="stats-header-name">Cargando datos...</h1>
                 </div>
             </header>
 
@@ -279,8 +277,8 @@ export const VISTA_ALUMNO_STATS = `
                     </div>
                     <div class="metrics-list-panel card-panel" style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                         <div style="margin-bottom: 24px;">
-                            <h2 id="metric-list-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;">Cómo te sentís este cuatrimestre</h2>
-                            <p class="subtitle" id="metric-list-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;">Tus respuestas en la última encuesta</p>
+                            <h2 id="metric-list-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;"> </h2>
+                            <p class="subtitle" id="metric-list-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;"> </p>
                         </div>
                         <div id="metrics-list-container" style="display: flex; flex-direction: column; gap: 20px;">
                             <!-- Loaded dynamically -->
@@ -291,8 +289,8 @@ export const VISTA_ALUMNO_STATS = `
                 <div class="chart-panel card-panel" id="right-panel-container" style="background: white; border-radius: 12px; padding: 32px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                     <div style="margin-bottom: 24px; display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
-                            <h2 id="chart-percepcion-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;">Cómo cambió tu percepción a lo largo del tiempo</h2>
-                            <p class="subtitle" id="chart-percepcion-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;">Solo te mostramos tu propio recorrido — no hay ningún otro alumno en este gráfico</p>
+                            <h2 id="chart-percepcion-title" style="font-size: 1.25rem; color: #141b2b; margin: 0 0 4px 0;"> </h2>
+                            <p class="subtitle" id="chart-percepcion-subtitle" style="color: #434655; font-size: 0.9rem; margin: 0;"> </p>
                         </div>
                         <select id="encuesta-period-selector" style="display: none; padding: 6px 10px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc; cursor: pointer; font-weight: 500;">
                             <option value="2025 C1">2025 C1</option>
@@ -401,44 +399,62 @@ export const VISTA_TUTORES = `
             </div>
             <p class="panel-desc mb-4">Marque los alumnos que desea asignarle a este tutor.</p>
 
-            <div class="list-container-t" style="max-width: 600px; margin: 0 auto;">
-                <div class="list-header-flex-t">
+            <section class="table-section" style="margin-top: 16px; border: none; padding: 0;">
+                <div class="table-header">
                     <h3>Seleccionar Alumnos</h3>
-                    <div class="search-mini-t">
-                        <span class="material-symbols-outlined">search</span>
-                        <input type="text" placeholder="Buscar alumno...">
+                    <div class="table-controls">
+                        <div class="search-wrap">
+                            <span class="material-symbols-outlined">search</span>
+                            <input id="searchAlumnoAsignacion" type="search" placeholder="Buscar por DNI o nombre...">
+                        </div>
                     </div>
                 </div>
-                <div class="list-box-t alumno-list">
-                    <label class="list-item-t check-item-t">
-                        <input type="checkbox">
-                        <div class="item-details-t">
-                            <strong>Mateo González</strong>
-                            <span>Ingeniería Civil - DNI: 44.322.111</span>
-                        </div>
-                    </label>
-                    <label class="list-item-t check-item-t">
-                        <input type="checkbox">
-                        <div class="item-details-t">
-                            <strong>Laura Martínez</strong>
-                            <span>Arquitectura - DNI: 43.111.222</span>
-                        </div>
-                    </label>
-                    <label class="list-item-t check-item-t">
-                        <input type="checkbox">
-                        <div class="item-details-t">
-                            <strong>Juan Pérez</strong>
-                            <span>Ingeniería Civil - DNI: 42.555.777</span>
-                        </div>
-                    </label>
+
+                <div class="table-container">
+                    <table id="asignacionStudentsTable">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px; text-align: center;">✓</th>
+                                <th>DNI Alumno</th>
+                                <th>Nombre y Apellido</th>
+                                <th>Email</th>
+                                <th>DNI Tutor</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody id="asignacionStudentsTbody">
+                            <tr class="placeholder-row">
+                                <td colspan="6">
+                                    <div class="placeholder-content">
+                                        <div class="placeholder-icon">
+                                            <span class="material-symbols-outlined" style="font-size: 32px;">folder_open</span>
+                                        </div>
+                                        <p>Los alumnos sin tutor se cargarán aquí...</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
-                <div class="selection-summary-t">
-                    <span id="selected-alumnos-count">0 alumnos seleccionados</span>
+
+                <!-- CONTROLES DE PAGINACIÓN -->
+                <div class="pagination-controls" id="asignacionPaginationControls">
+                    <button id="btnPrevPageAsignacion" class="btn-pagination" disabled>
+                        <span class="material-symbols-outlined">chevron_left</span> Anterior
+                    </button>
+                    <span id="pageIndicatorAsignacion" class="page-indicator">Página 1 de 1</span>
+                    <button id="btnNextPageAsignacion" class="btn-pagination" disabled>
+                        Siguiente <span class="material-symbols-outlined">chevron_right</span>
+                    </button>
                 </div>
-                <div class="asignacion-footer-t" style="margin-top: 20px;">
-                    <button id="btnCancelarAsignacion" class="btn-secondary-t">Cancelar</button>
-                    <button class="btn-primary-large-t"><span class="material-symbols-outlined">assignment_ind</span> Confirmar Asignación</button>
-                </div>
+            </section>
+
+            <div class="selection-summary-t" style="text-align: right; margin-top: 16px;">
+                <span id="selected-alumnos-count" style="font-weight: 600; color: #475569;">0 alumnos seleccionados</span>
+            </div>
+            <div class="asignacion-footer-t" style="margin-top: 20px; display: flex; justify-content: flex-end; gap: 12px;">
+                <button id="btnCancelarAsignacion" class="btn-secondary-t">Cancelar</button>
+                <button class="btn-primary-large-t"><span class="material-symbols-outlined">assignment_ind</span> Confirmar Asignación</button>
             </div>
         </div>
     </div>

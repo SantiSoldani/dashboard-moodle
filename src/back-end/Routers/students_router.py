@@ -2,7 +2,7 @@ import json
 
 import server
 from Controllers import AlumnoController
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Header
 from pandas._libs.tslibs import timestamps
 from sqlalchemy.orm import Session
 from starlette.types import HTTPExceptionHandler
@@ -14,12 +14,21 @@ router = APIRouter(
 
 
 @router.get("/get/stats", status_code=200)
-async def get_students_with_stats(db: Session = Depends(server.get_db)):
+async def get_students_with_stats(db: Session = Depends(server.get_db), x_tutor_dni: str = Header(default=None)):
     try:
-        alumnos = AlumnoController.Get_alumnos_with_stats(db)
+        alumnos = AlumnoController.Get_alumnos_with_stats(db, x_tutor_dni)
         return [a.__dict__ for a in alumnos]
     except Exception as e:
         print(f"Error en get_students_with_stats: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+@router.get("/get/stats/{limit}/{page}", status_code=200)
+async def get_students_with_stats_by_page(limit: int, page: int, db: Session = Depends(server.get_db)):
+    try:
+        alumnos = AlumnoController.Get_alumnos_with_stats_by_page(limit, page, db)
+        return [a.__dict__ for a in alumnos]
+    except Exception as e:
+        print(f"Error en get_students_with_stats_by_page: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -32,9 +41,9 @@ async def get_student(student_dni: str, db: Session = Depends(server.get_db)):
 
 
 @router.get("/get", status_code=200)
-async def get_students(db: Session = Depends(server.get_db)):
+async def get_students(db: Session = Depends(server.get_db), x_tutor_dni: str = Header(default=None)):
     try:
-        alumnos = AlumnoController.Get_alumnos(db)
+        alumnos = AlumnoController.Get_alumnos(db, x_tutor_dni)
         return [a.__dict__ for a in alumnos]
     except Exception as e:
         print(f"Error en get_students: {e}")
@@ -98,9 +107,9 @@ async def get_evolucion_semaforos(
 
 
 @router.get("/get/criticos", status_code=200)
-async def get_criticos(db: Session = Depends(server.get_db)):
+async def get_criticos(db: Session = Depends(server.get_db), x_tutor_dni: str = Header(default=None)):
     try:
-        criticos = AlumnoController.get_criticos(db)
+        criticos = AlumnoController.get_criticos(db, x_tutor_dni)
         return [c.__dict__ for c in criticos]
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

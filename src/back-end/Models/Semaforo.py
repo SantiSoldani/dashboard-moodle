@@ -93,15 +93,28 @@ def get_evolucion(db, valor, piso, techo):
         return []
 
 
-def get_criticos(db):
-    query = text(
-        """
-        SELECT dni_alumno, color, score FROM (
-            SELECT dni_alumno, color, score, ROW_NUMBER() OVER(PARTITION BY dni_alumno ORDER BY created_at DESC) as rn
-            FROM "Semaforo"
-        ) AS subquery
-        WHERE rn = 1 AND color = 'rojo'
-        """
-    )
-    rows = db.execute(query).mappings().all()
+def get_criticos(db, tutor_dni=None):
+    if tutor_dni:
+        query = text(
+            """
+            SELECT s.dni_alumno, s.color, s.score FROM (
+                SELECT dni_alumno, color, score, ROW_NUMBER() OVER(PARTITION BY dni_alumno ORDER BY created_at DESC) as rn
+                FROM "Semaforo"
+            ) AS s
+            INNER JOIN "Tutor-Alumno" ta ON s.dni_alumno = ta.dni_alumno
+            WHERE s.rn = 1 AND s.color = 'rojo' AND ta.dni_tutor = :tutor_dni
+            """
+        )
+        rows = db.execute(query, {"tutor_dni": tutor_dni}).mappings().all()
+    else:
+        query = text(
+            """
+            SELECT dni_alumno, color, score FROM (
+                SELECT dni_alumno, color, score, ROW_NUMBER() OVER(PARTITION BY dni_alumno ORDER BY created_at DESC) as rn
+                FROM "Semaforo"
+            ) AS subquery
+            WHERE rn = 1 AND color = 'rojo'
+            """
+        )
+        rows = db.execute(query).mappings().all()
     return [semaforoDTO(**row) for row in rows]

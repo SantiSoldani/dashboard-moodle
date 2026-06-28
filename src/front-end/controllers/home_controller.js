@@ -230,12 +230,12 @@ async function calcularYMostrarMetricas() {
   // 2. Alumnos de 1er año y su promedio
   let promedio1erAnio = null;
   try {
-      const promResponse = await Handle_get_promedio_general();
-      if (promResponse !== undefined && promResponse !== null) {
-          promedio1erAnio = typeof promResponse === 'string' ? parseFloat(promResponse) : promResponse;
-      }
+    const promResponse = await Handle_get_promedio_general();
+    if (promResponse !== undefined && promResponse !== null) {
+      promedio1erAnio = typeof promResponse === 'string' ? parseFloat(promResponse) : promResponse;
+    }
   } catch (error) {
-      console.error("Error al obtener promedio general:", error);
+    console.error("Error al obtener promedio general:", error);
   }
 
   if (avgScoreElement) {

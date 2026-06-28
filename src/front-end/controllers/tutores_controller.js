@@ -1,6 +1,11 @@
 import { getBackendURL } from '../config.js';
 import { HandleGet_solicitudes } from '../models/Solicitudes.js';
 
+let asignacionCurrentPage = 0;
+const asignacionLimit = 10;
+let selectedAlumnosAsignacion = new Set();
+
+
 export function initTutores() {
     setupAltaTutor();
     setupListadoTutores();
@@ -312,22 +317,109 @@ async function loadSolicitudesAdmin() {
     }
 }
 
-function abrirPanelAsignacion(tutorName) {
+function abrirPanelAsignacion(tutorName, tutorId) {
     const panel = document.getElementById('panelAsignacion');
     const nameSpan = document.getElementById('tutorAsignadoName');
 
     if (panel && nameSpan) {
         nameSpan.textContent = tutorName;
-        // Guardamos un identificador en el panel
         panel.setAttribute('data-current-tutor', tutorName);
-
-        // Reset de los checkboxes simulados
-        const checkboxes = panel.querySelectorAll('.check-item-t input[type="checkbox"]');
-        checkboxes.forEach(cb => cb.checked = false);
+        panel.setAttribute('data-current-tutor-id', tutorId);
+        
+        selectedAlumnosAsignacion.clear();
         document.getElementById('selected-alumnos-count').textContent = '0 alumnos seleccionados';
+        
+        asignacionCurrentPage = 0;
+        cargarAlumnosParaAsignacion();
 
         panel.style.display = 'block';
         panel.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+async function cargarAlumnosParaAsignacion() {
+    const tbody = document.getElementById('asignacionStudentsTbody');
+    const pageIndicator = document.getElementById('pageIndicatorAsignacion');
+    const btnPrev = document.getElementById('btnPrevPageAsignacion');
+    const btnNext = document.getElementById('btnNextPageAsignacion');
+    
+    if (!tbody) return;
+
+    tbody.innerHTML = `
+        <tr class="placeholder-row">
+            <td colspan="6">
+                <div class="placeholder-content">
+                    <span class="material-symbols-outlined" style="font-size: 32px; animation: spin 1s linear infinite;">sync</span>
+                    <p>Cargando alumnos...</p>
+                </div>
+            </td>
+        </tr>
+    `;
+
+    try {
+        const baseUrl = getBackendURL();
+        const res = await fetch(`${baseUrl}/alumnos/get/stats/${asignacionLimit}/${asignacionCurrentPage}`);
+        if (!res.ok) throw new Error('Error al cargar alumnos');
+        const alumnos = await res.json();
+
+        tbody.innerHTML = '';
+        if (alumnos.length === 0 && asignacionCurrentPage === 0) {
+            tbody.innerHTML = `
+                <tr class="placeholder-row">
+                    <td colspan="6">
+                        <div class="placeholder-content">
+                            <span class="material-symbols-outlined" style="font-size: 32px;">inbox</span>
+                            <p>No hay alumnos sin tutor disponibles.</p>
+                        </div>
+                    </td>
+                </tr>
+            `;
+            btnPrev.disabled = true;
+            btnNext.disabled = true;
+            pageIndicator.textContent = 'Página 1 de 1';
+            return;
+        }
+
+        alumnos.forEach(a => {
+            const tr = document.createElement('tr');
+            
+            const isChecked = selectedAlumnosAsignacion.has(a.dni) ? 'checked' : '';
+
+            tr.innerHTML = `
+                <td style="text-align: center;">
+                    <input type="checkbox" class="asignacion-checkbox" data-dni="${a.dni}" ${isChecked}>
+                </td>
+                <td>${a.dni || '-'}</td>
+                <td><strong>${a.nombre || ''} ${a.apellido || ''}</strong></td>
+                <td>${a.email || '-'}</td>
+                <td>${a.dni_tutor || 'Sin asignar'}</td>
+                <td><strong>${a.score}</strong></td>
+            `;
+            
+            const checkbox = tr.querySelector('.asignacion-checkbox');
+            checkbox.addEventListener('change', (e) => {
+                if (e.target.checked) {
+                    selectedAlumnosAsignacion.add(a.dni);
+                } else {
+                    selectedAlumnosAsignacion.delete(a.dni);
+                }
+                document.getElementById('selected-alumnos-count').textContent = `${selectedAlumnosAsignacion.size} alumnos seleccionados`;
+            });
+            
+            tbody.appendChild(tr);
+        });
+
+        pageIndicator.textContent = `Página ${asignacionCurrentPage + 1}`;
+        btnPrev.disabled = asignacionCurrentPage === 0;
+        btnNext.disabled = alumnos.length < asignacionLimit;
+
+    } catch (error) {
+        console.error(error);
+        tbody.innerHTML = `
+            <tr class="placeholder-row">
+                <td colspan="6" style="text-align:center; color: #ef4444;">Error al cargar alumnos.</td>
+            </tr>
+        `;
     }
 }
 
@@ -338,55 +430,69 @@ function setupAsignacionPanel() {
     const btnCerrar = document.getElementById('btnCerrarAsignacion');
     const btnCancelar = document.getElementById('btnCancelarAsignacion');
     const btnConfirmar = panel.querySelector('.btn-primary-large-t');
-    const checkboxes = panel.querySelectorAll('.check-item-t input[type="checkbox"]');
-    const countDisplay = document.getElementById('selected-alumnos-count');
+    const btnPrev = document.getElementById('btnPrevPageAsignacion');
+    const btnNext = document.getElementById('btnNextPageAsignacion');
 
     const cerrarPanel = () => {
         panel.style.display = 'none';
         panel.removeAttribute('data-current-tutor');
+        panel.removeAttribute('data-current-tutor-id');
+        selectedAlumnosAsignacion.clear();
     };
 
     if (btnCerrar) btnCerrar.addEventListener('click', cerrarPanel);
     if (btnCancelar) btnCancelar.addEventListener('click', cerrarPanel);
 
-    checkboxes.forEach(cb => {
-        cb.addEventListener('change', () => {
-            const selectedCount = Array.from(checkboxes).filter(c => c.checked).length;
-            countDisplay.textContent = `${selectedCount} alumnos seleccionados`;
+    if (btnPrev) {
+        btnPrev.addEventListener('click', () => {
+            if (asignacionCurrentPage > 0) {
+                asignacionCurrentPage--;
+                cargarAlumnosParaAsignacion();
+            }
         });
-    });
+    }
+
+    if (btnNext) {
+        btnNext.addEventListener('click', () => {
+            asignacionCurrentPage++;
+            cargarAlumnosParaAsignacion();
+        });
+    }
 
     if (btnConfirmar) {
         btnConfirmar.addEventListener('click', async () => {
-            const selectedAlumnos = Array.from(checkboxes)
-                .filter(cb => cb.checked);
-
-            if (selectedAlumnos.length === 0) {
+            if (selectedAlumnosAsignacion.size === 0) {
                 alert('Debe seleccionar al menos un alumno para asignar.');
                 return;
             }
 
             const tutorName = panel.getAttribute('data-current-tutor');
+            const tutorId = panel.getAttribute('data-current-tutor-id');
 
             const originalIcon = btnConfirmar.innerHTML;
             btnConfirmar.innerHTML = '<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Guardando...';
             btnConfirmar.disabled = true;
 
             try {
-                const tutorId = "MOCK_TUTOR_ID"; // Ojo: Reemplazar por el ID real
-                const estudiantesIds = [1, 2, 3]; // Ojo: Reemplazar por los IDs reales de los alumnos seleccionados
+                const estudiantesIds = Array.from(selectedAlumnosAsignacion); 
                 const baseUrl = getBackendURL();
-
-                const response = await fetch(`${baseUrl}/tutores/${tutorId}/asignar`, {
+                
+                const response = await fetch(`${baseUrl}/tutor_alumno/post/tutor_alumno`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ estudiantes: estudiantesIds })
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        tutor_dni: tutorId,
+                        alumno_dnis: estudiantesIds
+                    })
                 });
-
+                
                 if (!response.ok) throw new Error('Error al asignar estudiantes');
 
-                alert(`Se asignaron ${selectedAlumnos.length} estudiantes al tutor ${tutorName} exitosamente.`);
+                alert(`Se asignaron ${estudiantesIds.length} estudiantes al tutor ${tutorName} exitosamente.`);
                 cerrarPanel();
+                loadTutores(); // Recargar listado
             } catch (error) {
                 console.error(error);
                 alert('Error al guardar la asignación.');
