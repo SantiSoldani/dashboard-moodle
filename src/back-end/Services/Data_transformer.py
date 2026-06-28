@@ -143,12 +143,12 @@ def limpiar_encuesta_inicial(file: BinaryIO) -> pd.DataFrame:
     df_final["plan de estudios"] = df["Plan de estudio actual"]
     # df_final["carrera"] = df["Carrera"]
     # Definir grupos
-    grupo_PSE = df.iloc[:, 10:14]
-    grupo_IC = df.iloc[:, 14:17]
-    grupo_PEP = df.iloc[:, 17:21]
-    grupo_CL = df.iloc[:, 21:24]
-    grupo_CV = df.iloc[:, 24:28]
-    grupo_LOC = df.iloc[:, 28:31]
+    grupo_PSE = df.iloc[:, 8:12]
+    grupo_IC = df.iloc[:, 12:15]
+    grupo_PEP = df.iloc[:, 15:19]
+    grupo_CL = df.iloc[:, 19:22]
+    grupo_CV = df.iloc[:, 22:26]
+    grupo_LOC = df.iloc[:, 26:29]
 
     grupos = {
         "PSE": grupo_PSE,
