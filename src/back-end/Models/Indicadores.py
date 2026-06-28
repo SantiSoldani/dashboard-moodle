@@ -21,7 +21,7 @@ class IndicadorDTO:
 def set_indicadores(indicador_dto: IndicadorDTO, db):
 
     query = text("""
-        INSERT INTO "Indicadores" (dni, ic, pse, pep, cl, cv, loc)
+        INSERT INTO "Indicadores" (dni_alumno, ic, pse, pep, cl, cv, loc)
         VALUES (:dni, :ic, :pse, :pep, :cl, :cv, :loc)
     """)
     try:
@@ -44,7 +44,7 @@ def set_indicadores(indicador_dto: IndicadorDTO, db):
 def set_indicadores_cuatrimestrales(db, objeto: SimpleNamespace):
 
     query = text("""
-                 INSERT INTO "indicadores_cuatrimestrales" (dni, rac, rap, raf, ac) values(:dni, :rac, :raf, :ac)
+                 INSERT INTO "indicadores_cuatrimestrales" (dni_alumno, rac, rap, raf, ac) values(:dni, :rac, :raf, :ac)
                  """)
     db.execute(
         query,

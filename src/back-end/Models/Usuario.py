@@ -17,13 +17,16 @@ class UsuarioDTO:
 
 def post_Usuario(usuario: UsuarioDTO, db):
     query = text(
-        """INSERT INTO "Usuarios" (dni, rol, ult_coneccion, created_at) VALUES (:dni, :rol, :ult_coneccion, :created_at) ON CONFLICT (dni) DO NOTHING"""
+        """INSERT INTO "Usuarios" (dni, rol, nombre, apellido, email, ult_coneccion, created_at) VALUES (:dni, :rol, :nombre, :apellido, :email, :ult_coneccion, :created_at) ON CONFLICT (dni) DO NOTHING"""
     )
     db.execute(
         query,
         {
             "dni": usuario.dni,
             "rol": usuario.rol,
+            "nombre": usuario.nombre,
+            "apellido": usuario.apellido,
+            "email": usuario.email,
             "ult_coneccion": usuario.ult_coneccion,
             "created_at": datetime.now(),
         },
