@@ -1,4 +1,4 @@
-import { HandleGet_alumnos, HandleGet_indicadores_iniciales, HandleGet_semaforosXpre, HandleGet_scoreXcohorte } from "../models/Alumno.js";
+import { HandleGet_alumnos, HandleGet_indicadores_iniciales, HandleGet_semaforosXpre, HandleGet_scoreXcohorte, HandleGet_conteo_semaforos } from "../models/Alumno.js";
 import { Handle_get_promedio_general, Handle_get_promedio_materias } from "../models/Notas.js";
 
 let allStudents = [];
@@ -19,6 +19,11 @@ export async function initAdminDashboard() {
     const selectPerfilSemaforo = document.getElementById('selectPerfilSemaforo');
     if (selectPerfilSemaforo) {
         selectPerfilSemaforo.addEventListener('change', renderHeatmapChart);
+    }
+
+    const selectFechaTechoSemaforo = document.getElementById('selectFechaTechoSemaforo');
+    if (selectFechaTechoSemaforo) {
+        selectFechaTechoSemaforo.addEventListener('change', () => renderLineChart());
     }
 
     window.addEventListener('resize', () => {
@@ -246,40 +251,57 @@ async function renderPromedioMateriasList() {
     dom.innerHTML = '<div style="display:flex; justify-content:center; align-items:center; height:100%;"><span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span></div>';
 
     try {
-        const materias = await Handle_get_promedio_materias();
-        if (!materias || !Array.isArray(materias)) {
-            dom.innerHTML = '<p style="color: #64748b; text-align: center; margin-top: 20px;">No hay datos disponibles.</p>';
-            return;
+        let rawMaterias = await Handle_get_promedio_materias();
+        if (!rawMaterias || !Array.isArray(rawMaterias)) {
+            rawMaterias = [];
         }
 
-        // Sort ascending (lowest averages first)
-        materias.sort((a, b) => a.promedio - b.promedio);
+        const subjectMap = {
+            'mate1': 'Análisis Matemático 1',
+            'algebra1': 'Álgebra 1',
+            'fdlq': 'Fund. de la Química',
+            'mate2': 'Análisis Matemático 2',
+            'algebra2': 'Álgebra 2',
+            'fisica': 'Física A',
+            'fdlp': 'Fund. de Programación'
+        };
 
-        // Take top 5
-        const top5 = materias.slice(0, 5);
+        const defaultKeys = Object.keys(subjectMap);
+        let materias = defaultKeys.map(key => {
+            let found = rawMaterias.find(m => m.nombre === key || m.nombre === subjectMap[key]);
+            return {
+                nombre: subjectMap[key],
+                promedio: found && found.promedio ? parseFloat(found.promedio) : 0
+            };
+        });
+
+        // Sort ascending (lowest averages first, the most struggled subjects)
+        materias.sort((a, b) => a.promedio - b.promedio);
 
         let html = '<div style="display: flex; flex-direction: column; gap: 12px; padding-top: 8px;">';
 
-        top5.forEach((materia, index) => {
-            let color = '#22C55E';
-            let bgColor = '#F0FDF4';
-            if (materia.promedio < 4) {
-                color = '#EF4444';
-                bgColor = '#FEF2F2';
-            } else if (materia.promedio < 6) {
-                color = '#F59E0B';
-                bgColor = '#FFFBEB';
+        materias.forEach((materia, index) => {
+            let color = '#475569';
+            let bgColor = '#f1f5f9';
+            let iconCode = '';
+
+            if (index === 0) {
+                color = '#a16207'; bgColor = '#fef08a'; iconCode = '🥇'; // Gold
+            } else if (index === 1) {
+                color = '#334155'; bgColor = '#e2e8f0'; iconCode = '🥈'; // Silver
+            } else if (index === 2) {
+                color = '#9a3412'; bgColor = '#ffedd5'; iconCode = '🥉'; // Bronze
             }
 
             html += `
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: #ffffff; border: 1px solid #e2e8f0; border-radius: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);">
                     <div style="display: flex; align-items: center; gap: 12px;">
-                        <div style="width: 28px; height: 28px; border-radius: 50%; background: ${bgColor}; color: ${color}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.85rem;">
-                            #${index + 1}
+                        <div style="width: 32px; height: 32px; border-radius: 50%; background: ${bgColor}; color: ${color}; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.95rem;">
+                            ${iconCode ? iconCode : '#' + (index + 1)}
                         </div>
                         <span style="font-weight: 600; color: #1e293b; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 150px;" title="${materia.nombre}">${materia.nombre}</span>
                     </div>
-                    <div style="font-weight: 700; color: ${color}; font-size: 1.1rem;">
+                    <div style="font-weight: 700; color: ${color}; font-size: 1.1rem; background: ${bgColor}; padding: 4px 10px; border-radius: 6px;">
                         ${materia.promedio.toFixed(2)}
                     </div>
                 </div>
@@ -295,25 +317,83 @@ async function renderPromedioMateriasList() {
     }
 }
 
-function renderLineChart() {
+async function renderLineChart() {
     const dom = document.getElementById('chartEvolucionSemaforo');
     if (!dom) return;
     const chart = echarts.init(dom);
     chartInstances.push(chart);
 
+    chart.showLoading();
+
+    // techo expects a year string because in backend: fecha_techo = date(int(techo), 11, 30)
+    const selectSemaforo = document.getElementById('selectFechaTechoSemaforo');
+    const techoYear = selectSemaforo ? selectSemaforo.value : new Date().getFullYear().toString();
+    const dataFromApi = await HandleGet_conteo_semaforos(techoYear);
+    chart.hideLoading();
+
+    let xAxisData = [];
+    let estableData = [];
+    let alertaData = [];
+    let criticoData = [];
+
+    // Assuming we group data manually if backend returns a flat list of {fecha, color, cantidad}
+    if (dataFromApi && Array.isArray(dataFromApi)) {
+        // Group by fecha
+        const dateGroups = {};
+        dataFromApi.forEach(item => {
+            const fechaStr = item.fecha || 'Sin fecha';
+            if (!dateGroups[fechaStr]) {
+                dateGroups[fechaStr] = { verde: 0, amarillo: 0, rojo: 0 };
+            }
+            if (item.color) {
+                // map colors safely
+                const c = item.color.toLowerCase();
+                if (c === 'verde' || c === 'estable') dateGroups[fechaStr].verde += item.cantidad;
+                if (c === 'amarillo' || c === 'alerta') dateGroups[fechaStr].amarillo += item.cantidad;
+                if (c === 'rojo' || c === 'critico' || c === 'crítico') dateGroups[fechaStr].rojo += item.cantidad;
+            }
+        });
+
+        // Sort dates chronologically
+        const sortedDates = Object.keys(dateGroups).sort((a, b) => new Date(a) - new Date(b));
+
+        // Take up to 4 latest dates to match "las ultimas 4 encuestas"
+        const last4Dates = sortedDates.slice(-4);
+
+        last4Dates.forEach(date => {
+            xAxisData.push(date);
+            estableData.push(dateGroups[date].verde);
+            alertaData.push(dateGroups[date].amarillo);
+            criticoData.push(dateGroups[date].rojo);
+        });
+    }
+
+    if (xAxisData.length === 0) {
+        chart.clear();
+        chart.setOption({
+            title: {
+                text: 'Sin datos para este período',
+                left: 'center',
+                top: 'middle',
+                textStyle: { color: '#64748b', fontSize: 14, fontWeight: 'normal' }
+            }
+        }, true);
+        return;
+    }
+
     const option = {
         tooltip: { trigger: 'axis' },
         legend: { data: ['Estable', 'Alerta', 'Crítico'], bottom: 0 },
         grid: { left: '5%', right: '5%', top: '5%', bottom: '15%', containLabel: true },
-        xAxis: { type: 'category', data: ['Q1 \'23', 'Q2 \'23', 'Q1 \'24', 'Q2 \'24'], axisLabel: { color: '#434655' } },
-        yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed' } }, axisLabel: { color: '#434655' } },
+        xAxis: { type: 'category', data: xAxisData, axisLabel: { color: '#434655' } },
+        yAxis: { type: 'value', splitLine: { lineStyle: { type: 'dashed' } }, axisLabel: { color: '#434655' }, minInterval: 1 },
         series: [
-            { name: 'Estable', type: 'bar', stack: 'total', data: [120, 132, 101, 134], itemStyle: { color: '#22C55E' } },
-            { name: 'Alerta', type: 'bar', stack: 'total', data: [220, 182, 191, 234], itemStyle: { color: '#F59E0B' } },
-            { name: 'Crítico', type: 'bar', stack: 'total', data: [150, 232, 201, 154], itemStyle: { color: '#EF4444' } }
+            { name: 'Estable', type: 'bar', stack: 'total', data: estableData, itemStyle: { color: '#22C55E' } },
+            { name: 'Alerta', type: 'bar', stack: 'total', data: alertaData, itemStyle: { color: '#F59E0B' } },
+            { name: 'Crítico', type: 'bar', stack: 'total', data: criticoData, itemStyle: { color: '#EF4444' } }
         ]
     };
-    chart.setOption(option);
+    chart.setOption(option, true);
 }
 
 async function renderBarChart() {

@@ -72,3 +72,12 @@ async def post_pesos_materias(
         ConfigController.new_pesos_materias(db, SimpleNamespace(**(pesos.__dict__)))
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/get/csv/db", status_code=200)
+async def export_db(db: Session = Depends(server.get_db)):
+
+    try:
+        return ConfigController.export_db(db)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

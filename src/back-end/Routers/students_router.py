@@ -2,7 +2,7 @@ import json
 
 import server
 from Controllers import AlumnoController
-from fastapi import APIRouter, Depends, HTTPException, Header
+from fastapi import APIRouter, Depends, Header, HTTPException
 from pandas._libs.tslibs import timestamps
 from sqlalchemy.orm import Session
 from starlette.types import HTTPExceptionHandler
@@ -14,7 +14,9 @@ router = APIRouter(
 
 
 @router.get("/get/stats", status_code=200)
-async def get_students_with_stats(db: Session = Depends(server.get_db), x_tutor_dni: str = Header(default=None)):
+async def get_students_with_stats(
+    db: Session = Depends(server.get_db), x_tutor_dni: str = Header(default=None)
+):
     try:
         alumnos = AlumnoController.Get_alumnos_with_stats(db, x_tutor_dni)
         return [a.__dict__ for a in alumnos]
@@ -22,8 +24,11 @@ async def get_students_with_stats(db: Session = Depends(server.get_db), x_tutor_
         print(f"Error en get_students_with_stats: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
+
 @router.get("/get/stats/{limit}/{page}", status_code=200)
-async def get_students_with_stats_by_page(limit: int, page: int, db: Session = Depends(server.get_db)):
+async def get_students_with_stats_by_page(
+    limit: int, page: int, db: Session = Depends(server.get_db)
+):
     try:
         alumnos = AlumnoController.Get_alumnos_with_stats_by_page(limit, page, db)
         return [a.__dict__ for a in alumnos]
@@ -41,7 +46,9 @@ async def get_student(student_dni: str, db: Session = Depends(server.get_db)):
 
 
 @router.get("/get", status_code=200)
-async def get_students(db: Session = Depends(server.get_db), x_tutor_dni: str = Header(default=None)):
+async def get_students(
+    db: Session = Depends(server.get_db), x_tutor_dni: str = Header(default=None)
+):
     try:
         alumnos = AlumnoController.Get_alumnos(db, x_tutor_dni)
         return [a.__dict__ for a in alumnos]
@@ -94,20 +101,20 @@ async def get_indicadores_filtrados(
 # luego en la parte de piso se pone la fecha piso de las encuestas y en techo la fecha techo
 # de la misma manera cualquiera de los campos enviados de ser parseados a -1 seran ignorados, si paso todo -1 entonces simplemente traera todos los semaforos
 # ejemplo --> get/semaforos/fecha_inicio/-1/20-03-2020/17-07-2027 --> traeria todos los promedios de semaforo ordenados por fecha de inicio, registrados desde el 20 de febrero de 2020 hasta el 17 de julio de 2027
-@router.get("/get/semaforos/{valor}/{piso}/{techo}", status_code=200)
-async def get_evolucion_semaforos(
-    valor: int, piso, techo, db: Session = Depends(server.get_db)
-):
+@router.get("/get/semaforos/{techo}", status_code=200)
+async def get_evolucion_semaforos(techo, db: Session = Depends(server.get_db)):
 
     try:
-        semaforos = AlumnoController.get_evolucion_semaforos(db, valor, piso, techo)
+        semaforos = AlumnoController.get_evolucion_semaforos(db, techo)
         return semaforos
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/get/criticos", status_code=200)
-async def get_criticos(db: Session = Depends(server.get_db), x_tutor_dni: str = Header(default=None)):
+async def get_criticos(
+    db: Session = Depends(server.get_db), x_tutor_dni: str = Header(default=None)
+):
     try:
         criticos = AlumnoController.get_criticos(db, x_tutor_dni)
         return [c.__dict__ for c in criticos]

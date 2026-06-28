@@ -50,3 +50,20 @@ def set_pesos(db, pesos):
         db.commit()
     except Exception as e:
         print(e)
+
+
+def promedioXmateria(db):
+
+    try:
+        query = text("""
+                        SELECT AVG(e.notas) AS promedio, m.nombre
+                        FROM "Examen" e
+                        JOIN "Materia" m
+                        ON e.id_materia = m.id
+                        GROUP BY (m.nombre)
+                    """)
+        rows = db.execute(query).mappings().fetchall()
+        return [SimpleNamespace(**row) for row in rows]
+    except Exception as e:
+        print(e)
+        return []

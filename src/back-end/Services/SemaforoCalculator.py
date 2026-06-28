@@ -67,8 +67,14 @@ def get_states_From_notas_from_df(df: pd.DataFrame, db):
             if score_inicial is not None
             else score_final
         )
+        if score_final > 1:
+            score_final = 1
         resultados.append(
-            {"color": get_color(score_final), "dni_alumno": dni, "score": score_final}
+            {
+                "color": get_color(1 - score_final),
+                "dni_alumno": dni,
+                "score": score_final,
+            }
         )
     return resultados
 

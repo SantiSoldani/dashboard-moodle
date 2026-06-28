@@ -555,9 +555,11 @@ export const VISTA_ADMIN_DASHBOARD = `
                         <span class="material-symbols-outlined icon-blue" style="color: #434655;">bar_chart</span>
                         <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Evolución del Semáforo por Cuatrimestre</h2>
                     </div>
-                    <select class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
-                        <option value="2025 C1">2025 C1</option>
-                        <option value="2024 C2">2024 C2</option>
+                    <select id="selectFechaTechoSemaforo" class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
+                        <option value="2027">2027</option>
+                        <option value="2026" selected>2026</option>
+                        <option value="2025">2025</option>
+                        <option value="2024">2024</option>
                     </select>
                 </div>
                 <div id="chartEvolucionSemaforo" style="width: 100%; height: 250px;"></div>

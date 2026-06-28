@@ -120,9 +120,9 @@ def iniciales_filtrados(db, filtro, valor):
     return raw
 
 
-def get_evolucion_semaforos(db, valor, piso, techo):
+def get_evolucion_semaforos(db, techo):
 
-    raw = Semaforo.get_evolucion(db, valor, piso, techo)
+    raw = Semaforo.get_evolucion(db, techo)
 
     return raw
 

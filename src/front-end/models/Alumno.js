@@ -321,3 +321,22 @@ export async function HandleMarcar_agenda(id_entrevista) {
     return null;
   }
 }
+
+export async function HandleGet_conteo_semaforos(fecha_techo) {
+  try {
+    const rol = localStorage.getItem("rol") || "Admin";
+    const headers = {
+      "ngrok-skip-browser-warning": "69420",
+      "X-Role": rol
+    };
+    const response = await fetch(`${alumnosAPI}/get/semaforos/${fecha_techo}`, { headers });
+    if (!response.ok) {
+      throw new Error(`Error en el fetch de conteo semaforos: ${response.status}`);
+    }
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Error al traer conteo semaforos", error);
+    return [];
+  }
+}

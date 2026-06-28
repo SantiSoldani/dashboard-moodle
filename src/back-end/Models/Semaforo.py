@@ -48,39 +48,31 @@ def get_color_actual(dni: str, db):
     return result.fetchone()
 
 
-def get_evolucion(db, valor, piso, techo):
-
-    fecha_piso = datetime.strptime(piso, "%d-%m-%Y")
-    fecha_techo = datetime.strptime(techo, "%d-%m-%Y")
+def get_evolucion(db, techo):
+    # fecha_techo = f"30-11-{techo}"
+    fecha_techo = date(int(techo), 11, 30)
 
     try:
         query = text("""
             SELECT
-                fecha,
+                DATE(s.created_at) as fecha,
                 color,
                 COUNT(*) AS cantidad
-            FROM (
-                SELECT DISTINCT ON (s.dni_alumno, DATE(s.created_at))
-                    s.dni_alumno,
-                    DATE(s.created_at) AS fecha,
-                    s.color
-                FROM "Semaforo" s
-                JOIN "Alumnos" a
-                    ON a.dni = s.dni_alumno
-                WHERE a.fecha_inicio = :valor
-                  AND s.created_at BETWEEN :fecha_piso AND :fecha_techo
-                ORDER BY s.dni_alumno, DATE(s.created_at), s.created_at DESC
-            ) t
-            GROUP BY fecha, color
-            ORDER BY fecha, color;
+            FROM "Semaforo" s
+            JOIN "Alumnos" a
+            ON a.dni = s.dni_alumno
+            WHERE DATE(s.created_at) <= :fecha_techo
+            GROUP BY (s.color, DATE(s.created_at))
+            ORDER BY (DATE(s.created_at)) DESC
+            LIMIT 4
+
+
 
                     """)
         rows = (
             db.execute(
                 query,
                 {
-                    "valor": valor,
-                    "fecha_piso": fecha_piso,
                     "fecha_techo": fecha_techo,
                 },
             )
