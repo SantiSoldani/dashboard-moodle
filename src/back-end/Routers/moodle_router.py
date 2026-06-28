@@ -41,7 +41,7 @@ async def lti_launch(request: Request, db: Session = Depends(server.get_db)):
     if not usuario:
         # Usuario nuevo
         # Instanciamos el DTO del Usuario y Alumno en caso de serlo 
-        nuevo_usuario = Usuario.Usuario(
+        nuevo_usuario = Usuario.UsuarioDTO(
             dni = dni_moodle,
             rol = rol_moodle,
             nombre = nombre_moodle,
@@ -108,6 +108,8 @@ async def lti_launch(request: Request, db: Session = Depends(server.get_db)):
     </html>
         """
     return HTMLResponse(content=html)
+
+    
     
 
     
