@@ -45,7 +45,7 @@ export async function Post_csv(file, which_file, subject = null) {
 
 export async function Get_Database() {
   try {
-    const response = await fetch(`${getBackendURL()}/data/download/database`, {
+    const response = await fetch(`${getBackendURL()}/config/get/csv/db`, {
       method: "GET",
       headers: {
         "ngrok-skip-browser-warning": "69420"

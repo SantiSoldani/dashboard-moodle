@@ -39,26 +39,26 @@ def export_db(db):
 
                     FROM "Alumnos" a
                     -- join de alumnos con los semaforos --
-                    JOIN "Semaforo" s
+                    LEFT JOIN "Semaforo" s
                     ON s.dni_alumno = a.dni
 
                     --join de alumnos con las notas --
-                    JOIN "Examen" e
+                    LEFT JOIN "Examen" e
                     ON e.dni_alumno = a.dni
 
                     --join de notas con las materias --
 
-                    JOIN "Materia" m
+                    LEFT JOIN "Materia" m
                     ON m.id = e.id_materia
 
                     --join con los indicadores--
-                    JOIN "Indicadores" i
+                    LEFT JOIN "Indicadores" i
                     ON i.dni_alumno = a.dni
-                    JOIN "indicadores_cuatrimestrales" ic
+                    LEFT JOIN "indicadores_cuatrimestrales" ic
                     ON ic.dni_alumno = a.dni
                 """)
-
     rows = db.execute(query).mappings().fetchall()
+    print(rows)
     output = io.StringIO()
     writer = csv.DictWriter(output, fieldnames=rows[0].keys())
     writer.writeheader()
