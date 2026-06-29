@@ -142,7 +142,7 @@ def limpiar_encuesta_inicial(file: BinaryIO) -> pd.DataFrame:
         "¿Cuantas materias aprobadas tenes hasta ahora?"
     ]
     df_final["cuatrimestre"] = df[
-        "¿En que cuatrimestre de la carrera te encontras actualmente? (1 - 10)"
+        "¿En que cuatrimestre de la carrera te encontras actualmente?"
     ]
     df_final["plan de estudios"] = df["Plan de estudio actual"]
     # df_final["carrera"] = df["Carrera"]
