@@ -7,11 +7,11 @@ from Models import Encuestas
 def Handle_respuestas(respuestas_list: list[SimpleNamespace], db):
     print("ENTRE EN LA PARTE DE PERSISTIR RESPUESTAS")
     resultados = []
-    CAMPOS_EXCLUIR = {"Respuesta número", "ingrese su DNI"}
+    CAMPOS_EXCLUIR = {"Respuesta número", "Ingrese_su_DNI"}
     try:
         for respuesta_obj in respuestas_list:
             datos = respuesta_obj.__dict__
-            dni = datos["Ingrese su DNI"]
+            dni = datos["Ingrese_su_DNI"]
 
             for campo, valor in datos.items():
                 print(campo, " ", valor)

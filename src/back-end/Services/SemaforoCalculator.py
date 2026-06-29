@@ -4,6 +4,7 @@ import numpy as np
 import pandas as pd
 from Controllers import AlumnoController, IndicadoresController, MateriasController
 from Models import Indicadores, Semaforo
+from sqlalchemy.sql.selectable import elem
 
 # from numpy._core import astype, float128
 
@@ -36,47 +37,46 @@ def get_states_From_notas_from_df(df: pd.DataFrame, db):
 
     def get_color(score):
         if score <= 0.3:
-            return "rojo"
+            return "verde"
         elif score <= 0.6:
             return "amarillo"
         else:
-            return "verde"
+            return "rojo"
 
     def get_coeficiente(id_materia, materias):
         return materias[id_materia - 1].coeficiente
 
-    for dni, grupo in df.groupby("dni_alumno"):
-        indicador = 0.0
-        cursadas = 0
-        for id_materia, subgrupo in grupo.groupby("id_materia"):
-            coeficiente = get_coeficiente(hash(id_materia), materias_db)
-            cursadas += 1
-            nota = subgrupo["nota"].values[0]
-            if (
-                nota is not None
-                and nota >= materias_db[hash(id_materia) - 1].notaMinima
-            ):
-                indicador += coeficiente
-            else:
-                indicador += 0
+    try:
+        for dni, grupo in df.groupby("dni_alumno"):
+            indicador = 0.0
+            cursadas = 0
+            for id_materia, subgrupo in grupo.groupby("id_materia"):
+                coeficiente = get_coeficiente(hash(id_materia), materias_db)
+                cursadas += 1
+                nota = subgrupo["nota"].values[0]
+                if (
+                    nota is not None
+                    and nota >= materias_db[hash(id_materia) - 1].notaMinima
+                ):
+                    indicador += coeficiente
+                else:
+                    indicador += 0
 
-        score_final = indicador / cursadas
-        score_inicial = Semaforo.get_score_actual(str(dni), db)
-        score_final = (
-            ((score_final + score_inicial) / 2)
-            if score_inicial is not None
-            else score_final
-        )
-        if score_final > 1:
-            score_final = 1
-        resultados.append(
-            {
+            score_final = indicador / cursadas
+            # score_inicial = Semaforo.get_score_actual(str(dni), db)
+            if score_final > 1:
+                score_final = 1
+            resultado = {
                 "color": get_color(1 - score_final),
                 "dni_alumno": dni,
-                "score": score_final,
+                "score": (1 - score_final),
             }
-        )
-    return resultados
+            resultados.append(resultado)
+
+        return resultados
+    except Exception as e:
+        print(e)
+        return []
 
 
 # Mantener compatibilidad con path (DEPRECADO)

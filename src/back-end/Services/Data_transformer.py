@@ -1,4 +1,5 @@
 import io
+import unicodedata
 from types import SimpleNamespace
 from typing import BinaryIO, Union
 
@@ -79,13 +80,12 @@ def To_object_list_from_df(df: pd.DataFrame) -> list[SimpleNamespace]:
 
         objetos = []
         for i, registro_dict in enumerate(diccionarios, 1):
+            registro_dict = {k.replace(" ", "_"): v for k, v in registro_dict.items()}
             registro_obj = SimpleNamespace(**registro_dict)
             objetos.append(registro_obj)
-        # print("lista final: ", objetos)
         return objetos
-
     except Exception as e:
-        print(f"❌ Error al convertir DataFrame a objetos: {e}")
+        print(e)
         return []
 
 
@@ -123,6 +123,7 @@ def limpiar_encuesta_inicial(file: BinaryIO) -> pd.DataFrame:
             "fecha_inicio",
             "materias_aprobadas",
             "plan de estudios",
+            "cuatrimestre",
             "PSE",
             "IC",
             "PEP",
@@ -146,12 +147,12 @@ def limpiar_encuesta_inicial(file: BinaryIO) -> pd.DataFrame:
     df_final["plan de estudios"] = df["Plan de estudio actual"]
     # df_final["carrera"] = df["Carrera"]
     # Definir grupos
-    grupo_PSE = df.iloc[:, 8:12]
-    grupo_IC = df.iloc[:, 12:15]
-    grupo_PEP = df.iloc[:, 15:19]
-    grupo_CL = df.iloc[:, 19:22]
-    grupo_CV = df.iloc[:, 22:26]
-    grupo_LOC = df.iloc[:, 26:29]
+    grupo_PSE = df.iloc[:, 9:13]
+    grupo_IC = df.iloc[:, 13:16]
+    grupo_PEP = df.iloc[:, 16:20]
+    grupo_CL = df.iloc[:, 20:23]
+    grupo_CV = df.iloc[:, 23:27]
+    grupo_LOC = df.iloc[:, 27:30]
 
     grupos = {
         "PSE": grupo_PSE,
@@ -311,9 +312,18 @@ def limpiar_notas(file: BinaryIO, db) -> pd.DataFrame:
     Limpia un CSV de notas desde un file-like object.
     """
 
+    def limpiar_texto(texto):
+        # Descompone el unicode y filtra las marcas de acentuación
+        sin_acentos = "".join(
+            c
+            for c in unicodedata.normalize("NFKD", texto)
+            if not unicodedata.combining(c)
+        )
+        return sin_acentos.lower()
+
     def nombreToid(nombre: str) -> int:
         for materia in materias:
-            if materia.nombre == nombre:
+            if materia.nombre == limpiar_texto(nombre):
                 return materia.id
         return -1
 

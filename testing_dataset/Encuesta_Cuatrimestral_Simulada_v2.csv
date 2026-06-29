@@ -1,0 +1,101 @@
+Respuesta número,Ingrese su DNI,¿Cuantas materias cursaste este cuatrimestre?,¿Cuantas de las materias que cursaste aprobaste su cursada?,¿Cuántos finales pendientes tenes?,¿Cuantas materias adelantaste respecto del plan de estudios este cuatrimestre?,¿Cuantas materias estas atrasado respecto del plan de estudios?,¿Como evaluas el impacto de tu situacion laboral actual sobre el rendimiento de este cuatrimestre?,¿Has dispuesto del tiempo semanal necesario fuera del horario de clases para dedicarle al estudio y las entregas este cuatrimestre?,¿Como evaluas tu motivacion para continuar la carrera luego de este cuatrimestre?,¿Que tan seguro te sentías de poder aprobar las materias en las que te inscribiste?,¿En que estado se encuentra tu trabajo final?
+1,45000193,2,2,3,1,1,3 - Impacto neutro,3 - Tiempo regular,4 - Peor,1 - Muy seguro,0 - Todavía no cursé trabajo final
+2,44408324,3,0,2,2,4,5 - Impacto negativo alto,4 - Poco tiempo,3 - Igual,2 - Bastante seguro,0 - Todavía no cursé trabajo final
+3,46556168,4,1,3,2,6,2 - Impacto positivo,4 - Poco tiempo,5 - Mucho peor,3 - Regular,5 - Aún no comencé a pensar en él
+4,43385357,5,5,5,2,3,4 - Impacto negativo leve,2 - Buen tiempo,3 - Igual,2 - Bastante seguro,0 - Todavía no cursé trabajo final
+5,46080526,5,1,4,2,0,5 - Impacto negativo alto,1 - Mucho tiempo,1 - Mucho mejor,1 - Muy seguro,0 - Todavía no cursé trabajo final
+6,47558158,5,1,5,0,0,2 - Impacto positivo,1 - Mucho tiempo,2 - Mejor,5 - Nada seguro,5 - Aún no comencé a pensar en él
+7,44926484,4,0,4,2,5,5 - Impacto negativo alto,4 - Poco tiempo,4 - Peor,1 - Muy seguro,0 - Todavía no cursé trabajo final
+8,45664789,5,0,0,2,5,3 - Impacto neutro,5 - Casi nada de tiempo,3 - Igual,1 - Muy seguro,5 - Aún no comencé a pensar en él
+9,42586644,3,0,0,2,1,2 - Impacto positivo,2 - Buen tiempo,5 - Mucho peor,5 - Nada seguro,5 - Aún no comencé a pensar en él
+10,43853339,4,2,3,0,2,4 - Impacto negativo leve,4 - Poco tiempo,5 - Mucho peor,2 - Bastante seguro,0 - Todavía no cursé trabajo final
+11,47130144,4,0,5,2,6,1 - No trabajo / Sin impacto,1 - Mucho tiempo,4 - Peor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+12,46397986,5,0,5,0,5,2 - Impacto positivo,1 - Mucho tiempo,4 - Peor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+13,42991650,2,2,0,0,1,5 - Impacto negativo alto,4 - Poco tiempo,3 - Igual,1 - Muy seguro,0 - Todavía no cursé trabajo final
+14,41285160,4,4,4,2,0,2 - Impacto positivo,3 - Tiempo regular,1 - Mucho mejor,2 - Bastante seguro,0 - Todavía no cursé trabajo final
+15,42725928,5,0,2,0,4,2 - Impacto positivo,5 - Casi nada de tiempo,4 - Peor,5 - Nada seguro,5 - Aún no comencé a pensar en él
+16,40122409,5,5,1,2,5,1 - No trabajo / Sin impacto,5 - Casi nada de tiempo,3 - Igual,1 - Muy seguro,0 - Todavía no cursé trabajo final
+17,42299435,5,1,0,1,4,5 - Impacto negativo alto,5 - Casi nada de tiempo,4 - Peor,3 - Regular,0 - Todavía no cursé trabajo final
+18,44545583,4,3,3,0,2,5 - Impacto negativo alto,4 - Poco tiempo,4 - Peor,2 - Bastante seguro,5 - Aún no comencé a pensar en él
+19,40917040,2,2,2,0,5,1 - No trabajo / Sin impacto,1 - Mucho tiempo,3 - Igual,2 - Bastante seguro,5 - Aún no comencé a pensar en él
+20,42557489,3,3,2,1,0,1 - No trabajo / Sin impacto,1 - Mucho tiempo,3 - Igual,4 - Poco seguro,5 - Aún no comencé a pensar en él
+21,41954354,4,0,1,0,1,4 - Impacto negativo leve,4 - Poco tiempo,5 - Mucho peor,5 - Nada seguro,5 - Aún no comencé a pensar en él
+22,40068148,2,0,0,1,4,1 - No trabajo / Sin impacto,5 - Casi nada de tiempo,5 - Mucho peor,3 - Regular,5 - Aún no comencé a pensar en él
+23,43910197,2,1,3,1,6,1 - No trabajo / Sin impacto,5 - Casi nada de tiempo,2 - Mejor,5 - Nada seguro,0 - Todavía no cursé trabajo final
+24,42416182,5,1,1,1,2,3 - Impacto neutro,4 - Poco tiempo,2 - Mejor,1 - Muy seguro,0 - Todavía no cursé trabajo final
+25,42630708,5,2,3,1,3,1 - No trabajo / Sin impacto,3 - Tiempo regular,3 - Igual,2 - Bastante seguro,5 - Aún no comencé a pensar en él
+26,42253882,3,3,0,0,2,1 - No trabajo / Sin impacto,4 - Poco tiempo,3 - Igual,5 - Nada seguro,5 - Aún no comencé a pensar en él
+27,43747389,4,3,2,1,6,5 - Impacto negativo alto,2 - Buen tiempo,3 - Igual,3 - Regular,0 - Todavía no cursé trabajo final
+28,41752126,5,2,1,1,2,3 - Impacto neutro,4 - Poco tiempo,5 - Mucho peor,2 - Bastante seguro,5 - Aún no comencé a pensar en él
+29,40769598,5,2,3,1,0,5 - Impacto negativo alto,2 - Buen tiempo,5 - Mucho peor,5 - Nada seguro,0 - Todavía no cursé trabajo final
+30,41425472,2,2,3,2,1,4 - Impacto negativo leve,3 - Tiempo regular,1 - Mucho mejor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+31,41692743,3,2,1,1,5,2 - Impacto positivo,4 - Poco tiempo,4 - Peor,1 - Muy seguro,5 - Aún no comencé a pensar en él
+32,41870928,5,4,3,2,4,4 - Impacto negativo leve,5 - Casi nada de tiempo,1 - Mucho mejor,3 - Regular,0 - Todavía no cursé trabajo final
+33,47641680,2,0,5,2,2,2 - Impacto positivo,5 - Casi nada de tiempo,1 - Mucho mejor,5 - Nada seguro,5 - Aún no comencé a pensar en él
+34,44044887,4,3,0,0,0,3 - Impacto neutro,2 - Buen tiempo,5 - Mucho peor,5 - Nada seguro,0 - Todavía no cursé trabajo final
+35,43416664,5,2,3,1,6,5 - Impacto negativo alto,5 - Casi nada de tiempo,2 - Mejor,3 - Regular,0 - Todavía no cursé trabajo final
+36,43397723,5,0,2,1,0,1 - No trabajo / Sin impacto,2 - Buen tiempo,3 - Igual,3 - Regular,5 - Aún no comencé a pensar en él
+37,44683874,5,1,4,1,2,4 - Impacto negativo leve,1 - Mucho tiempo,4 - Peor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+38,46466659,2,1,0,2,0,1 - No trabajo / Sin impacto,3 - Tiempo regular,1 - Mucho mejor,2 - Bastante seguro,0 - Todavía no cursé trabajo final
+39,41948260,3,1,2,2,3,4 - Impacto negativo leve,2 - Buen tiempo,4 - Peor,2 - Bastante seguro,0 - Todavía no cursé trabajo final
+40,46413414,5,3,0,2,4,2 - Impacto positivo,4 - Poco tiempo,5 - Mucho peor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+41,47394918,2,2,1,0,2,1 - No trabajo / Sin impacto,5 - Casi nada de tiempo,1 - Mucho mejor,5 - Nada seguro,0 - Todavía no cursé trabajo final
+42,47681129,4,2,1,1,0,3 - Impacto neutro,4 - Poco tiempo,5 - Mucho peor,3 - Regular,5 - Aún no comencé a pensar en él
+43,46550634,5,4,0,1,2,4 - Impacto negativo leve,5 - Casi nada de tiempo,2 - Mejor,3 - Regular,0 - Todavía no cursé trabajo final
+44,42234489,3,2,0,0,2,1 - No trabajo / Sin impacto,2 - Buen tiempo,3 - Igual,2 - Bastante seguro,5 - Aún no comencé a pensar en él
+45,41504384,5,4,1,2,3,4 - Impacto negativo leve,2 - Buen tiempo,4 - Peor,5 - Nada seguro,0 - Todavía no cursé trabajo final
+46,42138242,3,3,2,0,1,3 - Impacto neutro,4 - Poco tiempo,5 - Mucho peor,1 - Muy seguro,5 - Aún no comencé a pensar en él
+47,46564994,2,1,1,0,6,4 - Impacto negativo leve,5 - Casi nada de tiempo,5 - Mucho peor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+48,45401218,5,3,5,1,3,2 - Impacto positivo,1 - Mucho tiempo,5 - Mucho peor,1 - Muy seguro,0 - Todavía no cursé trabajo final
+49,42663046,4,0,2,0,4,3 - Impacto neutro,2 - Buen tiempo,4 - Peor,5 - Nada seguro,5 - Aún no comencé a pensar en él
+50,42230919,2,2,0,1,6,5 - Impacto negativo alto,3 - Tiempo regular,5 - Mucho peor,1 - Muy seguro,5 - Aún no comencé a pensar en él
+51,47624838,3,3,0,2,6,2 - Impacto positivo,3 - Tiempo regular,1 - Mucho mejor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+52,44330634,4,0,3,0,6,2 - Impacto positivo,2 - Buen tiempo,5 - Mucho peor,3 - Regular,5 - Aún no comencé a pensar en él
+53,42948089,3,1,1,0,6,1 - No trabajo / Sin impacto,5 - Casi nada de tiempo,3 - Igual,5 - Nada seguro,5 - Aún no comencé a pensar en él
+54,44523669,3,2,5,1,2,5 - Impacto negativo alto,3 - Tiempo regular,5 - Mucho peor,1 - Muy seguro,0 - Todavía no cursé trabajo final
+55,44472471,5,0,2,2,1,2 - Impacto positivo,2 - Buen tiempo,2 - Mejor,3 - Regular,0 - Todavía no cursé trabajo final
+56,45805212,5,3,1,2,5,3 - Impacto neutro,4 - Poco tiempo,4 - Peor,4 - Poco seguro,0 - Todavía no cursé trabajo final
+57,41262752,2,1,4,2,2,3 - Impacto neutro,4 - Poco tiempo,4 - Peor,3 - Regular,0 - Todavía no cursé trabajo final
+58,40196769,2,2,3,2,5,3 - Impacto neutro,1 - Mucho tiempo,5 - Mucho peor,4 - Poco seguro,0 - Todavía no cursé trabajo final
+59,42111138,5,1,3,1,2,3 - Impacto neutro,3 - Tiempo regular,5 - Mucho peor,5 - Nada seguro,0 - Todavía no cursé trabajo final
+60,42570406,5,2,5,0,0,1 - No trabajo / Sin impacto,4 - Poco tiempo,1 - Mucho mejor,1 - Muy seguro,0 - Todavía no cursé trabajo final
+61,43530409,5,3,0,1,1,2 - Impacto positivo,3 - Tiempo regular,2 - Mejor,3 - Regular,0 - Todavía no cursé trabajo final
+62,46245035,4,2,0,1,5,2 - Impacto positivo,1 - Mucho tiempo,4 - Peor,3 - Regular,0 - Todavía no cursé trabajo final
+63,40084654,5,5,0,2,0,1 - No trabajo / Sin impacto,2 - Buen tiempo,4 - Peor,1 - Muy seguro,0 - Todavía no cursé trabajo final
+64,42350770,3,3,0,0,5,3 - Impacto neutro,1 - Mucho tiempo,4 - Peor,2 - Bastante seguro,5 - Aún no comencé a pensar en él
+65,44721339,2,0,3,0,5,1 - No trabajo / Sin impacto,1 - Mucho tiempo,3 - Igual,3 - Regular,5 - Aún no comencé a pensar en él
+66,44304572,3,3,1,2,5,2 - Impacto positivo,1 - Mucho tiempo,5 - Mucho peor,5 - Nada seguro,0 - Todavía no cursé trabajo final
+67,44260029,3,3,2,2,1,2 - Impacto positivo,4 - Poco tiempo,5 - Mucho peor,4 - Poco seguro,0 - Todavía no cursé trabajo final
+68,43584702,2,0,1,0,4,4 - Impacto negativo leve,3 - Tiempo regular,4 - Peor,3 - Regular,0 - Todavía no cursé trabajo final
+69,40791743,3,2,5,0,1,5 - Impacto negativo alto,5 - Casi nada de tiempo,5 - Mucho peor,5 - Nada seguro,5 - Aún no comencé a pensar en él
+70,41007293,2,2,2,0,4,5 - Impacto negativo alto,5 - Casi nada de tiempo,2 - Mejor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+71,46723771,2,0,3,1,0,2 - Impacto positivo,4 - Poco tiempo,5 - Mucho peor,1 - Muy seguro,0 - Todavía no cursé trabajo final
+72,41843400,4,2,1,1,6,5 - Impacto negativo alto,4 - Poco tiempo,3 - Igual,5 - Nada seguro,0 - Todavía no cursé trabajo final
+73,42658505,5,0,0,2,0,1 - No trabajo / Sin impacto,3 - Tiempo regular,2 - Mejor,1 - Muy seguro,0 - Todavía no cursé trabajo final
+74,44798669,5,4,2,2,5,5 - Impacto negativo alto,4 - Poco tiempo,4 - Peor,4 - Poco seguro,0 - Todavía no cursé trabajo final
+75,47209166,3,2,0,1,0,5 - Impacto negativo alto,2 - Buen tiempo,2 - Mejor,5 - Nada seguro,5 - Aún no comencé a pensar en él
+76,40023247,5,4,5,2,5,1 - No trabajo / Sin impacto,3 - Tiempo regular,4 - Peor,2 - Bastante seguro,0 - Todavía no cursé trabajo final
+77,43366612,3,0,3,0,3,5 - Impacto negativo alto,5 - Casi nada de tiempo,1 - Mucho mejor,3 - Regular,0 - Todavía no cursé trabajo final
+78,45515989,2,0,5,0,5,1 - No trabajo / Sin impacto,2 - Buen tiempo,4 - Peor,3 - Regular,5 - Aún no comencé a pensar en él
+79,41570006,3,2,1,2,6,3 - Impacto neutro,1 - Mucho tiempo,1 - Mucho mejor,3 - Regular,5 - Aún no comencé a pensar en él
+80,42879190,4,4,0,1,5,5 - Impacto negativo alto,1 - Mucho tiempo,4 - Peor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+81,41767640,2,1,4,0,2,2 - Impacto positivo,3 - Tiempo regular,1 - Mucho mejor,5 - Nada seguro,0 - Todavía no cursé trabajo final
+82,47281369,3,0,0,0,1,1 - No trabajo / Sin impacto,4 - Poco tiempo,3 - Igual,4 - Poco seguro,0 - Todavía no cursé trabajo final
+83,44142807,3,0,4,2,5,4 - Impacto negativo leve,2 - Buen tiempo,3 - Igual,2 - Bastante seguro,5 - Aún no comencé a pensar en él
+84,43136729,4,2,0,2,2,1 - No trabajo / Sin impacto,5 - Casi nada de tiempo,1 - Mucho mejor,2 - Bastante seguro,0 - Todavía no cursé trabajo final
+85,40491234,2,1,0,1,6,3 - Impacto neutro,3 - Tiempo regular,3 - Igual,1 - Muy seguro,5 - Aún no comencé a pensar en él
+86,44483302,2,1,1,1,4,3 - Impacto neutro,5 - Casi nada de tiempo,2 - Mejor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+87,47064294,5,1,5,2,6,2 - Impacto positivo,2 - Buen tiempo,1 - Mucho mejor,4 - Poco seguro,0 - Todavía no cursé trabajo final
+88,41307371,3,2,5,2,0,3 - Impacto neutro,1 - Mucho tiempo,4 - Peor,3 - Regular,0 - Todavía no cursé trabajo final
+89,45267180,3,1,3,1,0,2 - Impacto positivo,3 - Tiempo regular,1 - Mucho mejor,1 - Muy seguro,0 - Todavía no cursé trabajo final
+90,47545073,5,5,2,1,5,1 - No trabajo / Sin impacto,5 - Casi nada de tiempo,1 - Mucho mejor,5 - Nada seguro,0 - Todavía no cursé trabajo final
+91,43474675,5,0,4,2,0,4 - Impacto negativo leve,2 - Buen tiempo,2 - Mejor,3 - Regular,5 - Aún no comencé a pensar en él
+92,45596411,4,3,5,2,2,3 - Impacto neutro,4 - Poco tiempo,3 - Igual,2 - Bastante seguro,0 - Todavía no cursé trabajo final
+93,45183740,3,1,4,0,1,1 - No trabajo / Sin impacto,2 - Buen tiempo,4 - Peor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+94,47033595,5,0,4,1,6,2 - Impacto positivo,4 - Poco tiempo,3 - Igual,4 - Poco seguro,5 - Aún no comencé a pensar en él
+95,46167294,2,0,1,2,2,5 - Impacto negativo alto,1 - Mucho tiempo,2 - Mejor,3 - Regular,0 - Todavía no cursé trabajo final
+96,44378368,2,2,1,1,3,5 - Impacto negativo alto,1 - Mucho tiempo,3 - Igual,3 - Regular,0 - Todavía no cursé trabajo final
+97,44981505,2,1,3,2,5,5 - Impacto negativo alto,2 - Buen tiempo,1 - Mucho mejor,4 - Poco seguro,0 - Todavía no cursé trabajo final
+98,45558019,3,0,0,0,6,2 - Impacto positivo,2 - Buen tiempo,2 - Mejor,4 - Poco seguro,5 - Aún no comencé a pensar en él
+99,47640836,2,2,4,1,6,1 - No trabajo / Sin impacto,1 - Mucho tiempo,1 - Mucho mejor,2 - Bastante seguro,5 - Aún no comencé a pensar en él
+100,44997895,3,0,2,0,0,4 - Impacto negativo leve,1 - Mucho tiempo,2 - Mejor,5 - Nada seguro,5 - Aún no comencé a pensar en él

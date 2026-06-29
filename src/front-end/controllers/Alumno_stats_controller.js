@@ -91,11 +91,11 @@ function set_header(alumno, rol) {
             </button>
         </div>
       `;
-      
+
       const btn = document.getElementById("btn_agendarEntrevista");
       if (btn) {
         btn.addEventListener("click", () => {
-            abrir_modal_agenda(alumno);
+          abrir_modal_agenda(alumno);
         });
       }
     }
@@ -113,25 +113,25 @@ function set_header(alumno, rol) {
 }
 
 function abrir_modal_agenda(alumno) {
-    let modal = document.getElementById("modal_agenda");
-    if (!modal) {
-        modal = document.createElement("div");
-        modal.id = "modal_agenda";
-        modal.style.position = "fixed";
-        modal.style.top = "0";
-        modal.style.left = "0";
-        modal.style.width = "100%";
-        modal.style.height = "100%";
-        modal.style.backgroundColor = "rgba(15, 23, 42, 0.5)"; // overlay color matches theme
-        modal.style.display = "flex";
-        modal.style.justifyContent = "center";
-        modal.style.alignItems = "center";
-        modal.style.zIndex = "99999";
-        modal.style.backdropFilter = "blur(4px)";
-        document.body.appendChild(modal);
-    }
-    
-    modal.innerHTML = `
+  let modal = document.getElementById("modal_agenda");
+  if (!modal) {
+    modal = document.createElement("div");
+    modal.id = "modal_agenda";
+    modal.style.position = "fixed";
+    modal.style.top = "0";
+    modal.style.left = "0";
+    modal.style.width = "100%";
+    modal.style.height = "100%";
+    modal.style.backgroundColor = "rgba(15, 23, 42, 0.5)"; // overlay color matches theme
+    modal.style.display = "flex";
+    modal.style.justifyContent = "center";
+    modal.style.alignItems = "center";
+    modal.style.zIndex = "99999";
+    modal.style.backdropFilter = "blur(4px)";
+    document.body.appendChild(modal);
+  }
+
+  modal.innerHTML = `
         <div style="background: white; padding: 24px; border-radius: 12px; width: 400px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #cbd5e1;">
             <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 20px;">
                 <span class="material-symbols-outlined" style="color: #2563eb; font-size: 28px;">edit_calendar</span>
@@ -150,32 +150,32 @@ function abrir_modal_agenda(alumno) {
             </div>
         </div>
     `;
-    
-    document.getElementById("btn_cancelar_agenda").addEventListener("click", () => {
-        modal.remove();
-    });
-    
-    document.getElementById("btn_confirmar_agenda").addEventListener("click", async () => {
-        const fecha = document.getElementById("input_fecha_agenda").value;
-        if (!fecha) {
-            alert("Por favor, seleccioná una fecha válida.");
-            return;
-        }
-        
-        const dni_entrevistador = localStorage.getItem("dni") || "0"; 
-        
-        // Dynamic import to avoid circular dependencies if any, but better to import at top
-        const { HandleCreate_agenda } = await import('../models/Alumno.js');
-        const res = await HandleCreate_agenda(alumno.dni, dni_entrevistador, fecha);
-        
-        if (res) {
-            modal.remove();
-            // Refresh to show banner
-            window.location.reload();
-        } else {
-            alert("Error al agendar entrevista. Por favor, intentá nuevamente.");
-        }
-    });
+
+  document.getElementById("btn_cancelar_agenda").addEventListener("click", () => {
+    modal.remove();
+  });
+
+  document.getElementById("btn_confirmar_agenda").addEventListener("click", async () => {
+    const fecha = document.getElementById("input_fecha_agenda").value;
+    if (!fecha) {
+      alert("Por favor, seleccioná una fecha válida.");
+      return;
+    }
+
+    const dni_entrevistador = localStorage.getItem("dni") || "0";
+
+    // Dynamic import to avoid circular dependencies if any, but better to import at top
+    const { HandleCreate_agenda } = await import('../models/Alumno.js');
+    const res = await HandleCreate_agenda(alumno.dni, dni_entrevistador, fecha);
+
+    if (res) {
+      modal.remove();
+      // Refresh to show banner
+      window.location.reload();
+    } else {
+      alert("Error al agendar entrevista. Por favor, intentá nuevamente.");
+    }
+  });
 }
 
 function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null, indicadoresCuatrimestrales = null, encuesta = null, evolucionSemaforos = null, rendimientoAcademico = null, entrevistaPendienteData = null, solicitudPendiente = null) {
@@ -344,11 +344,11 @@ function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null,
         entrevistaBanner.style.display = "flex";
         entrevistaBanner.style.justifyContent = "space-between";
         entrevistaBanner.style.alignItems = "center";
-        
+
         let dateObj = new Date(entrevistaPendienteData.fecha);
-        let formattedDate = !isNaN(dateObj) 
-            ? `${dateObj.toLocaleDateString('es-AR')} ${dateObj.toLocaleTimeString('es-AR', {hour: '2-digit', minute:'2-digit'})}`
-            : entrevistaPendienteData.fecha;
+        let formattedDate = !isNaN(dateObj)
+          ? `${dateObj.toLocaleDateString('es-AR')} ${dateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`
+          : entrevistaPendienteData.fecha;
 
         entrevistaBanner.innerHTML = `
           <div style="display: flex; align-items: center; gap: 8px;">
@@ -418,11 +418,18 @@ function render_dashboard_by_role(alumno, rol, indicadores = null, tutor = null,
                 <strong style="color: #141b2b; font-size: 1.1rem;">${indicadoresCuatrimestrales ? formatKpi(indicadoresCuatrimestrales.rap) : '-'}</strong>
             </div>
         </div>
-        <div style="display: flex; gap: 16px;">
+        <div style="border-bottom: 1px solid #e1e8fd; padding-bottom: 12px; display: flex; gap: 16px;">
             <span class="material-symbols-outlined" style="color: #22C55E;">calculate</span>
             <div>
                 <span style="font-size: 0.75rem; font-weight: 700; color: #434655;">RENDIMIENTO ACADÉMICO CUANTITATIVO</span><br/>
                 <strong style="color: #141b2b; font-size: 1.1rem;">${indicadoresCuatrimestrales ? formatKpi(indicadoresCuatrimestrales.rac) : '-'}</strong>
+            </div>
+        </div>
+        <div style="display: flex; gap: 16px; padding-top: 12px;">
+            <span class="material-symbols-outlined" style="color: #EF4444;">history</span>
+            <div>
+                <span style="font-size: 0.75rem; font-weight: 700; color: #434655;">COEFICIENTE DE ATRASO DE LA CARRERA</span><br/>
+                <strong style="color: #141b2b; font-size: 1.1rem;">${indicadoresCuatrimestrales ? formatKpi(indicadoresCuatrimestrales.ac) : '-'}</strong>
             </div>
         </div>
       `;

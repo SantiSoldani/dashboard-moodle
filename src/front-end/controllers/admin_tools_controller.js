@@ -8,7 +8,7 @@ export function initAdminTools() {
         '.coef-input-iniciales', 6, 'sumaInicialesDisplay', 'Suma Total: $val / 6',
         'errorIniciales', 'btnGuardarIniciales'
     );
-    setupForm('formCoefIniciales', 'msgIniciales', 'Coeficientes iniciales actualizados.', async () => {
+    setupForm('formCoefIniciales', 'msgIniciales', 'Coeficientes iniciales actualizados. Las configuraciones se implementarán a partir de la próxima encuesta.', async () => {
         const data = {
             pse: parseFloat(document.getElementById('coefSocioeconomico').value),
             ic: parseFloat(document.getElementById('coefInterrupcion').value),
@@ -24,7 +24,7 @@ export function initAdminTools() {
         '.coef-input-cuatri', 2, 'sumaCuatriDisplay', 'Suma Total: $val / 2',
         'errorCuatri', 'btnGuardarCuatri'
     );
-    setupForm('formCoefCuatri', 'msgCuatri', 'Coeficientes cuatrimestrales actualizados.', async () => {
+    setupForm('formCoefCuatri', 'msgCuatri', 'Coeficientes cuatrimestrales actualizados. Las configuraciones se implementarán a partir de la próxima encuesta.', async () => {
         const data = {
             rap: parseFloat(document.getElementById('coefRendPercibido').value),
             rac: parseFloat(document.getElementById('coefRendCuantitativo').value)
@@ -40,7 +40,7 @@ export function initAdminTools() {
         ['errorMat1', 'errorMat2'],
         'btnGuardarMaterias'
     );
-    setupForm('formPesosMaterias', 'msgMaterias', 'Pesos de materias actualizados.', async () => {
+    setupForm('formPesosMaterias', 'msgMaterias', 'Pesos de materias actualizados. Las configuraciones se implementarán a partir de la próxima carga de notas.', async () => {
         const data = {
             mate1: parseFloat(document.getElementById('pesoMat1').value),
             algebra1: parseFloat(document.getElementById('pesoAlg1b').value),

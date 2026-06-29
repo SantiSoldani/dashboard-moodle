@@ -8,30 +8,44 @@ const LIKERT_QUESTIONS = [
   {
     id: "pse",
     text: "¿Qué puntaje le asignaría al perfil sociocultural del alumno?",
+    labelMin: "Favorable",
+    labelMax: "Vulnerable",
   },
   {
     id: "ic",
     text: "¿Qué puntaje le asignaría a la continuidad esperada de la carrera del alumno?",
+    labelMin: "Alta Probabilidad",
+    labelMax: "Riesgo de Abandono",
   },
   {
     id: "pep",
     text: "¿Qué puntaje le asignaría al perfil educativo de los padres del alumno?",
+    labelMin: "Nivel Educativo Alto",
+    labelMax: "Baja Escolaridad",
   },
   {
     id: "cl",
     text: "¿Qué puntaje le asignaría a la carga laboral del alumno?",
+    labelMin: "Sin Carga",
+    labelMax: "Alta Carga Laboral",
   },
   {
     id: "cv",
     text: "¿Qué puntaje le asignaría a la carga vital del alumno?",
+    labelMin: "Mínima",
+    labelMax: "Muy Alta / Crítica",
   },
   {
     id: "loc",
     text: "¿Qué puntaje le asignaría a la localización del alumno respecto de la facultad?",
+    labelMin: "Cercana",
+    labelMax: "Muy Distante / Difícil",
   },
   {
     id: "ra",
     text: "¿Qué puntaje le asignaría al rendimiento académico del alumno durante el último cuatrimestre?",
+    labelMin: "Excelente",
+    labelMax: "Crítico",
   },
 ];
 
@@ -55,8 +69,8 @@ function renderLikertQuestions() {
         <p class="likert-question-text">${index + 1}. ${q.text}</p>
         <div class="likert-options" role="group" aria-label="${q.text}">
           ${[1, 2, 3, 4, 5]
-            .map(
-              (val) => `
+        .map(
+          (val) => `
             <button
               type="button"
               class="likert-btn"
@@ -65,8 +79,12 @@ function renderLikertQuestions() {
               aria-label="Puntaje ${val}"
             >${val}</button>
           `,
-            )
-            .join("")}
+        )
+        .join("")}
+        </div>
+        <div class="likert-labels" style="display: flex; justify-content: space-between; font-size: 0.75rem; color: #64748b; margin-top: 8px; padding: 0 4px; font-weight: 500;">
+           <span>1 - ${q.labelMin}</span>
+           <span>5 - ${q.labelMax}</span>
         </div>
       </div>
     `,
@@ -254,7 +272,7 @@ async function onGuardarEntrevista(payload) {
       const { HandleGet_agenda_pendiente, HandleMarcar_agenda } = await import('../models/Alumno.js');
       const agenda = await HandleGet_agenda_pendiente(payload.dni);
       if (agenda && agenda.id) {
-         await HandleMarcar_agenda(agenda.id);
+        await HandleMarcar_agenda(agenda.id);
       }
     } catch (e) {
       console.error("Error al marcar la entrevista en agendas", e);

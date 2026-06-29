@@ -30,7 +30,7 @@ def post_notas(db, notas: list[SimpleNamespace]):
             ],
             db,
         )
-       # print("volvi de la funcion")
+        # print("volvi de la funcion")
         return
     except Exception as e:
         db.rollback()

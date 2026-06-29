@@ -63,7 +63,7 @@ def set_indicadores_cuatrimestrales(objeto: SimpleNamespace, db):
 def get_indicadores_cuatrimestrales(db, dni):
     try:
         query = text("""
-                    SELECT ic.rap, ic.rac, ic.raf
+                    SELECT ic.rap, ic.rac, ic.raf, ic.ac
                     FROM "indicadores_cuatrimestrales" ic
                     WHERE ic.dni_alumno = :dni
                     """)

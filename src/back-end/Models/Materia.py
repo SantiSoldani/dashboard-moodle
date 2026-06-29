@@ -41,13 +41,28 @@ def get_materias_del_cuatrimestre(db, cuatrimestre, plan):
 
 
 def set_pesos(db, pesos):
+    def map_nombre(nombre):
+        if nombre == "mate1":
+            return "analisis matematico 1"
+        elif nombre == "mate2":
+            return "analisis matematico 2"
+        elif nombre == "algebra1":
+            return "algebra 1"
+        elif nombre == "algebra2":
+            return "algebra 2"
+        elif nombre == "fdlq":
+            return "fundamentos de la quimica"
+        elif nombre == "fdlp":
+            return "fundamentos de la programacion"
+
     try:
         for nombre, peso in pesos.__dict__.items():
+            nombre_real = map_nombre(nombre)
             query = text(""" UPDATE "Materia" SET
                              coeficiente = :peso
                              WHERE nombre = :nombre
                         """)
-            db.execute(query, {"nombre": nombre, "peso": peso})
+            db.execute(query, {"nombre": nombre_real, "peso": peso})
         db.commit()
     except Exception as e:
         print(e)
@@ -57,7 +72,7 @@ def promedioXmateria(db):
 
     try:
         query = text("""
-                        SELECT AVG(e.notas) AS promedio, m.nombre
+                        SELECT AVG(e.nota) AS promedio, m.nombre
                         FROM "Examen" e
                         JOIN "Materia" m
                         ON e.id_materia = m.id

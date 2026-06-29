@@ -19,6 +19,7 @@ def Post_alumnos_FromEncuesta(alumno: SimpleNamespace, db):
             materias_aprobadas=alumno.materias_aprobadas,
             plan_de_estudios=alumno.plan_de_estudios,
             pre=alumno.pre,
+            cuatrimestre=alumno.cuatrimestre,
         ),
         db,
     )
@@ -37,6 +38,7 @@ def Post_alumnos(Alumnos: list[SimpleNamespace], db):
                 materias_aprobadas=0,
                 pre=0,
                 plan_de_estudios=2024,
+                cuatrimestre=1,
             ),
             db,
         )

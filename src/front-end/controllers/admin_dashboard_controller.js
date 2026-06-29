@@ -266,17 +266,29 @@ async function renderPromedioMateriasList() {
             'fdlp': 'Fund. de Programación'
         };
 
+        const dbNameMap = {
+            'mate1': ['analisis matematico 1', 'mate1', 'Análisis Matemático 1'],
+            'algebra1': ['algebra 1', 'algebra1', 'Álgebra 1'],
+            'fdlq': ['fundamentos de la quimica', 'fdlq', 'Fund. de la Química'],
+            'mate2': ['analisis matematico 2', 'mate2', 'Análisis Matemático 2'],
+            'algebra2': ['algebra 2', 'algebra2', 'Álgebra 2'],
+            'fisica': ['fisica a', 'fisica', 'Física A'],
+            'fdlp': ['fundamentos de la programacion', 'fdlp', 'Fund. de Programación']
+        };
+
         const defaultKeys = Object.keys(subjectMap);
         let materias = defaultKeys.map(key => {
-            let found = rawMaterias.find(m => m.nombre === key || m.nombre === subjectMap[key]);
+            let found = rawMaterias.find(m =>
+                m.nombre && dbNameMap[key].some(validName => validName.toLowerCase() === m.nombre.toLowerCase())
+            );
             return {
                 nombre: subjectMap[key],
                 promedio: found && found.promedio ? parseFloat(found.promedio) : 0
             };
         });
 
-        // Sort ascending (lowest averages first, the most struggled subjects)
-        materias.sort((a, b) => a.promedio - b.promedio);
+        // Sort descending (highest averages first, as it's a "top de materias")
+        materias.sort((a, b) => b.promedio - a.promedio);
 
         let html = '<div style="display: flex; flex-direction: column; gap: 12px; padding-top: 8px;">';
 
