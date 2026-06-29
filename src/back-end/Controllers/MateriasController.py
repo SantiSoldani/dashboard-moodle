@@ -10,4 +10,5 @@ def get_materias(db):
 
 def get_cant_materias_acumulada(db, cuatrimestre, plan):
 
-    return Materia.get_materias_del_cuatrimestre(db, cuatrimestre, plan)
+    obj = Materia.get_materias_del_cuatrimestre(db, cuatrimestre, plan)
+    return obj.cantidad_acumulada if obj is not None else 1

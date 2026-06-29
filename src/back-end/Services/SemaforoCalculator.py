@@ -127,6 +127,7 @@ def calculo_inicial_from_df(df: pd.DataFrame, db):
     df_final["fecha_inicio"] = df["fecha_inicio"]
     df_final["plan_de_estudios"] = df["plan de estudios"]
     df_final["materias_aprobadas"] = df["materias_aprobadas"]
+    df_final["cuatrimestre"] = df["cuatrimestre"]
     diccionarios = df_final.to_dict(orient="records")
     resultados = []
     print(df_final.head(10))
@@ -161,64 +162,71 @@ def calculo_cuatrimestral_from_df(df: pd.DataFrame, db):
         else:
             return "rojo"
 
-    resultados = []
-    print(df)
-    print(df.columns)
-    columnas_numericas = ["EA", "R", "PDE", "EL", "DT", "MOT", "SEG"]
-    for col in columnas_numericas:
-        df[col] = pd.to_numeric(df[col], errors="coerce")
+    try:
+        resultados = []
+        print(df)
+        print(df.columns)
+        columnas_numericas = ["EA", "R", "PDE", "EL", "DT", "MOT", "SEG"]
+        for col in columnas_numericas:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
 
-    df["RAC"] = 0.4 * df["EA"] + 0.3 * df["R"] + 0.3 * df["PDE"]
-    df["RAP"] = (
-        (df["EL"] - 1) / 4
-        + (df["DT"] - 1) / 4
-        + (df["MOT"] - 1) / 4
-        + (df["SEG"] - 1) / 4
-    ) / 4
-    pesos = Indicadores.get_pesos_cuatrimestrales(db)
-    if pesos is None:
-        df["RAF"] = (df["RAC"] + df["RAP"]) / 2
-    else:
-        df["RAF"] = (pesos.rac * df["RAC"] + pesos.raf * df["RAP"]) / 2
-    # Luego iterar solo para obtener datos del alumno
-    resultados = []
-    indicadores_persistibles = []
-    for index, row in df.iterrows():
-        try:
-            dni = row["dni"]
-            alumno = AlumnoController.Get_alumno_Bydni(str(dni), db)
-            cantidad_acumulada = MateriasController.get_cant_materias_acumulada(
-                db, alumno.cuatrimestre, alumno.plan_de_estudios
-            )
-            pre = float(alumno.pre) if alumno.pre else 0
-            ac = (
-                row["MATERIAS_APROBADAS"] + alumno.materias_aprobadas
-            ) / cantidad_acumulada
-            score = (row["RAF"] + pre) / 2
-            objeto = {
-                "dni": dni,
-                "rac": row["RAC"],
-                "rap": row["RAP"],
-                "raf": row["RAF"],
-                "ac": ac,
-            }
-            if pd.isna(score):
-                continue
-
-            color = get_color(score)
-            resultados.append(
-                {
-                    "dni_alumno": dni,
-                    "color": color,
-                    "score": float(score),
+        df["RAC"] = 0.4 * df["EA"] + 0.3 * df["R"] + 0.3 * df["PDE"]
+        df["RAP"] = (
+            (df["EL"] - 1) / 4
+            + (df["DT"] - 1) / 4
+            + (df["MOT"] - 1) / 4
+            + (df["SEG"] - 1) / 4
+        ) / 4
+        pesos = Indicadores.get_pesos_cuatrimestrales(db)
+        if pesos is None:
+            df["RAF"] = (df["RAC"] + df["RAP"]) / 2
+        else:
+            df["RAF"] = (pesos.rac * df["RAC"] + pesos.rap * df["RAP"]) / 2
+        print("df cuatrimestral", df)
+        # Luego iterar solo para obtener datos del alumno
+        resultados = []
+        indicadores_persistibles = []
+        for index, row in df.iterrows():
+            try:
+                dni = row["dni"]
+                alumno = AlumnoController.Get_alumno_Bydni(str(dni), db)
+                cantidad_acumulada = MateriasController.get_cant_materias_acumulada(
+                    db, alumno.cuatrimestre, alumno.plan_de_estudios
+                )
+                pre = float(alumno.pre) if alumno.pre else 0
+                ac = (
+                    row["MATERIAS_APROBADAS"] + alumno.materias_aprobadas
+                ) / cantidad_acumulada
+                score = (row["RAF"] + pre) / 2
+                objeto = {
+                    "dni": dni,
+                    "rac": row["RAC"],
+                    "rap": row["RAP"],
+                    "raf": row["RAF"],
+                    "ac": ac,
                 }
-            )
-            indicadores_persistibles.append(SimpleNamespace(**objeto))
-        except Exception as e:
-            print(f"❌ Error en DNI {row['dni']}: {e}")
-            continue
-    IndicadoresController.post_indicadores_cuatrimestrales(db, indicadores_persistibles)
-    return resultados
+                if pd.isna(score):
+                    continue
+
+                color = get_color(score)
+                resultados.append(
+                    {
+                        "dni_alumno": dni,
+                        "color": color,
+                        "score": float(score),
+                    }
+                )
+                indicadores_persistibles.append(SimpleNamespace(**objeto))
+                print(SimpleNamespace(**objeto))
+            except Exception as e:
+                print(f"❌ Error en DNI {row['dni']}: {e}")
+                continue
+        IndicadoresController.post_indicadores_cuatrimestrales(
+            indicadores_persistibles, db
+        )
+        return resultados
+    except Exception as e:
+        print(e)
 
 
 # Mantener compatibilidad con path (DEPRECADO)

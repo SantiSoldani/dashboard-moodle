@@ -41,10 +41,10 @@ def set_indicadores(indicador_dto: IndicadorDTO, db):
         print(e)
 
 
-def set_indicadores_cuatrimestrales(db, objeto: SimpleNamespace):
+def set_indicadores_cuatrimestrales(objeto: SimpleNamespace, db):
 
     query = text("""
-                 INSERT INTO "indicadores_cuatrimestrales" (dni_alumno, rac, rap, raf, ac) values(:dni, :rac, :raf, :ac)
+                 INSERT INTO "indicadores_cuatrimestrales" (dni_alumno, rac, rap, raf, ac) values(:dni, :rac, :rap, :raf, :ac)
                  """)
     db.execute(
         query,
@@ -52,6 +52,7 @@ def set_indicadores_cuatrimestrales(db, objeto: SimpleNamespace):
             "dni": objeto.dni,
             "rac": objeto.rac,
             "rap": objeto.rap,
+            "raf": objeto.raf,
             "ac": objeto.ac,
         },
     )
@@ -142,6 +143,7 @@ def get_pesos_cuatrimestrales(db):
         )
 
         pesos = db.execute(query).mappings().fetchone()
+        print(pesos)
         return SimpleNamespace(**pesos)
 
     except Exception as e:

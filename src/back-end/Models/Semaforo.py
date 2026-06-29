@@ -3,7 +3,6 @@ from datetime import date, datetime
 from types import SimpleNamespace
 
 from sqlalchemy import text
-from sqlalchemy.orm.strategies import query
 
 
 @dataclass
@@ -65,9 +64,6 @@ def get_evolucion(db, techo):
             GROUP BY (s.color, DATE(s.created_at))
             ORDER BY (DATE(s.created_at)) DESC
             LIMIT 4
-
-
-
                     """)
         rows = (
             db.execute(

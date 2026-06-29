@@ -140,6 +140,9 @@ def limpiar_encuesta_inicial(file: BinaryIO) -> pd.DataFrame:
     df_final["materias_aprobadas"] = df[
         "¿Cuantas materias aprobadas tenes hasta ahora?"
     ]
+    df_final["cuatrimestre"] = df[
+        "¿En que cuatrimestre de la carrera te encontras actualmente? (1 - 10)"
+    ]
     df_final["plan de estudios"] = df["Plan de estudio actual"]
     # df_final["carrera"] = df["Carrera"]
     # Definir grupos
@@ -216,8 +219,8 @@ def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
             "MATERIAS_APROBADAS",
         ]
     )
-
-    df_final["dni"] = df["ingrese su DNI"].astype(str)
+    print("df ", df)
+    df_final["dni"] = df["Ingrese su DNI"].astype(str)
     df_final["EA"] = (
         df["¿Cuantas de las materias que cursaste aprobaste su cursada?"]
         / df["¿Cuantas materias cursaste este cuatrimestre?"]
@@ -228,7 +231,7 @@ def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
     # para calcular la regularidad tengo que traerme todas las materias aprobadas de todos los alumnos
     alumnos = AlumnoController.Get_alumnos(db)
     for alumno in alumnos:
-        rowdf = df[df["ingrese su DNI"].astype(str) == alumno.dni]
+        rowdf = df[df["Ingrese su DNI"].astype(str) == alumno.dni]
         print("compruebpo la flag", rowdf.empty)
         if rowdf.empty:
             continue
@@ -275,7 +278,7 @@ def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
     print(df_final["EL"])
     df_final["DT"] = (
         df[
-            "¿Dispones del tiempo semanal necesario fuera del horario de clases para dedicarle al estudio y las entregas este cuatrimestre?"
+            "¿Has dispuesto del tiempo semanal necesario fuera del horario de clases para dedicarle al estudio y las entregas este cuatrimestre?"
         ]
         .str.extract(r"(\d+)")
         .astype(int)
@@ -284,7 +287,7 @@ def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
 
     df_final["MOT"] = (
         df[
-            "¿Como evaluas tu motivacion para continuar la carrera este cuatrimestre comparado con el anterior?"
+            "¿Como evaluas tu motivacion para continuar la carrera luego de este cuatrimestre?"
         ]
         .str.extract(r"(\d+)")
         .astype(int)
@@ -293,7 +296,7 @@ def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
 
     df_final["SEG"] = (
         df[
-            "¿Que tan seguro te sentis de poder aprobar las materias que te inscribiste?"
+            "¿Que tan seguro te sentías de poder aprobar las materias en las que te inscribiste?"
         ]
         .str.extract(r"(\d+)")
         .astype(int)

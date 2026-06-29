@@ -29,11 +29,12 @@ def get_materias_del_cuatrimestre(db, cuatrimestre, plan):
         """SELECT cantidad_acumulada FROM "materiasXcuatrimestre" WHERE numero = :cuatrimestre AND plan = :plan"""
     )
     try:
-        return SimpleNamespace ** (
+        row = (
             db.execute(query, {"cuatrimestre": cuatrimestre, "plan": plan})
             .mappings()
             .fetchone()
         )
+        return SimpleNamespace(**row)
     except Exception as e:
         print(e)
         return None

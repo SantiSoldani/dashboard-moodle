@@ -20,6 +20,7 @@ class AlumnoDto:
     materias_aprobadas: int
     pre: float
     plan_de_estudios: int
+    cuatrimestre: int
     carrera: str = "Industrial"
     color: str = "gris"
 
@@ -86,6 +87,7 @@ def Get_alumno_by_dni(dni: str, db) -> AlumnoDto:
         pre=alumno_by_dni["PRE"],
         materias_aprobadas=alumno_by_dni["materias_aprobadas"],
         plan_de_estudios=alumno_by_dni["plan_de_estudios"],
+        cuatrimestre=alumno_by_dni["cuatrimestre"],
     )
 
 
@@ -94,13 +96,15 @@ def Get_alumnos(db, tutor_dni=None) -> list[AlumnoDto]:
     alumnos_list = []
     if tutor_dni:
         query = text("""
-            SELECT "Alumnos".* 
-            FROM "Alumnos" 
-            INNER JOIN "Tutor-Alumno" ON "Alumnos".dni = "Tutor-Alumno".dni_alumno 
+            SELECT "Alumnos".*
+            FROM "Alumnos"
+            INNER JOIN "Tutor-Alumno" ON "Alumnos".dni = "Tutor-Alumno".dni_alumno
             WHERE "Tutor-Alumno".dni_tutor = :tutor_dni
             ORDER BY "Alumnos".dni
         """)
-        fetched_alumnos = (db.execute(query, {"tutor_dni": tutor_dni})).mappings().fetchall()
+        fetched_alumnos = (
+            (db.execute(query, {"tutor_dni": tutor_dni})).mappings().fetchall()
+        )
     else:
         query = text("""SELECT *  FROM "Alumnos" ORDER BY dni""")
         fetched_alumnos = (db.execute(query)).mappings().fetchall()
@@ -118,6 +122,7 @@ def Get_alumnos(db, tutor_dni=None) -> list[AlumnoDto]:
                 pre=0,
                 materias_aprobadas=alumno["materias_aprobadas"],
                 plan_de_estudios=alumno["plan_de_estudios"],
+                cuatrimestre=alumno["cuatrimestre"],
             )
         )
     return alumnos_list
@@ -148,10 +153,10 @@ def Get_alumnos_with_stats(db, tutor_dni=None) -> list[AlumnoDto]:
             FROM "Semaforo"
         ) "Semaforo" ON "Alumnos".dni = "Semaforo".dni_alumno AND "Semaforo".rn = 1
     """
-    
+
     if tutor_dni:
         base_query += """ WHERE "Tutor-Alumno".dni_tutor = :tutor_dni """
-        
+
     base_query += """ ORDER BY "Alumnos".dni ASC """
     query = text(base_query)
 
@@ -168,8 +173,9 @@ def Get_alumnos_with_stats(db, tutor_dni=None) -> list[AlumnoDto]:
         alumnos.append(SimpleNamespace(**data))
     return alumnos
 
+
 def Get_alumnos_with_stats_by_page(limit, page, db):
-    offset = page*limit
+    offset = page * limit
     """
     Trae a los alumnos que no tienen tutor asignado, ordenados por score ascendente (menor a mayor).
     """
@@ -194,7 +200,9 @@ def Get_alumnos_with_stats_by_page(limit, page, db):
         LIMIT :limit OFFSET :offset
     """)
 
-    fetched = (db.execute(query, {"limit": limit, "offset": offset})).mappings().fetchall()
+    fetched = (
+        (db.execute(query, {"limit": limit, "offset": offset})).mappings().fetchall()
+    )
     for row in fetched:
         data = dict(row)
         if data.get("score") is None:

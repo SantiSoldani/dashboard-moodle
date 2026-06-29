@@ -2,30 +2,31 @@ from collections import defaultdict
 from types import SimpleNamespace
 
 from Models import Encuestas
-from sqlalchemy.pool.base import reset_commit
 
 
 def Handle_respuestas(respuestas_list: list[SimpleNamespace], db):
-
+    print("ENTRE EN LA PARTE DE PERSISTIR RESPUESTAS")
     resultados = []
     CAMPOS_EXCLUIR = {"Respuesta número", "ingrese su DNI"}
+    try:
+        for respuesta_obj in respuestas_list:
+            datos = respuesta_obj.__dict__
+            dni = datos["Ingrese su DNI"]
 
-    for respuesta_obj in respuestas_list:
-        datos = respuesta_obj.__dict__
-        dni = datos["ingrese su DNI"]
-
-        for campo, valor in datos.items():
-            print(campo, " ", valor)
-            if campo not in CAMPOS_EXCLUIR:
-                resultados.append(
-                    Encuestas.encuestasDTO(
-                        dni_alumno=dni, pregunta=campo, respuesta=valor
+            for campo, valor in datos.items():
+                print(campo, " ", valor)
+                if campo not in CAMPOS_EXCLUIR:
+                    resultados.append(
+                        Encuestas.encuestasDTO(
+                            dni_alumno=dni, pregunta=campo, respuesta=valor
+                        )
                     )
-                )
 
-    print(resultados)
-    Encuestas.Handle_respuestas(resultados, db)
-    db.commit()
+        print(resultados)
+        Encuestas.Handle_respuestas(resultados, db)
+        db.commit()
+    except Exception as e:
+        print("ERROR:", e)
 
 
 def get_encuesta(db, dni):
