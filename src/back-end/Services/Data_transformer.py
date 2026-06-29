@@ -144,6 +144,7 @@ def limpiar_encuesta_inicial(file: BinaryIO) -> pd.DataFrame:
     df_final["cuatrimestre"] = df[
         "¿En que cuatrimestre de la carrera te encontras actualmente?"
     ]
+    print(df_final["cuatrimestre"])
     df_final["plan de estudios"] = df["Plan de estudio actual"]
     # df_final["carrera"] = df["Carrera"]
     # Definir grupos
@@ -227,7 +228,7 @@ def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
         / df["¿Cuantas materias cursaste este cuatrimestre?"]
     )
     df_final["MATERIAS_APROBADAS"] = df[
-        "¿Cuantas materias cursaste este cuatrimestre?"
+        "¿Cuantas de las materias que cursaste aprobaste su cursada?"
     ]  # cantidad de materias aprobadas / cantidad de materias que deberia haber aprobado
     # para calcular la regularidad tengo que traerme todas las materias aprobadas de todos los alumnos
     alumnos = AlumnoController.Get_alumnos(db)

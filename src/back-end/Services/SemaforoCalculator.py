@@ -194,6 +194,13 @@ def calculo_cuatrimestral_from_df(df: pd.DataFrame, db):
                     db, alumno.cuatrimestre, alumno.plan_de_estudios
                 )
                 pre = float(alumno.pre) if alumno.pre else 0
+                print(
+                    row["MATERIAS_APROBADAS"],
+                    " ",
+                    alumno.materias_aprobadas,
+                    " ",
+                    cantidad_acumulada,
+                )
                 ac = (
                     row["MATERIAS_APROBADAS"] + alumno.materias_aprobadas
                 ) / cantidad_acumulada

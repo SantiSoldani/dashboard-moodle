@@ -26,7 +26,7 @@ def get_materias(db) -> list[MateriaDto]:
 def get_materias_del_cuatrimestre(db, cuatrimestre, plan):
 
     query = text(
-        """SELECT cantidad_acumulada FROM "materiasXcuatrimestre" WHERE numero = :cuatrimestre AND plan = :plan"""
+        """SELECT "cantidad_acumulada" FROM "materiasXcuatrimestre" WHERE numero = :cuatrimestre AND plan = :plan"""
     )
     try:
         row = (
