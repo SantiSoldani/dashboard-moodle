@@ -505,23 +505,30 @@ export const VISTA_ADMIN_DASHBOARD = `
         <div class="charts-grid" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px;">
             <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                 <div class="panel-header-flex" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
-                    <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
+                    <div class="panel-header-t" style="display: flex; align-items: center; gap: 10px;">
                         <span class="material-symbols-outlined icon-blue" style="color: #434655;">pentagon</span>
+                        <div>
                         <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Distribución del PRE</h2>
-                    </div>
-                    <select id="selectDistribucionPRE" class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
+                        <h5>Perfil de Riesgo Estructural</h5> 
+                        </div>
+                        <select id="selectDistribucionPRE" class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
                         <option value="2025">2025</option>
                         <option value="2024">2024</option>
                         <option value="2023">2023</option>
-                    </select>
+                    </select>  
+                    
+                    </div>
+                    
+                    
                 </div>
+                
                 <div id="chartMeticasAgregadas" style="width: 100%; height: 250px;"></div>
             </div>
             <div class="chart-panel card-panel" style="background: white; border-radius: 12px; padding: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                 <div class="panel-header-flex" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
                     <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined icon-blue" style="color: #434655;">grid_view</span>
-                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Perfil Económico vs Semáforo</h2>
+                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">PRE vs Puntaje</h2>
                     </div>
                     <select id="selectPerfilSemaforo" class="period-selector" style="padding: 4px 8px; border-radius: 4px; border: 1px solid #e2e8f0; font-size: 0.85rem; color: #434655; background-color: #f8fafc;">
                         <option value="2025">2025</option>
@@ -568,7 +575,7 @@ export const VISTA_ADMIN_DASHBOARD = `
                 <div class="panel-header-flex" style="margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
                     <div class="panel-header-t" style="display: flex; align-items: center; gap: 8px;">
                         <span class="material-symbols-outlined icon-blue" style="color: #434655;">compare_arrows</span>
-                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Score x Cohorte</h2>
+                        <h2 style="font-size: 1.1rem; color: #141b2b; margin: 0;">Puntaje por Cohorte</h2>
                     </div>
                     <!-- Select removed because Score x Cohorte brings all cohorts at once -->
                 </div>

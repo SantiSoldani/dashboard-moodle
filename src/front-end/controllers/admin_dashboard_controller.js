@@ -107,7 +107,6 @@ async function renderRadarChart() {
     let filtro = "fecha_inicio"
     const dataFromApi = await HandleGet_indicadores_iniciales(tipo, filtro, anio);
     chart.hideLoading();
-
     let radarData = [0, 0, 0, 0, 0, 0];
 
     let dataObj = null;
@@ -120,13 +119,14 @@ async function renderRadarChart() {
     }
 
     if (dataObj) {
+        const round3 = val => parseFloat((val || 0).toFixed(3));
         radarData = [
-            dataObj["perfil socio-economico"] || 0,
-            dataObj["interrupcion de la carrera"] || 0,
-            dataObj["perfil educativo de los padres/tutores"] || 0,
-            dataObj["carga vital"] || 0,
-            dataObj["carga laboral"] || 0,
-            dataObj["localidad"] || 0
+            round3(dataObj["perfil socio-economico"]),
+            round3(dataObj["interrupcion de la carrera"]),
+            round3(dataObj["perfil educativo de los padres/tutores"]),
+            round3(dataObj["carga vital"]),
+            round3(dataObj["carga laboral"]),
+            round3(dataObj["localidad"])
         ];
     }
 
@@ -178,8 +178,8 @@ async function renderHeatmapChart() {
 
     chart.hideLoading();
 
-    const xData = ['Desafiante', 'Medio-Bajo', 'Medio-Alto', 'Favorable'];
-    const yData = ['Crítico', 'Alerta', 'Estable', 'Alto'];
+    const xData = ['Favorable', 'Medio-Favorable', 'Medio-Desafiante', 'Desafiante'];
+    const yData = ['Estable', 'Alerta', 'Riesgo', 'Crítico'];
 
     const matrix = [
         [0, 0, 0, 0],
@@ -221,9 +221,34 @@ async function renderHeatmapChart() {
 
     const option = {
         tooltip: { position: 'top' },
-        grid: { left: '15%', right: '5%', top: '5%', bottom: '15%' },
-        xAxis: { type: 'category', data: xData, axisLabel: { color: '#434655' }, name: 'PRE', nameLocation: 'middle', nameGap: 25 },
-        yAxis: { type: 'category', data: yData, axisLabel: { color: '#434655' }, name: 'RAF', nameLocation: 'end' },
+        grid: { left: '15%', right: '12%', top: '5%', bottom: '15%' },
+        xAxis: {
+            type: 'category',
+            data: xData,
+            axisLabel: {
+                color: '#434655',
+                interval: 0,
+                showMaxLabel: true,
+                formatter: function (value) {
+                    return (value === 'Favorable' || value === 'Desafiante') ? value : '';
+                }
+            },
+            name: 'PRE',
+            nameLocation: 'middle',
+            nameGap: 25
+        },
+        yAxis: {
+            type: 'category',
+            data: yData,
+            axisLabel: {
+                color: '#434655',
+                formatter: function (value) {
+                    return (value === 'Estable' || value === 'Crítico') ? value : '';
+                }
+            },
+            name: 'Puntaje',
+            nameLocation: 'end'
+        },
         visualMap: {
             min: 0,
             max: maxVal,

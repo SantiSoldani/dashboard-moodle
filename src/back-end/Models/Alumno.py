@@ -196,7 +196,7 @@ def Get_alumnos_with_stats_by_page(limit, page, db):
             FROM "Semaforo"
         ) "Semaforo" ON "Alumnos".dni = "Semaforo".dni_alumno AND "Semaforo".rn = 1
         WHERE "Tutor-Alumno".dni_tutor IS NULL
-        ORDER BY "Semaforo".score ASC
+        ORDER BY "Semaforo".score DESC
         LIMIT :limit OFFSET :offset
     """)
 
