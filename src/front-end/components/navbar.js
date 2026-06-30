@@ -26,8 +26,10 @@ class navBar extends HTMLElement {
                 <li class="${isDataEntry ? 'active' : ''}"><a href="#data_entry">📁 Cargar Datos</a></li>
             `;
         } else if (rol !== 'Learner') {
+            const isEntrevista = hash === 'entrevista';
             navLinks = `
                 <li class="${isHome ? 'active' : ''}"><a href="#home">📊 Inicio</a></li>
+                <li class="${isEntrevista ? 'active' : ''}"><a href="#entrevista">🗣️ Entrevista</a></li>
                 <li class="${isDataEntry ? 'active' : ''}"><a href="#data_entry">📁 Cargar Datos</a></li>
             `;
         } else {
