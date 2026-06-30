@@ -94,8 +94,25 @@ function activar_solicitudes(alumno, tutor) {
   if (tutor != null)
     dni_tutor = tutor.dni_tutor
   const btn = document.getElementById("btn_crearSolicitud");
-  btn.addEventListener("click", () => {
-    HandleCreate_solicitud(alumno.dni, dni_tutor);
+  btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    btn.innerHTML = `<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> SOLICITANDO...`;
+    
+    const res = await HandleCreate_solicitud(alumno.dni, dni_tutor);
+    
+    if (res) {
+      btn.style.background = "#94a3b8";
+      btn.style.cursor = "not-allowed";
+      btn.style.boxShadow = "0 4px 6px rgba(148,163,184,0.2)";
+      btn.style.transform = "none";
+      btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 20px;">check_circle</span> ENTREVISTA/TUTOR YA SOLICITADO`;
+      btn.removeAttribute("onmouseover");
+      btn.removeAttribute("onmouseout");
+    } else {
+      btn.disabled = false;
+      btn.innerHTML = `<span class="material-symbols-outlined" style="font-size: 20px;">calendar_month</span> SOLICITAR TUTOR / ENTREVISTA`;
+      alert("Hubo un error al crear la solicitud. Por favor, intentá nuevamente.");
+    }
   });
 }
 

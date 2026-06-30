@@ -63,7 +63,6 @@ export async function HandleGet_tutor(dni_alumno) {
 
 export async function HandleCreate_solicitud(dni_alumno, dni_tutor = null) {
   try {
-    console.log("HANDLE GET SOLICITUDES", dni_alumno, dni_tutor)
     const headers = {
       "Content-Type": "application/json",
       "ngrok-skip-browser-warning": "69420",
@@ -348,7 +347,7 @@ export async function HandleGet_esTutor(dni) {
     if (!response.ok) throw new Error("Error al obtener si es tutor");
     const data = await response.json();
     return data;
-  } catch(error) {
+  } catch (error) {
     console.error(error);
     return false;
   }
@@ -356,14 +355,14 @@ export async function HandleGet_esTutor(dni) {
 
 export async function HandlePut_Rol(dni, nuevo_rol) {
   try {
-    const headers = { 
+    const headers = {
       "ngrok-skip-browser-warning": "69420",
       "Content-Type": "application/json"
     };
-    const response = await fetch(`${getConfig()}/usuarios/${dni}/rol`, { 
+    const response = await fetch(`${getConfig()}/usuarios/${dni}/rol`, {
       method: 'PUT',
       headers,
-      body: JSON.stringify({ rol: nuevo_rol }) 
+      body: JSON.stringify({ rol: nuevo_rol })
     });
     if (!response.ok) throw new Error("Error al actualizar rol");
     return true;
