@@ -33,6 +33,13 @@ export async function initAlumnoStats(dniParam = null) {
     }
 
     let alumno = await HandleGet_alumnos(alumno_dni, "byDNI");
+
+    if (!alumno || (Array.isArray(alumno) && alumno.length === 0) || alumno.error || alumno.detail) {
+      console.warn("No se encontró el alumno o DNI inválido, redirigiendo a la ruta base.");
+      window.location.href = window.location.origin + window.location.pathname;
+      return;
+    }
+
     let tutor = await HandleGet_tutor(alumno_dni);
 
     let tipo = "iniciales"
@@ -628,21 +635,21 @@ export async function renderRoleToggleComponent() {
         btn.disabled = true;
         btn.style.background = "#475569";
         btn.style.cursor = "not-allowed";
-        btn.innerHTML = `<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Cambiando...`;
+        btn.innerHTML = `<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Cambiando rol...`;
         await HandlePut_Rol(dni, "Learner");
         localStorage.setItem("rol", "Learner");
-        window.location.reload();
+        window.location.href = window.location.origin + window.location.pathname;
       };
     } else {
-      btn.innerHTML = `<span class="material-symbols-outlined">admin_panel_settings</span> Cambiar a Vista Docente`;
+      btn.innerHTML = `<span class="material-symbols-outlined">admin_panel_settings</span> Cambiar a Vista Tutor`;
       btn.onclick = async () => {
         btn.disabled = true;
         btn.style.background = "#475569";
         btn.style.cursor = "not-allowed";
-        btn.innerHTML = `<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Cambiando...`;
+        btn.innerHTML = `<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Cambiando rol...`;
         await HandlePut_Rol(dni, "Tutor");
         localStorage.setItem("rol", "Tutor");
-        window.location.reload();
+        window.location.href = window.location.origin + window.location.pathname;
       };
     }
 
