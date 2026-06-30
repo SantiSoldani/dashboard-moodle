@@ -77,6 +77,7 @@ def promedioXmateria(db):
                         JOIN "Materia" m
                         ON e.id_materia = m.id
                         GROUP BY (m.nombre)
+                        ORDER BY promedio ASC
                     """)
         rows = db.execute(query).mappings().fetchall()
         return [SimpleNamespace(**row) for row in rows]
