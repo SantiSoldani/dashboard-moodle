@@ -43,3 +43,8 @@ async def get_usuario_by_dni(dni: str, db: Session = Depends(server.get_db)):
 async def get_usuarios_by_rol(rol: str, db: Session = Depends(server.get_db)):
     usuarios = UsuarioController.get_usuarios_by_rol(rol, db)
     return {"usuarios": usuarios}
+
+@router.get("/esTutor/{dni}")
+async def esTutor(dni: str, db: Session = Depends(server.get_db)):
+    tutor = UsuarioController.esTutor(dni, db)
+    return tutor

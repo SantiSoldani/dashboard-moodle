@@ -5,6 +5,7 @@ import {
   Handle_get_Notas,
   Handle_get_promedio_general
 } from "../models/Notas.js";
+import { renderRoleToggleComponent } from "./Alumno_stats_controller.js";
 import {
   HandleGet_solicitudes,
   HandleGet_solicitudes_tutor,
@@ -51,6 +52,7 @@ export async function initHome() {
   setupNavigation();
   await cargarDatosDashboard();
   loadSolicitudesHome();
+  await renderRoleToggleComponent();
 }
 
 async function loadSolicitudesHome() {

@@ -1,5 +1,6 @@
 import { HandleGet_alumnos, HandleGet_indicadores_iniciales, HandleGet_semaforosXpre, HandleGet_scoreXcohorte, HandleGet_conteo_semaforos } from "../models/Alumno.js";
 import { Handle_get_promedio_general, Handle_get_promedio_materias } from "../models/Notas.js";
+import { renderRoleToggleComponent } from "./Alumno_stats_controller.js";
 
 let allStudents = [];
 let chartInstances = [];
@@ -31,6 +32,9 @@ export async function initAdminDashboard() {
             if (chart) chart.resize();
         });
     });
+
+    // Renderizar el boton flotante de cambio de rol si aplica
+    await renderRoleToggleComponent();
 }
 
 async function cargarDatos() {

@@ -30,21 +30,20 @@ def add_usuario(usuario_data: dict, db):
 
 
 def delete_usuario(dni: str, db):
-
     Usuario.delete_usuario(dni, db)
 
 
 def update_rol(dni: str, nuevo_rol: str, db):
-
     Usuario.update_rol(dni, nuevo_rol, db)
 
 
 def get_usuario_by_dni(dni: str, db):
-
     return Usuario.get_usuario_by_dni(dni, db)
 
 
 def get_usuarios_by_rol(rol: str, db):
-
     return Usuario.get_usuarios_by_rol(rol, db)
+
+def esTutor(dni: str, db):
+    return Usuario.esTutor(dni, db)
 

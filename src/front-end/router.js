@@ -46,7 +46,7 @@ export function navegar(nombreVista) {
     root.innerHTML = VISTA_ALUMNO_STATS;
     // Para estudiante obtenemos el dni del localStorage o si pasamos ?alumno=DNI en URL
     const params = new URLSearchParams(window.location.search);
-    let dni = params.get("alumno") || localStorage.getItem("estudianteDNI");
+    let dni = params.get("alumno") || localStorage.getItem("dni");
     initAlumnoStats(dni);
   } else if (nombreVista === "tutores") {
     if (rol !== "Administrador") {

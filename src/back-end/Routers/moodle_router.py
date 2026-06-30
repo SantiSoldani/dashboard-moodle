@@ -82,6 +82,14 @@ async def lti_launch(request: Request, db: Session = Depends(server.get_db)):
         #El usuario ya fué encontrado, por lo que el rol lo define la tabla de Usuarios
         rol_moodle = usuario.rol
 
+    print("--------------------------------------------------")
+    print(f"SETEANDO VARIABLES PARA EL FRONTEND (localStorage):")
+    print(f"nombreUsuario: {nombre_moodle}")
+    print(f"apellidoUsuario: {apellido_moodle}")
+    print(f"rol: {rol_moodle}")
+    print(f"dni: {dni_moodle}")
+    print("--------------------------------------------------")
+
     # --------------------------------------------
     #Se inyecta el index.html, pero además pasamos por localStorage los datos que nos envía moodle para saber que pestaña renderizar
     #Esta ultima eleccion lo hace el frontend.
@@ -101,7 +109,7 @@ async def lti_launch(request: Request, db: Session = Depends(server.get_db)):
         localStorage.setItem('nombreUsuario', '{nombre_moodle}');
         localStorage.setItem('apellidoUsuario', '{apellido_moodle}');
         localStorage.setItem('rol', '{rol_moodle}');
-        localStorage.setItem('dniUsuario', '{dni_moodle}');
+        localStorage.setItem('dni', '{dni_moodle}');
         </script>
         <iframe src="/" style="width: 100%; height: 90vh; border: none;" allow="fullscreen"></iframe>
     </body>

@@ -43,6 +43,9 @@ def delete_usuario(dni: str, db):
 def update_rol(dni: str, nuevo_rol: str, db):
     query = text("""UPDATE "Usuarios" SET rol = :rol WHERE dni = :dni""")
     db.execute(query, {"rol": nuevo_rol, "dni": dni})
+    if nuevo_rol == 'Tutor' and not esTutor(dni,db):
+        query = text("""UPDATE "Usuarios" SET "esTutor" = True WHERE dni = :dni""")
+        db.execute(query, {"dni": dni})
     return db.commit()
 
 
@@ -68,3 +71,10 @@ def get_usuarios_by_rol(rol: str, db):
     
     return usuarios
 
+def esTutor(dni,db):
+    query = text("""SELECT "esTutor" FROM "Usuarios" WHERE dni = :dni""")
+    result = db.execute(query, {"dni": dni}).fetchone()
+    if result:
+        print(result[0])
+        return result[0]
+    return False

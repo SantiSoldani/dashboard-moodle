@@ -1,4 +1,17 @@
-import { HandleGet_alumnos, HandleGet_tutor, HandleCreate_solicitud, HandleGet_indicadores_Bydni, HandleGet_encuesta_ByDni, HandleGet_evolucion_semaforos, HandleGet_rendimiento_academico, HandleGet_agenda_pendiente, HandleGet_usuario_by_dni, HandleGet_solicitud_pendiente } from "../models/Alumno.js";
+import {
+  HandleGet_alumnos,
+  HandleGet_tutor,
+  HandleCreate_solicitud,
+  HandleGet_indicadores_Bydni,
+  HandleGet_encuesta_ByDni,
+  HandleGet_evolucion_semaforos,
+  HandleGet_rendimiento_academico,
+  HandleGet_agenda_pendiente,
+  HandleGet_usuario_by_dni,
+  HandleGet_solicitud_pendiente,
+  HandleGet_esTutor,
+  HandlePut_Rol
+} from "../models/Alumno.js";
 
 let chartPercepcionInstance = null;
 
@@ -12,14 +25,13 @@ export async function initAlumnoStats(dniParam = null) {
 
     const rol = localStorage.getItem("rol") || "Instructor";
     if (!alumno_dni && rol === "Learner") {
-      alumno_dni = "20926120"; // Fallback para que cargue la vista de Alumno
+      alumno_dni = "47231265"; // Fallback para que cargue la vista de Alumno
     }
     if (!alumno_dni) {
       console.warn("No se especificó un DNI de alumno.");
       return;
     }
 
-    console.log("ACA!")
     let alumno = await HandleGet_alumnos(alumno_dni, "byDNI");
     let tutor = await HandleGet_tutor(alumno_dni);
 
@@ -51,7 +63,7 @@ export async function initAlumnoStats(dniParam = null) {
       alumno = typeof alumno === "string" ? JSON.parse(alumno) : alumno;
       const rol = localStorage.getItem("rol") || "Instructor";
 
-      set_header(alumno);
+      set_header(alumno, rol);
       render_dashboard_by_role(alumno, rol, indicadores, tutor, indicadoresCuatrimestrales, encuesta, evolucionSemaforos, rendimientoAcademico, entrevistaPendienteData, solicitudPendiente);
 
       window.addEventListener('resize', () => {
@@ -61,6 +73,9 @@ export async function initAlumnoStats(dniParam = null) {
       if (rol === "Learner" && !solicitudPendiente) {
         activar_solicitudes(alumno, tutor);
       }
+
+      // Renderizar el boton flotante de cambio de rol si aplica
+      await renderRoleToggleComponent();
     }
   } catch (error) {
     console.error("Error al cargar datos del alumno:", error);
@@ -86,9 +101,7 @@ function set_header(alumno, rol) {
       headerName.innerHTML = `
         <div style="display: flex; align-items: center; gap: 16px;">
             <span>${alumno.nombre} ${alumno.apellido}</span>
-            <button id="btn_agendarEntrevista" style="background: #2563eb; color: white; border: none; border-radius: 8px; padding: 6px 12px; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(37,99,235,0.2); display: flex; align-items: center; gap: 6px;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
-                <span class="material-symbols-outlined" style="font-size: 16px;">calendar_month</span> Agendar Entrevista
-            </button>
+            ${renderAgendarEntrevistaComponent(rol)}
         </div>
       `;
 
@@ -564,5 +577,75 @@ function renderChart(isStudent, evolucionSemaforos = null, rendimientoAcademico 
     chartPercepcionInstance.setOption(option);
   } else {
     chartSemaforoInstance.setOption(option);
+  }
+}
+
+// --- Componentes ---
+
+export function renderAgendarEntrevistaComponent(currentUserRole) {
+  if (currentUserRole === "Learner") {
+    return ""; // Estudiantes no pueden ver este boton
+  }
+  return `
+        <button id="btn_agendarEntrevista" style="background: #2563eb; color: white; border: none; border-radius: 8px; padding: 6px 12px; font-weight: 700; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; box-shadow: 0 4px 6px rgba(37,99,235,0.2); display: flex; align-items: center; gap: 6px;" onmouseover="this.style.background='#1d4ed8'" onmouseout="this.style.background='#2563eb'">
+            <span class="material-symbols-outlined" style="font-size: 16px;">calendar_month</span> Agendar Entrevista
+        </button>
+    `;
+}
+
+export async function renderRoleToggleComponent() {
+  const rol = localStorage.getItem("rol") || "Learner";
+  const dni = localStorage.getItem("dni");
+
+  if (!dni) return;
+
+  let isTutor = false;
+  if (rol === "Tutor") {
+    isTutor = true;
+  } else {
+    isTutor = await HandleGet_esTutor(dni);
+  }
+
+  if (isTutor) {
+    if (document.getElementById("btn_role_toggle")) return; // Ya existe
+
+    const btn = document.createElement("button");
+    btn.id = "btn_role_toggle";
+    btn.style = "position: fixed; bottom: 24px; right: 24px; z-index: 99999; background: #1e293b; color: white; border: none; border-radius: 50px; padding: 12px 24px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 8px; transition: all 0.2s ease-in-out;";
+
+    btn.onmouseover = () => {
+      btn.style.transform = 'translateY(-2px)';
+      btn.style.boxShadow = '0 6px 16px rgba(0,0,0,0.4)';
+    };
+    btn.onmouseout = () => {
+      btn.style.transform = 'translateY(0)';
+      btn.style.boxShadow = '0 4px 12px rgba(0,0,0,0.3)';
+    };
+
+    if (rol === "Tutor") {
+      btn.innerHTML = `<span class="material-symbols-outlined">school</span> Cambiar a Vista Alumno`;
+      btn.onclick = async () => {
+        btn.disabled = true;
+        btn.style.background = "#475569";
+        btn.style.cursor = "not-allowed";
+        btn.innerHTML = `<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Cambiando...`;
+        await HandlePut_Rol(dni, "Learner");
+        localStorage.setItem("rol", "Learner");
+        window.location.reload();
+      };
+    } else {
+      btn.innerHTML = `<span class="material-symbols-outlined">admin_panel_settings</span> Cambiar a Vista Docente`;
+      btn.onclick = async () => {
+        btn.disabled = true;
+        btn.style.background = "#475569";
+        btn.style.cursor = "not-allowed";
+        btn.innerHTML = `<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">sync</span> Cambiando...`;
+        await HandlePut_Rol(dni, "Tutor");
+        localStorage.setItem("rol", "Tutor");
+        window.location.reload();
+      };
+    }
+
+    document.body.appendChild(btn);
   }
 }

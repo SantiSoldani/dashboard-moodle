@@ -340,3 +340,35 @@ export async function HandleGet_conteo_semaforos(fecha_techo) {
     return [];
   }
 }
+
+export async function HandleGet_esTutor(dni) {
+  try {
+    const headers = { "ngrok-skip-browser-warning": "69420" };
+    const response = await fetch(`${getConfig()}/usuarios/esTutor/${dni}`, { headers });
+    if (!response.ok) throw new Error("Error al obtener si es tutor");
+    const data = await response.json();
+    return data;
+  } catch(error) {
+    console.error(error);
+    return false;
+  }
+}
+
+export async function HandlePut_Rol(dni, nuevo_rol) {
+  try {
+    const headers = { 
+      "ngrok-skip-browser-warning": "69420",
+      "Content-Type": "application/json"
+    };
+    const response = await fetch(`${getConfig()}/usuarios/${dni}/rol`, { 
+      method: 'PUT',
+      headers,
+      body: JSON.stringify({ rol: nuevo_rol }) 
+    });
+    if (!response.ok) throw new Error("Error al actualizar rol");
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}
