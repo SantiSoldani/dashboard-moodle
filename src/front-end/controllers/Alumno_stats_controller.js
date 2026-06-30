@@ -278,15 +278,15 @@ function render_dashboard_by_role(
         <div style="border: 1px solid #e1e8fd; border-radius: 8px; padding: 20px; background: #f8fafc;">
             <div style="display: flex; flex-direction: column; gap: 16px;">
                 ${encuestasFiltradas
-                  .map(
-                    (e) => `
+          .map(
+            (e) => `
                     <div>
-                        <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px;">${e.pregunta}</span>
+                        <span style="font-size: 0.8rem; color: #64748b; font-weight: 600; display: block; margin-bottom: 4px; word-wrap: break-word; white-space: normal;">${e.pregunta.replace(/_/g, ' ')}</span>
                         <strong style="color: #141b2b; font-size: 0.95rem;">${e.respuesta}</strong>
                     </div>
                 `,
-                  )
-                  .join("")}
+          )
+          .join("")}
             </div>
         </div>
       `;
@@ -303,7 +303,7 @@ function render_dashboard_by_role(
     if (isStudent) {
       let matAprobadas =
         alumno.materias_aprobadas !== undefined &&
-        alumno.materias_aprobadas !== null
+          alumno.materias_aprobadas !== null
           ? alumno.materias_aprobadas
           : "-";
       let respectoAlPlanText = "-";
@@ -438,7 +438,7 @@ function render_dashboard_by_role(
 
   if (isStudent) {
     if (instructorChartRow) instructorChartRow.style.display = "none";
-    if (mainChartsGrid) mainChartsGrid.style.gridTemplateColumns = "1fr 1fr";
+    if (mainChartsGrid) mainChartsGrid.style.gridTemplateColumns = "40% 60%";
     if (rightPanelContainer) rightPanelContainer.style.order = "-1";
     if (metricsListPanel) metricsListPanel.style.order = "1";
     if (entrevistaBanner) {
@@ -446,6 +446,7 @@ function render_dashboard_by_role(
         entrevistaBanner.style.display = "flex";
         entrevistaBanner.style.justifyContent = "space-between";
         entrevistaBanner.style.alignItems = "center";
+        entrevistaBanner.style.flexWrap = "wrap";
 
         let dateObj = new Date(entrevistaPendienteData.fecha);
         let formattedDate = !isNaN(dateObj)
@@ -453,15 +454,16 @@ function render_dashboard_by_role(
           : entrevistaPendienteData.fecha;
 
         entrevistaBanner.innerHTML = `
-          <div style="display: flex; align-items: center; gap: 8px;">
+
+          <div style="display: flex; align-items: center;">
               <span class="material-symbols-outlined" style="color: #3b82f6; font-size: 20px;">info</span>
               <span style="font-size: 0.85rem; font-weight: 800; color: #1e293b; letter-spacing: 0.5px;">ENTREVISTA PENDIENTE</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
+          <div style="display: flex; align-items: center;">
               <span class="material-symbols-outlined" style="font-size: 18px; color: #475569;">event</span>
               <span style="font-size: 0.85rem; font-weight: 700; color: #1e293b;">DÍA: ${formattedDate}</span>
           </div>
-          <div style="display: flex; align-items: center; gap: 6px;">
+          <div style="display: flex; align-items: center;">
               <span class="material-symbols-outlined" style="font-size: 18px; color: #475569;">person</span>
               <span style="font-size: 0.85rem; font-weight: 700; color: #1e293b;">TUTOR: ${entrevistaPendienteData.tutor}</span>
           </div>
@@ -605,95 +607,95 @@ function renderChart(
 
   const option = isStudent
     ? {
-        tooltip: {
-          trigger: "axis",
-          backgroundColor: "rgba(255, 255, 255, 0.95)",
-          borderColor: "#e2e8f0",
-          textStyle: { color: "#1e293b" },
-        },
-        grid: {
-          left: "5%",
-          right: "5%",
-          top: "10%",
-          bottom: "15%",
-          containLabel: true,
-        },
-        xAxis: {
-          type: "category",
-          data: xAxisDataPercepcion,
-          axisLine: { lineStyle: { color: "#cbd5e1" } },
-          axisLabel: { color: "#64748b", fontWeight: "500" },
-        },
-        yAxis: {
-          type: "value",
-          min: 0,
-          max: 100,
-          splitLine: { lineStyle: { type: "dashed", color: "#f1f5f9" } },
-          axisLine: { show: false },
-          axisLabel: { color: "#64748b" },
-        },
-        series: [
-          {
-            name: "Rendimiento",
-            type: "line",
-            data: seriesDataPercepcion,
-            smooth: true,
-            symbol: "circle",
-            symbolSize: 8,
-            itemStyle: { color: "#2563eb" },
-            lineStyle: { width: 3, color: "#2563eb" },
-            areaStyle: {
-              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                { offset: 0, color: "rgba(37,99,235,0.2)" },
-                { offset: 1, color: "rgba(37,99,235,0.0)" },
-              ]),
-            },
+      tooltip: {
+        trigger: "axis",
+        backgroundColor: "rgba(255, 255, 255, 0.95)",
+        borderColor: "#e2e8f0",
+        textStyle: { color: "#1e293b" },
+      },
+      grid: {
+        left: "5%",
+        right: "5%",
+        top: "10%",
+        bottom: "15%",
+        containLabel: true,
+      },
+      xAxis: {
+        type: "category",
+        data: xAxisDataPercepcion,
+        axisLine: { lineStyle: { color: "#cbd5e1" } },
+        axisLabel: { color: "#64748b", fontWeight: "500" },
+      },
+      yAxis: {
+        type: "value",
+        min: 0,
+        max: 100,
+        splitLine: { lineStyle: { type: "dashed", color: "#f1f5f9" } },
+        axisLine: { show: false },
+        axisLabel: { color: "#64748b" },
+      },
+      series: [
+        {
+          name: "Rendimiento",
+          type: "line",
+          data: seriesDataPercepcion,
+          smooth: true,
+          symbol: "circle",
+          symbolSize: 8,
+          itemStyle: { color: "#2563eb" },
+          lineStyle: { width: 3, color: "#2563eb" },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: "rgba(37,99,235,0.2)" },
+              { offset: 1, color: "rgba(37,99,235,0.0)" },
+            ]),
           },
-        ],
-        backgroundColor: "transparent",
-      }
+        },
+      ],
+      backgroundColor: "transparent",
+    }
     : {
-        tooltip: { trigger: "axis" },
-        visualMap: {
-          show: false,
-          pieces: [
-            { gt: 0, lte: 33, color: "#22C55E" },
-            { gt: 33, lte: 66, color: "#F59E0B" },
-            { gt: 66, lte: 100, color: "#EF4444" },
-          ],
-        },
-        grid: {
-          left: "5%",
-          right: "5%",
-          top: "10%",
-          bottom: "15%",
-          containLabel: true,
-        },
-        xAxis: {
-          type: "category",
-          data: xAxisDataSemaforo,
-          axisLine: { lineStyle: { color: "#dce2f7" } },
-          axisLabel: { color: "#434655" },
-        },
-        yAxis: {
-          type: "value",
-          min: 0,
-          max: 100,
-          splitLine: { lineStyle: { type: "dashed", color: "#e1e8fd" } },
-          axisLine: { show: false },
-          axisLabel: { color: "#434655", formatter: "{value}" },
-        },
-        series: [
-          {
-            name: "Score de Riesgo",
-            type: "line",
-            data: seriesDataSemaforo,
-            smooth: true,
-            symbolSize: 8,
-            lineStyle: { width: 3 },
-          },
+      tooltip: { trigger: "axis" },
+      visualMap: {
+        show: false,
+        pieces: [
+          { gt: 0, lte: 33, color: "#22C55E" },
+          { gt: 33, lte: 66, color: "#F59E0B" },
+          { gt: 66, lte: 100, color: "#EF4444" },
         ],
-      };
+      },
+      grid: {
+        left: "5%",
+        right: "5%",
+        top: "10%",
+        bottom: "15%",
+        containLabel: true,
+      },
+      xAxis: {
+        type: "category",
+        data: xAxisDataSemaforo,
+        axisLine: { lineStyle: { color: "#dce2f7" } },
+        axisLabel: { color: "#434655" },
+      },
+      yAxis: {
+        type: "value",
+        min: 0,
+        max: 100,
+        splitLine: { lineStyle: { type: "dashed", color: "#e1e8fd" } },
+        axisLine: { show: false },
+        axisLabel: { color: "#434655", formatter: "{value}" },
+      },
+      series: [
+        {
+          name: "Score de Riesgo",
+          type: "line",
+          data: seriesDataSemaforo,
+          smooth: true,
+          symbolSize: 8,
+          lineStyle: { width: 3 },
+        },
+      ],
+    };
 
   if (isStudent) {
     chartPercepcionInstance.setOption(option);
