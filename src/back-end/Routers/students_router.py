@@ -5,7 +5,6 @@ from Controllers import AlumnoController
 from fastapi import APIRouter, Depends, Header, HTTPException
 from pandas._libs.tslibs import timestamps
 from sqlalchemy.orm import Session
-from starlette.types import HTTPExceptionHandler
 
 router = APIRouter(
     prefix="/alumnos",

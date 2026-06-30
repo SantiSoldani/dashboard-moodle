@@ -26,25 +26,30 @@ class AlumnoDto:
 
 
 def Post_alumno_FromEncuesta(alumno: AlumnoDto, db):
-    query = text(
-        """INSERT INTO "Alumnos" (dni, nombre, apellido, email, fecha_inicio, carrera, materias_aprobadas, "PRE", plan_de_estudios) VALUES (:dni, :nombre, :apellido, :email, :fecha_inicio, :carrera, :materias_aprobadas, :pre, :plan_de_estudios)
-        ON CONFLICT (dni) DO UPDATE SET materias_aprobadas = :materias_aprobadas, "PRE" = :pre, plan_de_estudios = :plan_de_estudios"""
-    )
-    db.execute(
-        query,
-        {
-            "nombre": alumno.nombre,
-            "apellido": alumno.apellido,
-            "email": alumno.email,
-            "dni": alumno.dni,
-            "fecha_inicio": alumno.fecha_inicio,
-            "carrera": "industrial",
-            "materias_aprobadas": alumno.materias_aprobadas,
-            "pre": alumno.pre,
-            "plan_de_estudios": alumno.plan_de_estudios,
-        },
-    )
-    return db.commit()
+
+    try:
+        query = text(
+            """INSERT INTO "Alumnos" (dni, nombre, apellido, email, fecha_inicio, carrera, materias_aprobadas, "PRE", plan_de_estudios, cuatrimestre) VALUES (:dni, :nombre, :apellido, :email, :fecha_inicio, :carrera, :materias_aprobadas, :pre, :plan_de_estudios, :cuatrimestre)
+            ON CONFLICT (dni) DO UPDATE SET materias_aprobadas = :materias_aprobadas, "PRE" = :pre, plan_de_estudios = :plan_de_estudios, cuatrimestre = :cuatrimestre"""
+        )
+        db.execute(
+            query,
+            {
+                "nombre": alumno.nombre,
+                "apellido": alumno.apellido,
+                "email": alumno.email,
+                "dni": alumno.dni,
+                "fecha_inicio": alumno.fecha_inicio,
+                "carrera": "industrial",
+                "materias_aprobadas": alumno.materias_aprobadas,
+                "pre": alumno.pre,
+                "plan_de_estudios": alumno.plan_de_estudios,
+                "cuatrimestre": alumno.cuatrimestre,
+            },
+        )
+        return db.commit()
+    except Exception as e:
+        print(e)
 
 
 def Post_Alumno(alumno: AlumnoDto, db):
