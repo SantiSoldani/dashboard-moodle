@@ -268,7 +268,8 @@ def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
             ]
             - df["¿Cuantas materias estas atrasado respecto del plan de estudios?"]
         )
-    ) / 36
+        / 4
+    )
     print(df_final["EL"])
     df_final["EL"] = (
         df[

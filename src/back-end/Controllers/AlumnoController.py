@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import datetime
 from types import SimpleNamespace
 
 from Models import Alumno, Indicadores, Semaforo
@@ -26,6 +27,7 @@ def Post_alumnos_FromEncuesta(alumno: SimpleNamespace, db):
 
 
 def Post_alumnos(Alumnos: list[SimpleNamespace], db):
+    anio_actual = datetime.now().year
     for alumno in Alumnos:
         Alumno.Post_Alumno(
             Alumno.AlumnoDto(
@@ -33,7 +35,7 @@ def Post_alumnos(Alumnos: list[SimpleNamespace], db):
                 apellido=str(alumno.apellido),
                 email=str(alumno.email),
                 dni=str(alumno.dni),
-                fecha_inicio=-1,
+                fecha_inicio=anio_actual,
                 carrera=alumno.carrera,
                 materias_aprobadas=0,
                 pre=0,
