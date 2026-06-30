@@ -223,7 +223,7 @@ def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
     )
     print("df ", df)
     df_final["dni"] = df["Ingrese su DNI"].astype(str)
-    df_final["EA"] = (
+    df_final["EA"] = 1 - (
         df["¿Cuantas de las materias que cursaste aprobaste su cursada?"]
         / df["¿Cuantas materias cursaste este cuatrimestre?"]
     )
@@ -261,14 +261,13 @@ def limpiar_encuesta_cuatrimestral(file: BinaryIO, db) -> pd.DataFrame:
         print("TEXTO PARA DARME CUENTA", df_final.loc[mask, "R"])
 
     df_final["PDE"] = (
-        1
-        - abs(
+        abs(
             df[
                 "¿Cuantas materias adelantaste respecto del plan de estudios este cuatrimestre?"
             ]
             - df["¿Cuantas materias estas atrasado respecto del plan de estudios?"]
         )
-        / 4
+        / 5
     )
     print(df_final["EL"])
     df_final["EL"] = (

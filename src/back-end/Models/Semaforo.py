@@ -3,11 +3,12 @@ from datetime import date, datetime
 from types import SimpleNamespace
 
 from sqlalchemy import text
+from starlette.datastructures import UploadFile
 
 
 @dataclass
 class semaforoDTO:
-    dni_alumno: str | None
+    dni_alumno: str | None | UploadFile
     color: str | None
     score: float | None
 

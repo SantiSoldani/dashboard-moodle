@@ -56,7 +56,6 @@ def set_indicadores_cuatrimestrales(objeto: SimpleNamespace, db):
             "ac": objeto.ac,
         },
     )
-
     return
 
 
@@ -66,6 +65,8 @@ def get_indicadores_cuatrimestrales(db, dni):
                     SELECT ic.rap, ic.rac, ic.raf, ic.ac
                     FROM "indicadores_cuatrimestrales" ic
                     WHERE ic.dni_alumno = :dni
+                    ORDER BY created_at DESC
+                    LIMIT 1
                     """)
         row = db.execute(query, {"dni": dni}).mappings().fetchone()
         if row is None:

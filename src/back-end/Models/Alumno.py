@@ -8,14 +8,15 @@ from pydantic.networks import EmailStr
 from sqlalchemy import text
 from sqlalchemy.sql.selectable import elem
 from sqlalchemy.sql.sqltypes import SmallInteger
+from starlette.datastructures import UploadFile
 
 
 @dataclass
 class AlumnoDto:
     nombre: str
     apellido: str
-    email: EmailStr
-    dni: str
+    email: EmailStr | None | UploadFile
+    dni: str | None | UploadFile
     fecha_inicio: int
     materias_aprobadas: int
     pre: float

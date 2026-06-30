@@ -157,7 +157,7 @@ def calculo_cuatrimestral_from_df(df: pd.DataFrame, db):
     def get_color(score):
         if score <= 0.33:
             return "verde"
-        elif score <= 0.66:
+        elif score < 0.66:
             return "amarillo"
         else:
             return "rojo"
