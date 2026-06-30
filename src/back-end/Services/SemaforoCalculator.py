@@ -204,6 +204,9 @@ def calculo_cuatrimestral_from_df(df: pd.DataFrame, db):
                 ac = (
                     row["MATERIAS_APROBADAS"] + alumno.materias_aprobadas
                 ) / cantidad_acumulada
+                if ac > 1:
+                    ac = 1
+                ac = 1 - ac
                 score = (row["RAF"] + pre) / 2
                 objeto = {
                     "dni": dni,
