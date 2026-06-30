@@ -4,7 +4,7 @@ export const VISTA_HOME = `
         <!-- CABECERA PRINCIPAL -->
         <header class="page-header" style="display: flex; justify-content: space-between; align-items: flex-start; width: 100%; margin-bottom: 24px;">
             <div>
-                <h1>Panel del Instructor</h1>
+                <h1>Panel Docente/Tutor</h1>
                 <p class="subtitle">Visualizador de Datos de Alumnos</p>
                 <p id="currentDate" style="font-weight: 600; color: #3b82f6; margin-top: 6px; font-size: 0.92rem;"></p>
             </div>
